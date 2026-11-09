@@ -164,6 +164,25 @@ textarea.field{min-height:260px; font-family:var(--f-mono); font-size:14px; line
 .score{animation:pop .6s both}
 #confetti{position:fixed; inset:0; pointer-events:none; z-index:30}
 
+/* Три раздела химии */
+.branches{display:grid; gap:14px; grid-template-columns:1fr; margin-top:6px}
+@media (min-width:860px){ .branches{grid-template-columns:repeat(3,1fr)} }
+.branch{--bc:var(--accent); position:relative; overflow:hidden; display:flex; flex-direction:column; gap:12px; text-align:left; cursor:pointer; width:100%;
+  background:var(--surface); border:2px solid color-mix(in srgb, var(--bc) 35%, var(--line)); border-radius:22px; padding:18px; transition:transform .15s, box-shadow .15s, border-color .15s; animation:rise .4s both}
+.branch:hover{transform:translateY(-3px); border-color:var(--bc); box-shadow:0 14px 30px -16px var(--bc)}
+.branch:focus-visible{outline:3px solid var(--bc); outline-offset:3px}
+.branch::after{content:""; position:absolute; right:-40px; top:-40px; width:160px; height:160px; border-radius:50%; background:color-mix(in srgb, var(--bc) 14%, transparent); pointer-events:none}
+.branch .head{display:flex; gap:14px; align-items:center; position:relative}
+.btile{width:62px; height:70px; flex:none; border-radius:12px; background:var(--bc); color:#fff; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center}
+.btile i{position:absolute; top:4px; left:7px; font:500 11px var(--f-mono); font-style:normal; opacity:.9}
+.btile b{font:700 26px/1 var(--f-display)}
+.btile small{font-size:8.5px; font-weight:700; margin-top:4px; text-transform:uppercase; letter-spacing:.03em}
+.branch h2{font:700 1.15rem/1.2 var(--f-display); color:var(--ink)}
+.branch p{margin:0; color:var(--muted); font-size:.9rem; position:relative}
+.branch .foot{display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:.85rem; color:var(--muted); position:relative}
+.branch .bar2{max-width:none; margin-top:0}
+.branch.soon{opacity:.75}
+
 /* Test (exam) */
 .qnav{display:flex; flex-wrap:wrap; gap:6px; margin:12px 0 18px}
 .qn{width:36px; height:36px; border-radius:8px; border:1.5px solid var(--line); background:var(--surface); font:500 .85rem var(--f-mono); cursor:pointer}
@@ -805,7 +824,7 @@ function showResult(game, res, opts){
 }
 
 /* ================= Ученик ================= */
-const S = {student: store('chem_student'), data: null, topic: null, view: 'topics'};
+const S = {student: store('chem_student'), data: null, topic: null, section: null, view: 'topics'};
 const PH = ['var(--t-cross)','var(--t-quiz)','var(--warn)','var(--t-build)','var(--t-match)','var(--accent)','var(--t-test)'];
 
 function studentLogin(){
@@ -837,10 +856,18 @@ async function studentHome(){
   if (!S.data) app.innerHTML = '<div class="loading">Загружаем задания…</div>';
   try { S.data = await api('getStudentData', S.student.name, S.student.cls); }
   catch (e){ app.innerHTML = `<div class="wrap narrow"><div class="panel">Не удалось загрузить задания: ${esc(e.message)}<br><br><button class="btn" id="retry">Попробовать снова</button></div></div>`; document.getElementById('retry').onclick = studentHome; return; }
-  S.topic != null ? renderTopic(S.topic) : renderHome();
+  if (S.topic != null) renderTopic(S.topic); else if (S.section != null) renderSection(S.section); else renderHome();
 }
 
 const TYPE_ORDER = ['test', 'quiz', 'match', 'build', 'cross'];
+/* Три главных раздела. В каталоге тем учитель пишет: # Общая химия, # Органическая химия, # Неорганическая химия */
+const BRANCHES = [
+  {name: 'Общая химия', n: 1, sym: 'H', el: 'Водород', color: 'var(--t-match)', desc: 'Атом и периодический закон, химическая связь, моль, скорость реакций, растворы'},
+  {name: 'Органическая химия', n: 6, sym: 'C', el: 'Углерод', color: 'var(--t-build)', desc: 'Углеводороды, спирты, альдегиды, кислоты, жиры, углеводы, белки, полимеры'},
+  {name: 'Неорганическая химия', n: 26, sym: 'Fe', el: 'Железо', color: 'var(--t-quiz)', desc: 'Металлы и неметаллы, оксиды, кислоты, основания, соли, генетическая связь'}
+];
+const lc = s => String(s || '').trim().toLowerCase();
+const branchOf = name => BRANCHES.find(b => lc(b.name) === lc(name));
 function catalog(){
   const {games, topics} = S.data, cls = S.student.cls;
   const mine = games.filter(g => !g.className || g.className.toUpperCase().split(/[,\s]+/).includes(cls))
@@ -868,16 +895,17 @@ function catalog(){
 
 function topBar(back){
   return `<div class="row" style="justify-content:space-between">
-      ${back ? '<button class="btn sm ghost" id="backCat">← Все темы</button>' : '<div class="brand"><span class="el"><i>7</i>N</span><h1>Ramossitto</h1></div>'}
+      ${back ? `<button class="btn sm ghost" id="backCat">← ${esc(back)}</button>` : '<div class="brand"><span class="el"><i>7</i>N</span><h1>Ramossitto</h1></div>'}
       <div class="row" style="gap:8px"><span class="inst-slot"></span><span class="small muted">${esc(S.student.name)} · ${esc(S.student.cls)}</span>
         <button class="iconbtn" id="snd" aria-label="${SOUND ? 'Выключить звук' : 'Включить звук'}">${soundIcon()}</button>
         <button class="btn sm" id="chg">Выйти</button></div>
     </div>`;
 }
 function bindTop(){
-  document.getElementById('chg').onclick = () => { S.topic = null; S.data = null; studentLogin(); };
+  document.getElementById('chg').onclick = () => { S.topic = null; S.section = null; S.data = null; studentLogin(); };
   document.getElementById('snd').onclick = e => toggleSound(e.currentTarget);
-  const b = document.getElementById('backCat'); if (b) b.onclick = () => { S.topic = null; renderHome(); window.scrollTo(0, 0); };
+  const b = document.getElementById('backCat');
+  if (b) b.onclick = () => { if (S.topic != null){ S.topic = null; S.section != null ? renderSection(S.section) : renderHome(); } else { S.section = null; renderHome(); } window.scrollTo(0, 0); };
 }
 
 function renderHome(){
@@ -917,17 +945,51 @@ function renderHome(){
   const v = document.getElementById('view');
   if (S.view === 'rating') return renderRating(v, board);
   if (S.view === 'help') return renderHelp(v);
-  let ci = 0;
-  v.innerHTML = cat.length ? cat.map(sec => `<div class="sec">${sec.section ? `<h2>${esc(sec.section)}</h2>` : ''}<div class="grid2">${sec.topics.map(t => {
-      const d = t.games.filter(g => my[g.id]).length, test = t.games.find(g => g.type === 'test');
-      const games = t.games.length - (test ? 1 : 0), full = d === t.games.length, color = PH[(ci++) % 7];
-      return `<button class="card" data-t="${esc(t.title)}" style="animation-delay:${Math.min(ci, 10) * 40}ms"><span class="tnum" style="--tc:${color}">${full ? '✓' : t.num}</span>
-        <div class="grow"><h3>${esc(t.title)}</h3>
-          <div class="meta">${test ? '<span>Тест</span>' : ''}${games ? `<span>${plural(games, 'игра', 'игры', 'игр')}</span>` : ''}<span>${d} из ${t.games.length}</span></div>
-          <div class="bar2"><span style="width:${Math.round(d * 100 / t.games.length)}%"></span></div></div>
-        ${test && my[test.id] ? `<span class="pill ${pctClass(my[test.id].best)}">тест ${my[test.id].best}%</span>` : ''}
-      </button>`; }).join('')}</div></div>`).join('') : '<div class="empty panel" style="margin-top:20px">Учитель пока не задал заданий. Загляните позже.</div>';
-  v.querySelectorAll('.card').forEach(b => b.onclick = () => { sfx('tap'); renderTopic(b.dataset.t); window.scrollTo(0, 0); });
+  const statOf = topics => { const gs = topics.flatMap(t => t.games); return {topics: topics.length, total: gs.length, done: gs.filter(g => my[g.id]).length}; };
+  const others = cat.filter(sec => !branchOf(sec.section));
+  v.innerHTML = `<div class="branches">${BRANCHES.map((br, i) => {
+      const sec = cat.find(x => lc(x.section) === lc(br.name)), st = statOf(sec ? sec.topics : []);
+      return `<button class="branch ${st.total ? '' : 'soon'}" data-b="${esc(br.name)}" style="--bc:${br.color}; animation-delay:${i * 70}ms">
+        <div class="head"><span class="btile"><i>${br.n}</i><b>${br.sym}</b><small>${br.el}</small></span><h2>${br.name}</h2></div>
+        <p>${br.desc}</p>
+        <div class="bar2"><span style="width:${st.total ? Math.round(st.done * 100 / st.total) : 0}%"></span></div>
+        <div class="foot"><span>${st.total ? plural(st.topics, 'тема', 'темы', 'тем') : 'Скоро появятся задания'}</span>${st.total ? `<b style="color:var(--ink)">${st.done} из ${st.total}</b>` : ''}</div>
+      </button>`; }).join('')}</div>
+    ${others.map(sec => `<div class="sec"><h2>${esc(sec.section || 'Другие задания')}</h2><div class="grid2">${topicCards(sec.topics, my)}</div></div>`).join('')}`;
+  v.querySelectorAll('.branch').forEach(b => b.onclick = () => { sfx('tap'); renderSection(b.dataset.b); window.scrollTo(0, 0); });
+  v.querySelectorAll('.card').forEach(b => b.onclick = () => { sfx('tap'); S.section = null; renderTopic(b.dataset.t); window.scrollTo(0, 0); });
+}
+
+function topicCards(topics, my){
+  return topics.map((t, i) => {
+    const d = t.games.filter(g => my[g.id]).length, test = t.games.find(g => g.type === 'test');
+    const games = t.games.length - (test ? 1 : 0), full = d === t.games.length, color = PH[i % 7];
+    return `<button class="card" data-t="${esc(t.title)}" style="animation-delay:${Math.min(i, 10) * 40}ms"><span class="tnum" style="--tc:${color}">${full ? '✓' : i + 1}</span>
+      <div class="grow"><h3>${esc(t.title)}</h3>
+        <div class="meta">${test ? '<span>Тест</span>' : ''}${games ? `<span>${plural(games, 'игра', 'игры', 'игр')}</span>` : ''}<span>${d} из ${t.games.length}</span></div>
+        <div class="bar2"><span style="width:${Math.round(d * 100 / t.games.length)}%"></span></div></div>
+      ${test && my[test.id] ? `<span class="pill ${pctClass(my[test.id].best)}">тест ${my[test.id].best}%</span>` : ''}
+    </button>`; }).join('');
+}
+
+function renderSection(name){
+  const br = branchOf(name), my = S.data.my;
+  const sec = catalog().find(x => lc(x.section) === lc(name));
+  S.section = name; S.topic = null;
+  const topics = sec ? sec.topics : [];
+  const gs = topics.flatMap(t => t.games), done = gs.filter(g => my[g.id]).length;
+  app.innerHTML = `<div class="wrap">${topBar('Главная')}
+    <section class="hero" style="padding-bottom:22px">
+      <div class="row" style="gap:16px; flex-wrap:nowrap">
+        ${br ? `<span class="btile" style="--bc:${br.color}; background:${br.color}; width:70px; height:78px"><i>${br.n}</i><b>${br.sym}</b><small>${br.el}</small></span>` : ''}
+        <div class="grow"><h1>${esc(name)}</h1>
+          <div class="small muted" style="margin-top:6px">${topics.length ? `${plural(topics.length, 'тема', 'темы', 'тем')} · выполнено ${done} из ${gs.length}` : 'Учитель ещё не добавил задания в этот раздел'}</div></div>
+      </div>
+    </section>
+    ${topics.length ? `<div class="grid2" style="margin-top:18px">${topicCards(topics, my)}</div>` : '<div class="empty panel" style="margin-top:18px">Здесь скоро появятся тесты и игры. Загляните позже.</div>'}
+  </div>`;
+  bindTop();
+  app.querySelectorAll('.card').forEach(b => b.onclick = () => { sfx('tap'); renderTopic(b.dataset.t); window.scrollTo(0, 0); });
 }
 
 function renderRating(v, board){
@@ -963,9 +1025,10 @@ function renderHelp(v){
 function renderTopic(title){
   const cat = catalog(), my = S.data.my;
   const t = cat.flatMap(s => s.topics.map(x => ({...x, section: s.section}))).find(x => x.title === title);
-  if (!t){ S.topic = null; return renderHome(); }
+  if (!t){ S.topic = null; return S.section != null ? renderSection(S.section) : renderHome(); }
   S.topic = title;
-  app.innerHTML = `<div class="wrap">${topBar(true)}
+  if (branchOf(t.section)) S.section = branchOf(t.section).name;
+  app.innerHTML = `<div class="wrap">${topBar(S.section != null ? S.section : 'Главная')}
     <section class="hero" style="padding-bottom:22px">
       <div class="muted small">${esc(t.section)}</div>
       <h1 style="margin-top:4px">${esc(t.title)}</h1>
@@ -1038,8 +1101,9 @@ function renderTopics(){
   let text = '', sec = null;
   (d.topics || []).forEach(t => { if (t.section !== sec){ sec = t.section; if (sec) text += (text ? '\n' : '') + '# ' + sec + '\n'; } text += t.title + '\n'; });
   box.innerHTML = `<div class="panel" style="display:grid; gap:12px">
-    <div class="hint"><b>Каталог тем.</b> Одна тема — одна строка. Строка с # в начале — раздел (класс или глава). Порядок здесь — порядок у учеников. В задании указывайте тему точно так же, как она записана здесь.
-      <pre># 8 класс\nПервоначальные химические понятия\nСтроение атома\n# 9 класс\nЭлектролитическая диссоциация</pre></div>
+    <div class="hint"><b>Каталог тем.</b> У учеников три раздела: <b>Общая химия</b>, <b>Органическая химия</b>, <b>Неорганическая химия</b>. Строка с # — раздел, ниже — его темы, по одной на строку. Порядок здесь — порядок у учеников. В задании указывайте тему точно так же, как она записана здесь.
+      <pre># Общая химия\nСтроение атома\nХимическая связь\n# Органическая химия\nАлканы\n# Неорганическая химия\nКислоты</pre>
+      <button class="btn sm" id="tp-tpl" style="margin-top:8px">Добавить три раздела</button></div>
     <label class="label" for="tp-src">Темы</label>
     <textarea class="field" id="tp-src" spellcheck="false" style="min-height:340px">${esc(text)}</textarea>
     <div class="parse" id="tp-info"></div>
@@ -1054,6 +1118,12 @@ function renderTopics(){
       (orphan.length ? `<div class="err">• Есть задания с темами не из каталога: ${orphan.map(esc).join(', ')}</div>` : '');
   };
   ta.addEventListener('input', info); info();
+  document.getElementById('tp-tpl').onclick = () => {
+    const have = new Set(ta.value.split('\n').filter(l => l.trim()[0] === '#').map(l => lc(l.replace(/^\s*#+/, ''))));
+    const add = BRANCHES.filter(b => !have.has(lc(b.name))).map(b => '# ' + b.name).join('\n\n');
+    if (!add){ toast('Все три раздела уже есть'); return; }
+    ta.value = (ta.value.trim() ? ta.value.trim() + '\n\n' : '') + add + '\n'; info(); toast('Разделы добавлены. Впишите темы под каждым и сохраните');
+  };
   document.getElementById('tp-save').onclick = async e => {
     e.target.disabled = true;
     try { d.topics = await api('saveTopics', T.pw, parse()); toast('Каталог сохранён'); teacherHome(); }
