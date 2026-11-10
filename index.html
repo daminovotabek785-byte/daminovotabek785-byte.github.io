@@ -327,7 +327,7 @@ function fmt(s){
   return esc(s)
     .replace(/-&gt;/g, '→')
     .replace(/\^(\d*[+\-−])/g, '<sup>$1</sup>')
-    .replace(/([A-Za-z\)\]])(\d+)/g, '$1<sub>$2</sub>');
+    .replace(/([A-Za-z\)])(\d+)/g, '$1<sub>$2</sub>');
 }
 function shuffle(a){ a = a.slice(); for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 function tile(type, n){ const t = TYPES[type] || TYPES.quiz; return `<span class="tile" style="--tc:${t.color}"><i>${n || ''}</i><b>${t.sym}</b><small>${t.name}</small></span>`; }
@@ -371,7 +371,21 @@ function confetti(){
 const ELEMENTS = 'H Водород|He Гелий|Li Литий|Be Бериллий|B Бор|C Углерод|N Азот|O Кислород|F Фтор|Ne Неон|Na Натрий|Mg Магний|Al Алюминий|Si Кремний|P Фосфор|S Сера|Cl Хлор|Ar Аргон|K Калий|Ca Кальций|Sc Скандий|Ti Титан|V Ванадий|Cr Хром|Mn Марганец|Fe Железо|Co Кобальт|Ni Никель|Cu Медь|Zn Цинк|Ga Галлий|Ge Германий|As Мышьяк|Se Селен|Br Бром|Kr Криптон|Rb Рубидий|Sr Стронций|Y Иттрий|Zr Цирконий|Nb Ниобий|Mo Молибден|Tc Технеций|Ru Рутений|Rh Родий|Pd Палладий|Ag Серебро|Cd Кадмий|In Индий|Sn Олово|Sb Сурьма|Te Теллур|I Иод|Xe Ксенон'.split('|').map(s => { const [sym, name] = s.split(' '); return {sym, name}; });
 function levelOf(xp){ const n = Math.min(ELEMENTS.length, 1 + Math.floor(xp / 100)); return {n, ...ELEMENTS[n - 1], into: n >= ELEMENTS.length ? 100 : xp % 100, max: n >= ELEMENTS.length}; }
 function xpOf(my){ return Object.values(my || {}).reduce((s, r) => s + (r.best || 0), 0); }
-function store(k, v){ try { if (v === undefined) return JSON.parse(localStorage.getItem(k)); localStorage.setItem(k, JSON.stringify(v)); } catch(e){ return null; } }
+/* Память ученика: localStorage + запасная cookie на 2 года, чтобы имя вводилось один раз */
+function cookieGet(k){ try { const m = document.cookie.match(new RegExp('(?:^|; )' + k + '=([^;]*)')); return m ? decodeURIComponent(m[1]) : null; } catch(e){ return null; } }
+function cookieSet(k, v){ try { document.cookie = k + '=' + encodeURIComponent(v) + '; max-age=63072000; path=/; SameSite=Lax'; } catch(e){} }
+function store(k, v){
+  if (v === undefined){
+    let raw = null;
+    try { raw = localStorage.getItem(k); } catch(e){}
+    if (!raw) raw = cookieGet(k);
+    try { return raw ? JSON.parse(raw) : null; } catch(e){ return null; }
+  }
+  const raw = JSON.stringify(v);
+  try { localStorage.setItem(k, raw); } catch(e){}
+  cookieSet(k, raw);
+  try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch(e){}
+}
 function sstore(k, v){ try { if (v === undefined) return sessionStorage.getItem(k); if (v === null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, v); } catch(e){ return null; } }
 function deadlineText(d){
   if (!d) return '';
@@ -898,11 +912,16 @@ function topBar(back){
       ${back ? `<button class="btn sm ghost" id="backCat">← ${esc(back)}</button>` : '<div class="brand"><span class="el"><i>7</i>N</span><h1>Ramossitto</h1></div>'}
       <div class="row" style="gap:8px"><span class="inst-slot"></span><span class="small muted">${esc(S.student.name)} · ${esc(S.student.cls)}</span>
         <button class="iconbtn" id="snd" aria-label="${SOUND ? 'Выключить звук' : 'Включить звук'}">${soundIcon()}</button>
-        <button class="btn sm" id="chg">Выйти</button></div>
+        <button class="btn sm" id="chg" title="Войти под другим именем">Сменить</button></div>
     </div>`;
 }
 function bindTop(){
-  document.getElementById('chg').onclick = () => { S.topic = null; S.section = null; S.data = null; studentLogin(); };
+  let chgArmed = false;
+  document.getElementById('chg').onclick = e => {
+    const btn = e.currentTarget;
+    if (!chgArmed){ chgArmed = true; btn.textContent = 'Сменить ученика?'; setTimeout(() => { chgArmed = false; if (btn.isConnected) btn.textContent = 'Сменить'; }, 3000); return; }
+    S.topic = null; S.section = null; S.data = null; studentLogin();
+  };
   document.getElementById('snd').onclick = e => toggleSound(e.currentTarget);
   const b = document.getElementById('backCat');
   if (b) b.onclick = () => { if (S.topic != null){ S.topic = null; S.section != null ? renderSection(S.section) : renderHome(); } else { S.section = null; renderHome(); } window.scrollTo(0, 0); };
