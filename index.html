@@ -116,6 +116,29 @@ textarea.field{min-height:260px; font-family:var(--f-mono); font-size:14px; line
 .chat .pv{padding:0 14px; display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted)}
 .chat .pv img{height:48px; border-radius:8px}
 body:has(.fab) .wrap{padding-bottom:90px}
+/* Выбор предмета */
+.subj-hero{position:relative; overflow:hidden; border-radius:24px; padding:26px 20px 22px; margin-top:14px; background:radial-gradient(120% 90% at 0% 0%, #2B1F7A 0%, #171A45 55%, #0B3B2E 100%); color:#fff}
+.subj-hero h2{font:700 1.6rem/1.15 var(--f-display); margin:0; position:relative}
+.subj-hero p{margin:8px 0 0; opacity:.8; position:relative; max-width:34ch}
+.subj-hero .deco{position:absolute; inset:0; pointer-events:none; opacity:.22}
+.subjects{display:grid; gap:16px; margin-top:16px; grid-template-columns:1fr}
+@media (min-width:760px){ .subjects{grid-template-columns:1fr 1fr} }
+.subj{position:relative; overflow:hidden; border:0; border-radius:24px; min-height:210px; padding:22px; text-align:left; color:#fff; cursor:pointer; display:flex; flex-direction:column; justify-content:flex-end; gap:6px; box-shadow:0 18px 40px -22px var(--sc); transition:transform .15s, box-shadow .15s; animation:rise .45s both}
+.subj:hover{transform:translateY(-4px)}
+.subj:focus-visible{outline:3px solid var(--sc); outline-offset:3px}
+.subj.chem{--sc:#5B3BF0; background:linear-gradient(135deg,#4338F0 0%,#7B2FF7 60%,#B44CF0 100%)}
+.subj.bio{--sc:#13A06B; background:linear-gradient(135deg,#0E9F6E 0%,#22C55E 60%,#84CC16 100%); animation-delay:.08s}
+.subj .art{position:absolute; right:-10px; top:-6px; width:62%; max-width:260px; opacity:.95; pointer-events:none}
+.subj h3{font:700 1.7rem/1 var(--f-display); margin:0; position:relative}
+.subj .sub{position:relative; opacity:.9; font-size:.95rem; max-width:24ch}
+.subj .go{position:relative; margin-top:10px; align-self:flex-start; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); border-radius:999px; padding:8px 16px; font-weight:700; font-size:.95rem; backdrop-filter:blur(4px)}
+.subj .soon{position:absolute; right:18px; top:18px; background:#FFD447; color:#5A4300; font-weight:800; font-size:.8rem; padding:5px 12px; border-radius:999px; letter-spacing:.02em}
+.subj-page{position:relative}
+.subj-page::before{content:""; position:fixed; inset:0; z-index:-1; background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22240%22%20height%3D%22240%22%20viewBox%3D%220%200%20240%20240%22%20fill%3D%22none%22%20stroke%3D%22%236D5BF5%22%20stroke-opacity%3D%22.13%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M30%2020l18%2010v20L30%2060%2012%2050V30z%22/%3E%3Cpath%20d%3D%22M48%2030l18-10%2018%2010v20L66%2060%22/%3E%3Ccircle%20cx%3D%2240%22%20cy%3D%22150%22%20r%3D%227%22/%3E%3Ccircle%20cx%3D%2266%22%20cy%3D%22136%22%20r%3D%225%22/%3E%3Cpath%20d%3D%22M46%20146l15-7%22/%3E%3Cpath%20d%3D%22M150%2020h18M154%2020v26l-18%2034a8%208%200%200%200%207%2012h30a8%208%200%200%200%207-12l-18-34V20%22/%3E%3Cg%20stroke%3D%22%2316A34A%22%20stroke-opacity%3D%22.15%22%3E%3Cpath%20d%3D%22M180%20120c18%2014%2018%2028%200%2042s-18%2028%200%2042%22/%3E%3Cpath%20d%3D%22M204%20120c-18%2014-18%2028%200%2042s18%2028%200%2042%22/%3E%3Cpath%20d%3D%22M185%20133h14M185%20175h14%22/%3E%3Cpath%20d%3D%22M90%20200c0-22%2016-36%2036-38%202%2020-14%2038-36%2038z%22/%3E%3Cellipse%20cx%3D%22110%22%20cy%3D%2290%22%20rx%3D%2218%22%20ry%3D%2213%22/%3E%3Ccircle%20cx%3D%22113%22%20cy%3D%2289%22%20r%3D%224%22/%3E%3C/g%3E%3C/svg%3E") repeat, var(--bg)}
+@media (max-width:600px){ .subj .art{width:48%; right:-14px; top:auto; bottom:-8px; opacity:.55} .subj .sub{max-width:26ch} .subj{min-height:190px} }
+.subj h3,.subj .sub,.subj .go{z-index:1}
+.bio-soon{text-align:center; padding:28px 20px}
+.bio-soon svg{width:180px; height:auto}
 /* Element tile */
 .tile{--tc:var(--accent); width:64px; height:72px; flex:none; border-radius:12px; border:2px solid var(--tc); background:color-mix(in srgb, var(--tc) 12%, var(--surface)); position:relative; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding:0 2px 7px; overflow:hidden; color:var(--tc)}
 .tile i{position:absolute; top:3px; left:5px; font-style:normal; font:500 10px/1 var(--f-mono)}
@@ -975,6 +998,56 @@ async function helperSend(){
 }
 function stripHtml(h){ const d = document.createElement('div'); d.innerHTML = h; return (d.innerText || d.textContent || '').replace(/\n{3,}/g, '\n\n').trim(); }
 
+/* ================= Выбор предмета ================= */
+const ART_CHEM = `<svg viewBox="0 0 220 200" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+  <g opacity=".95"><path d="M70 20h30M78 20v46L46 132a14 14 0 0 0 12 20h54a14 14 0 0 0 12-20L92 66V20"/><path d="M58 112h54" opacity=".7"/>
+  <circle cx="70" cy="128" r="5" fill="#fff"/><circle cx="88" cy="120" r="4" fill="#fff"/><circle cx="96" cy="134" r="3" fill="#fff"/></g>
+  <g opacity=".75" transform="translate(140 40)"><path d="M30 0l26 15v30L30 60 4 45V15z"/><path d="M30 10l17 10v20L30 50 13 40V20z" opacity=".6"/></g>
+  <g opacity=".7"><circle cx="160" cy="150" r="10"/><circle cx="200" cy="130" r="7"/><circle cx="196" cy="176" r="7"/><path d="M169 146l24-12M168 156l22 15"/></g>
+  <g opacity=".6"><circle cx="128" cy="26" r="4" fill="#fff"/><circle cx="118" cy="48" r="3" fill="#fff"/></g></svg>`;
+const ART_BIO = `<svg viewBox="0 0 220 200" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+  <g opacity=".95"><path d="M60 10c40 30 40 60 0 90s-40 60 0 90"/><path d="M110 10c-40 30-40 60 0 90s40 60 0 90"/>
+  <path d="M66 30h38M72 55h26M66 80h38M66 120h38M72 145h26M66 170h38" opacity=".7"/></g>
+  <g opacity=".8" transform="translate(130 20)"><path d="M10 70C10 30 40 6 76 4c2 36-22 66-62 66z"/><path d="M14 66C30 48 46 32 66 16" opacity=".7"/></g>
+  <g opacity=".7"><ellipse cx="170" cy="150" rx="34" ry="26"/><circle cx="176" cy="148" r="9" fill="#fff" fill-opacity=".35"/><circle cx="152" cy="160" r="3" fill="#fff"/><circle cx="190" cy="134" r="3" fill="#fff"/></g></svg>`;
+function renderSubjects(){
+  S.subject = null; sstore('chem_subj', null);
+  const firstName = S.student.name.split(' ')[1] || S.student.name;
+  const nTests = S.data ? (S.data.games || []).length : 0;
+  app.innerHTML = `<div class="wrap subj-page">${topBar(false)}
+    <section class="subj-hero">
+      <svg class="deco" viewBox="0 0 400 160" preserveAspectRatio="xMidYMid slice" fill="none" stroke="#fff" stroke-width="2">
+        <g><path d="M20 30l14 8v16l-14 8-14-8V38z"/><path d="M34 38l14-8 14 8v16l-14 8"/><circle cx="90" cy="120" r="8"/><circle cx="120" cy="100" r="5"/><path d="M96 114l18-10"/></g>
+        <g><path d="M300 0c26 20 26 40 0 60s-26 40 0 60s26 40 0 60"/><path d="M330 0c-26 20-26 40 0 60s26 40 0 60s-26 40 0 60"/><path d="M306 20h20M306 80h20M306 140h20"/></g>
+        <g><circle cx="370" cy="40" r="16"/><circle cx="374" cy="38" r="5"/></g></svg>
+      <h2>Привет, ${esc(firstName)}! Что учим сегодня?</h2>
+      <p>Выбери предмет — внутри тесты, задачи и игры.</p>
+    </section>
+    <div class="subjects">
+      <button class="subj chem" id="sChem" aria-label="Химия"><span class="art">${ART_CHEM}</span>
+        <h3>Химия</h3><span class="sub">Общая, неорганическая и органическая химия${nTests ? ' · ' + nTests + ' заданий' : ''}</span><span class="go">Открыть →</span></button>
+      <button class="subj bio" id="sBio" aria-label="Биология — скоро"><span class="soon">Скоро</span><span class="art">${ART_BIO}</span>
+        <h3>Биология</h3><span class="sub">Клетка, генетика, растения, животные и человек</span><span class="go">Посмотреть</span></button>
+    </div></div>`;
+  bindTop();
+  document.querySelectorAll('.inst-slot').forEach(fillInstall);
+  document.getElementById('sChem').onclick = () => { sfx('tap'); S.subject = 'chem'; sstore('chem_subj', 'chem'); renderHome(); window.scrollTo(0, 0); };
+  document.getElementById('sBio').onclick = () => { sfx('tap'); renderBioSoon(); window.scrollTo(0, 0); };
+}
+function renderBioSoon(){
+  S.subject = 'bio';
+  app.innerHTML = `<div class="wrap subj-page">${topBar('Предметы')}
+    <div class="panel bio-soon" style="margin-top:16px">
+      <div style="background:linear-gradient(135deg,#0E9F6E,#22C55E); border-radius:20px; padding:18px; display:inline-block">${ART_BIO}</div>
+      <h2 style="margin:16px 0 6px">Биология скоро появится</h2>
+      <p class="muted" style="margin:0 auto; max-width:40ch">Учитель уже готовит тесты и задания по биологии. А пока можно потренироваться по химии!</p>
+      <button class="btn primary big" id="toChem" style="margin-top:18px">Перейти к химии</button>
+    </div></div>`;
+  bindTop();
+  document.querySelectorAll('.inst-slot').forEach(fillInstall);
+  document.getElementById('toChem').onclick = () => { S.subject = 'chem'; sstore('chem_subj', 'chem'); renderHome(); };
+}
+
 /* ================= Ученик ================= */
 const S = {student: store('chem_student'), data: null, topic: null, section: null, view: 'topics'};
 const PH = ['var(--t-cross)','var(--t-quiz)','var(--warn)','var(--t-build)','var(--t-match)','var(--accent)','var(--t-test)'];
@@ -1034,6 +1107,8 @@ async function studentHome(){
   if (!S.data) app.innerHTML = '<div class="loading">Загружаем задания…</div>';
   try { S.data = await api('getStudentData', S.student.name, S.student.cls); }
   catch (e){ app.innerHTML = `<div class="wrap narrow"><div class="panel">Не удалось загрузить задания: ${esc(e.message)}<br><br><button class="btn" id="retry">Попробовать снова</button></div></div>`; document.getElementById('retry').onclick = studentHome; return; }
+  if (!S.subject) S.subject = sstore('chem_subj');
+  if (S.subject !== 'chem') return renderSubjects();
   if (S.topic != null) renderTopic(S.topic); else if (S.section != null) renderSection(S.section); else renderHome();
 }
 
@@ -1085,11 +1160,11 @@ function bindTop(){
   document.getElementById('chg').onclick = e => {
     const btn = e.currentTarget;
     if (!chgArmed){ chgArmed = true; btn.textContent = 'Сменить ученика?'; setTimeout(() => { chgArmed = false; if (btn.isConnected) btn.textContent = 'Сменить'; }, 3000); return; }
-    S.topic = null; S.section = null; S.data = null; S.student = null; store('chem_student', null); setUrlStudent(null); studentLogin();
+    S.topic = null; S.section = null; S.subject = null; sstore('chem_subj', null); S.data = null; S.student = null; store('chem_student', null); setUrlStudent(null); studentLogin();
   };
   document.getElementById('snd').onclick = e => toggleSound(e.currentTarget);
   const b = document.getElementById('backCat');
-  if (b) b.onclick = () => { if (S.topic != null){ S.topic = null; S.section != null ? renderSection(S.section) : renderHome(); } else { S.section = null; renderHome(); } window.scrollTo(0, 0); };
+  if (b) b.onclick = () => { if (S.topic != null){ S.topic = null; S.section != null ? renderSection(S.section) : renderHome(); } else if (S.section != null){ S.section = null; renderHome(); } else renderSubjects(); window.scrollTo(0, 0); };
 }
 
 function renderHome(){
@@ -1099,7 +1174,7 @@ function renderHome(){
   const avg = done.length ? Math.round(done.reduce((s, g) => s + my[g.id].best, 0) / done.length) : 0;
   const xp = xpOf(my), L = levelOf(xp);
   const firstName = S.student.name.split(' ')[1] || S.student.name;
-  app.innerHTML = `<div class="wrap">${topBar(false)}
+  app.innerHTML = `<div class="wrap">${topBar('Предметы')}
     <section class="hero">
       <div class="row" style="gap:18px; align-items:center; flex-wrap:nowrap">
         <div class="lvl"><i>${L.n}</i><b>${L.sym}</b><small>${L.name}</small></div>
