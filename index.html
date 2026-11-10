@@ -605,11 +605,18 @@ function play(game, opts){
     } else t.textContent = fmtSec(ctx.elapsed());
   }, 500);
   let armed = false;
-  document.getElementById('exitBtn').onclick = e => {
-    if (!armed && !ctx.finished && ctx.elapsed() > 20){ armed = true; e.target.textContent = 'Точно выйти? Нажмите ещё раз'; setTimeout(() => { armed = false; if (e.target.isConnected) e.target.textContent = '← Выйти'; }, 3000); return; }
+  const exitClick = e => {
+    const btn = e.currentTarget;
+    if (!armed && !ctx.finished && ctx.elapsed() > 20){ armed = true; const was = btn.textContent; btn.textContent = 'Точно выйти? Нажмите ещё раз'; setTimeout(() => { armed = false; if (btn.isConnected) btn.textContent = was; }, 3000); return; }
     if (NAV.game && NAV.on && NAV.depth > 0) history.back(); else { NAV.game = null; ctx.finished = true; clearInterval(tick); opts.onExit && opts.onExit(); }
   };
+  document.getElementById('exitBtn').onclick = exitClick;
   const impl = GAMES[game.type](stage, parsed.items, ctx);
+  /* Кнопка «Выйти» и внизу экрана */
+  const eb = document.createElement('button'); eb.type = 'button'; eb.className = 'btn exitlow'; eb.textContent = '← Выйти'; eb.onclick = exitClick;
+  const tf = stage.querySelector('.tfoot .row');
+  if (tf) tf.prepend(eb);
+  else { const f = document.createElement('div'); f.className = 'tfoot'; f.innerHTML = '<div class="row" style="justify-content:center"></div>'; f.firstChild.appendChild(eb); stage.appendChild(f); }
 }
 
 const GAMES = {
