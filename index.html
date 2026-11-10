@@ -360,6 +360,61 @@ tr.sub td{background:var(--bg); font-size:.85rem; white-space:normal}
 .empty{text-align:center; padding:40px 16px; color:var(--muted)}
 @media (prefers-reduced-motion: reduce){*{transition:none!important; animation:none!important}}
 @media (max-width:520px){ .tile{width:56px; height:64px; padding-bottom:6px} .tile b{font-size:18px} .tile small{font-size:7px} .card{gap:12px; padding:12px} }
+/* Серии, награды, карточки */
+.hstats.h4{grid-template-columns:repeat(4,1fr)}
+.hstats .stk b{display:flex; align-items:center; gap:4px; color:#FFB547}
+.hstats .stk b svg{width:20px; height:20px}
+.hstats .stk.off b{color:var(--hero-muted)}
+@media (max-width:460px){ .hstats.h4{grid-template-columns:repeat(2,1fr)} }
+.nav button{font-size:14px; padding:10px 4px}
+.daily{display:flex; align-items:center; gap:12px; width:100%; text-align:left; margin:14px 0 4px; padding:14px 16px; border-radius:18px; border:0; cursor:pointer; color:#fff; background:linear-gradient(120deg,#F07F0A,#E2336B); box-shadow:0 10px 24px -12px #E2336B; font:inherit}
+.daily.done{background:linear-gradient(120deg,#139E4A,#0B94D1); box-shadow:0 10px 24px -12px #139E4A}
+.daily .dl{width:44px; height:44px; border-radius:14px; background:rgba(255,255,255,.2); display:grid; place-items:center; font-weight:800; font-size:20px; flex:none}
+.daily small{display:block; font-weight:700; opacity:.9; text-transform:uppercase; letter-spacing:.03em; font-size:11px}
+.daily b{display:block; font-size:16px; line-height:1.25; margin:2px 0}
+.daily span{font-size:13px; opacity:.9}
+.daily .go{font-weight:800; font-size:14px; white-space:nowrap; opacity:1}
+.streakp .weekrow{display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:16px}
+.wd{display:flex; flex-direction:column; align-items:center; gap:4px; font-size:12px; color:var(--muted); font-weight:700}
+.wd i{width:34px; height:34px; border-radius:50%; background:var(--sunk); display:grid; place-items:center; color:#F07F0A; font-style:normal}
+.wd.on i{background:#FFF1DE}
+.wd.today span{color:var(--accent)}
+.wd.today i{box-shadow:0 0 0 2px var(--accent)}
+.bigflame{width:56px; height:56px; border-radius:18px; background:var(--sunk); color:var(--muted); display:grid; place-items:center; flex:none}
+.bigflame svg{width:32px; height:32px}
+.bigflame.on{background:linear-gradient(140deg,#FFB547,#F07F0A); color:#fff}
+.badges{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; margin-top:10px}
+.badge{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:14px 10px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:4px}
+.badge b{font-size:14px; line-height:1.2}
+.badge span{font-size:12px; color:var(--muted); line-height:1.3}
+.badge:not(.got){opacity:.7}
+.bdg{width:56px; height:56px; border-radius:50%; display:grid; place-items:center; color:#fff; background:var(--bc); position:relative; box-shadow:inset 0 -4px 0 rgba(0,0,0,.18), 0 0 0 4px color-mix(in srgb, var(--bc) 25%, transparent); margin-bottom:4px}
+.badge .bdg b, .bpop .bdg b{font:800 15px var(--f-display); position:relative; color:#fff; z-index:1}
+.badge .bdg.off b{color:var(--muted)}
+.bdg svg{position:absolute; width:40px; height:40px; opacity:.28}
+.bdg.off{background:var(--sunk); color:var(--muted); box-shadow:inset 0 0 0 2px var(--line)}
+.bpop{position:fixed; left:50%; top:calc(16px + var(--sat)); transform:translateX(-50%); z-index:60; display:flex; gap:12px; align-items:center; background:var(--surface); color:var(--ink); border-radius:18px; padding:12px 16px 12px 12px; box-shadow:0 20px 40px -12px rgba(0,0,0,.35); border:1px solid var(--line); animation:bpop .4s ease-out; max-width:calc(100% - 32px)}
+.bpop .bdg{margin:0; flex:none}
+.bpop small{display:block; color:var(--accent); font-weight:800; font-size:12px; text-transform:uppercase}
+.bpop b{display:block}
+.bpop span{font-size:13px; color:var(--muted)}
+@keyframes bpop{from{opacity:0; transform:translate(-50%,-20px)} to{opacity:1; transform:translate(-50%,0)}}
+.cardsbtn{border-style:dashed !important}
+.fc{display:block; width:100%; min-height:260px; position:relative; border:0; background:transparent; cursor:pointer; perspective:1200px; padding:0; font:inherit; color:inherit}
+.fside{position:absolute; inset:0; border-radius:22px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:24px; text-align:center; backface-visibility:hidden; -webkit-backface-visibility:hidden; transition:transform .45s ease}
+.fside small{font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; opacity:.7}
+.fside b{font:700 clamp(1.15rem,4.6vw,1.6rem)/1.3 var(--f-display)}
+.fside i{font-size:12px; opacity:.6}
+.f1{background:var(--surface); border:1px solid var(--line); box-shadow:0 14px 30px -18px rgba(20,23,58,.35)}
+.f2{background:var(--hero); color:var(--hero-ink); transform:rotateY(180deg)}
+.fc.flip .f1{transform:rotateY(-180deg)}
+.fc.flip .f2{transform:rotateY(0)}
+.fcbtn{margin-top:16px}
+.fcbtn .btn{flex:1}
+@media (prefers-reduced-motion: reduce){ .fside{transition:none} }
+.rseg{display:inline-flex; gap:4px; background:var(--sunk); padding:4px; border-radius:12px; margin-bottom:12px}
+.rseg button{border:0; background:transparent; padding:7px 14px; border-radius:9px; font-weight:700; color:var(--muted); cursor:pointer}
+.rseg button.on{background:var(--surface); color:var(--accent)}
 </style>
 </head>
 <body>
@@ -417,7 +472,8 @@ function fmt(s){
     .replace(/([A-Za-z\)])(\d+)/g, '$1<sub>$2</sub>');
 }
 function shuffle(a){ a = a.slice(); for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
-function tile(type, n){ const t = TYPES[type] || TYPES.quiz; return `<span class="tile" style="--tc:${t.color}"><i>${n || ''}</i><b>${t.sym}</b><small>${t.name}</small></span>`; }
+const TILE_EXTRA = {cards: {name:'Карточки', sym:'Кт', color:'#139E4A'}};
+function tile(type, n){ const t = TYPES[type] || TILE_EXTRA[type] || TYPES.quiz; return `<span class="tile" style="--tc:${t.color}"><i>${n || ''}</i><b>${t.sym}</b><small>${t.name}</small></span>`; }
 function pctClass(p){ return p >= 80 ? 'good' : p >= 50 ? 'warn' : 'bad'; }
 function plural(n, a, b, c){ const m10 = n % 10, m100 = n % 100; return n + ' ' + (m10 === 1 && m100 !== 11 ? a : m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20) ? b : c); }
 function fmtSec(s){ s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
@@ -921,7 +977,9 @@ function showResult(game, res, opts){
   if (!opts.preview && S.data){
     const prev = (S.data.my[game.id] || {}).best || 0, before = xpOf(S.data.my), gain = Math.max(0, pct - prev);
     const m = S.data.my[game.id] || (S.data.my[game.id] = {best: 0, attempts: 0});
-    m.best = Math.max(m.best, pct); m.attempts++;
+    m.best = Math.max(m.best, pct); m.attempts++; m.last = todayStr();
+    if (!(S.data.days || []).includes(m.last)) (S.data.days = S.data.days || []).push(m.last);
+    setTimeout(checkNewBadges, 600);
     const lb = levelOf(before), la = levelOf(before + gain);
     xpHtml = gain ? `<div><span class="xp-gain">+${gain} опыта</span></div>` : `<div class="small muted" style="margin-top:10px">Опыт растёт, когда вы улучшаете свой лучший результат (сейчас ${prev}%)</div>`;
     if (la.n > lb.n) xpHtml += `<div class="lvlup">Новый уровень! Теперь вы — ${la.name} <b>${la.sym}</b> (№ ${la.n})</div>`;
@@ -1303,7 +1361,7 @@ function renderHome(){
   const done = all.filter(g => my[g.id]);
   const avg = done.length ? Math.round(done.reduce((s, g) => s + my[g.id].best, 0) / done.length) : 0;
   const xp = xpOf(my), L = levelOf(xp);
-  const firstName = S.student.name.split(' ')[1] || S.student.name;
+  const firstName = S.student.name.split(' ')[1] || S.student.name, stk = streakInfo();
   app.innerHTML = `<div class="wrap">${topBar('Предметы')}
     <section class="hero">
       <div class="row" style="gap:18px; align-items:center; flex-wrap:nowrap">
@@ -1315,7 +1373,8 @@ function renderHome(){
           <div class="small muted" style="margin-top:6px">${L.max ? 'Максимальный уровень!' : `${L.into} / 100 опыта до уровня «${ELEMENTS[L.n].name}»`}</div>
         </div>
       </div>
-      <div class="hstats">
+      <div class="hstats h4">
+        <div class="stk ${stk.cur ? '' : 'off'}"><b>${FLAME}${stk.cur}</b><span>${stk.today ? 'дней подряд' : stk.cur ? 'зайди сегодня!' : 'серия дней'}</span></div>
         <div><b>${done.length}/${all.length}</b><span>выполнено</span></div>
         <div><b>${done.length ? avg + '%' : '—'}</b><span>средний результат</span></div>
         <div><b>${board.myRank ? '#' + board.myRank : '—'}</b><span>место в классе</span></div>
@@ -1323,6 +1382,7 @@ function renderHome(){
     </section>
     <nav class="nav">
       <button data-v="topics" class="${S.view === 'topics' ? 'on' : ''}">Темы</button>
+      <button data-v="awards" class="${S.view === 'awards' ? 'on' : ''}">Награды</button>
       <button data-v="rating" class="${S.view === 'rating' ? 'on' : ''}">Рейтинг</button>
       <button data-v="help" class="${S.view === 'help' ? 'on' : ''}">Как играть</button>
     </nav>
@@ -1334,9 +1394,10 @@ function renderHome(){
   const v = document.getElementById('view');
   if (S.view === 'rating') return renderRating(v, board);
   if (S.view === 'help') return renderHelp(v);
+  if (S.view === 'awards') return renderAwards(v);
   const statOf = topics => { const gs = topics.flatMap(t => t.games); return {topics: topics.length, total: gs.length, done: gs.filter(g => my[g.id]).length}; };
   const others = cat.filter(sec => !branchOf(sec.section));
-  v.innerHTML = `<div class="branches${S.subject === 'bio' ? ' b4' : ''}">${curBranches().map((br, i) => {
+  v.innerHTML = dailyCardHtml() + `<div class="branches${S.subject === 'bio' ? ' b4' : ''}">${curBranches().map((br, i) => {
       const sec = cat.find(x => lc(x.section) === lc(br.name)), st = statOf(sec ? sec.topics : []);
       return `<button class="branch ${st.total ? '' : 'soon'}" data-b="${esc(br.name)}" style="--bc:${br.color}; animation-delay:${i * 70}ms">
         <div class="head"><span class="btile"><i>${br.n}</i><b>${br.sym}</b><small>${br.el}</small></span><h2>${br.name}</h2></div>
@@ -1345,6 +1406,7 @@ function renderHome(){
         <div class="foot"><span>${st.total ? plural(st.topics, 'тема', 'темы', 'тем') : 'Скоро появятся задания'}</span>${st.total ? `<b style="color:var(--ink)">${st.done} из ${st.total}</b>` : ''}</div>
       </button>`; }).join('')}</div>
     ${others.map(sec => `<div class="sec"><h2>${esc(sec.section || 'Другие задания')}</h2><div class="grid2">${topicCards(sec.topics, my)}</div></div>`).join('')}`;
+  bindDaily(); checkNewBadges();
   v.querySelectorAll('.branch').forEach(b => b.onclick = () => { sfx('tap'); navPush(); renderSection(b.dataset.b); window.scrollTo(0, 0); });
   v.querySelectorAll('.card').forEach(b => b.onclick = () => { sfx('tap'); S.section = null; navPush(); renderTopic(b.dataset.t); window.scrollTo(0, 0); });
 }
@@ -1381,16 +1443,186 @@ function renderSection(name){
   app.querySelectorAll('.card').forEach(b => b.onclick = () => { sfx('tap'); navPush(); renderTopic(b.dataset.t); window.scrollTo(0, 0); });
 }
 
-function renderRating(v, board){
+/* ================= Серии, задание дня, награды, карточки ================= */
+const FLAME = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 2c1 4-3 5-3 9a3 3 0 0 0 6 0c0-1-.5-2-1-3 3 1 5 4 5 7a7 7 0 0 1-14 0c0-6 6-8 7-13z" fill="currentColor"/></svg>';
+function dayAdd(d, n){ const t = new Date(d + 'T00:00:00Z'); t.setUTCDate(t.getUTCDate() + n); return t.toISOString().slice(0, 10); }
+function todayStr(){ return (S.data && S.data.today) || new Date().toISOString().slice(0, 10); }
+function lsKey(k){ return 'chem_' + k + '_' + lc((S.student && (S.student.email || S.student.name)) || ''); }
+function lsGet(k, def){ try { const v = JSON.parse(localStorage.getItem(lsKey(k))); return v == null ? def : v; } catch(e){ return def; } }
+function lsSet(k, v){ try { localStorage.setItem(lsKey(k), JSON.stringify(v)); } catch(e){} }
+function streakInfo(){
+  const set = new Set((S.data && S.data.days) || []), today = todayStr();
+  let cur = 0, d = set.has(today) ? today : dayAdd(today, -1);
+  while (set.has(d)){ cur++; d = dayAdd(d, -1); }
+  let best = 0, run = 0, prev = null;
+  [...set].sort().forEach(x => { run = prev && dayAdd(prev, 1) === x ? run + 1 : 1; best = Math.max(best, run); prev = x; });
+  return {cur, best: Math.max(best, cur), today: set.has(today), set};
+}
+function hashStr(s){ let h = 2166136261; for (const c of s){ h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+function dailyGame(){
+  const today = todayStr(), key = 'daily_' + (S.subject || 'chem');
+  const games = subjGames(S.subject === 'bio' ? 'bio' : 'chem'), my = S.data.my;
+  let pick = lsGet(key, null);
+  if (!pick || pick.date !== today || !games.some(g => g.id === pick.id)){
+    if (!games.length) return null;
+    let pool = games.filter(g => !my[g.id]);
+    if (!pool.length) pool = games.filter(g => (my[g.id].best || 0) < 100);
+    if (!pool.length) pool = games;
+    pool.sort((a, b) => a.id < b.id ? -1 : 1);
+    pick = {date: today, id: pool[hashStr(today + S.student.name + key) % pool.length].id};
+    lsSet(key, pick);
+  }
+  const g = games.find(x => x.id === pick.id);
+  const done = !!(g && my[g.id] && my[g.id].last === today);
+  if (done){ const ds = lsGet('dailydone', []); if (ds.indexOf(today) < 0){ ds.push(today); lsSet('dailydone', ds.slice(-400)); } }
+  return g ? {g, done} : null;
+}
+function cardsLearned(){ return lsGet('cards', {}); }
+function cardsTotalLearned(){ const c = cardsLearned(); return Object.values(c).reduce((s, a) => s + a.length, 0); }
+const BADGES = [
+  {id: 'first', sym: '1', name: 'Первый шаг', desc: 'Выполни первое задание', color: '#4338F0', test: s => s.done >= 1},
+  {id: 'g10', sym: '10', name: 'Десятка', desc: 'Выполни 10 заданий', color: '#0B94D1', test: s => s.done >= 10},
+  {id: 'g50', sym: '50', name: 'Полсотни', desc: 'Выполни 50 заданий', color: '#7B2FF7', test: s => s.done >= 50},
+  {id: 'g100', sym: '100', name: 'Сотня', desc: 'Выполни 100 заданий', color: '#B8001F', test: s => s.done >= 100},
+  {id: 'p1', sym: '★', name: 'Отличник', desc: 'Сдай задание на 100%', color: '#F2BE00', test: s => s.perfect >= 1},
+  {id: 'p10', sym: '★10', name: 'Звёздный', desc: '10 заданий на 100%', color: '#F07F0A', test: s => s.perfect >= 10},
+  {id: 'tests10', sym: 'Т', name: 'Тестировщик', desc: 'Пройди 10 тестов', color: '#7B2FF7', test: s => s.tests >= 10},
+  {id: 'cross5', sym: 'Кр', name: 'Кроссвордист', desc: 'Реши 5 кроссвордов', color: '#E2336B', test: s => s.cross >= 5},
+  {id: 'match5', sym: 'Пр', name: 'Найди пару', desc: 'Пройди 5 игр «Найди пару»', color: '#0B94D1', test: s => s.match >= 5},
+  {id: 's3', sym: '3', name: 'Разогрев', desc: 'Занимайся 3 дня подряд', color: '#F07F0A', flame: 1, test: s => s.streak >= 3},
+  {id: 's7', sym: '7', name: 'Неделя без пропусков', desc: 'Занимайся 7 дней подряд', color: '#E2336B', flame: 1, test: s => s.streak >= 7},
+  {id: 's30', sym: '30', name: 'Железная воля', desc: 'Занимайся 30 дней подряд', color: '#B8001F', flame: 1, test: s => s.streak >= 30},
+  {id: 'd5', sym: 'Д5', name: 'Задание дня ×5', desc: 'Выполни 5 заданий дня', color: '#139E4A', test: s => s.daily >= 5},
+  {id: 'c50', sym: 'К50', name: 'Знаток терминов', desc: 'Выучи 50 карточек', color: '#139E4A', test: s => s.cards >= 50},
+  {id: 'c200', sym: 'К200', name: 'Ходячий словарь', desc: 'Выучи 200 карточек', color: '#0B6E3A', test: s => s.cards >= 200},
+  {id: 'topic', sym: '✓', name: 'Тема закрыта', desc: 'Выполни все задания одной темы', color: '#4338F0', test: s => s.fullTopic >= 1},
+  {id: 'chem', sym: 'H', name: 'Химик', desc: 'Задания во всех разделах химии', color: '#139E4A', test: s => s.chemAll},
+  {id: 'bio', sym: 'Bt', name: 'Биолог', desc: 'Задания во всех разделах биологии', color: '#16A34A', test: s => s.bioAll}
+];
+function badgeStats(){
+  const my = S.data.my, games = S.data.games || [], byId = {};
+  games.forEach(g => byId[g.id] = g);
+  const doneIds = Object.keys(my).filter(id => byId[id]);
+  const cnt = t => doneIds.filter(id => byId[id].type === t).length;
+  const secOf = {}; (S.data.topics || []).forEach(t => secOf[lc(t.title)] = lc(t.section));
+  const secDone = new Set(doneIds.map(id => secOf[lc(byId[id].topic)]).filter(Boolean));
+  const topicGames = {}; games.forEach(g => (topicGames[lc(g.topic)] = topicGames[lc(g.topic)] || []).push(g.id));
+  const st = streakInfo();
+  return {done: doneIds.length, perfect: doneIds.filter(id => my[id].best >= 100).length, tests: cnt('test'), cross: cnt('cross'), match: cnt('match'),
+    streak: st.best, daily: lsGet('dailydone', []).length, cards: cardsTotalLearned(),
+    fullTopic: Object.values(topicGames).filter(ids => ids.length >= 2 && ids.every(id => my[id])).length,
+    chemAll: CHEM_BRANCHES.every(b => secDone.has(lc(b.name))), bioAll: BIO_BRANCHES.every(b => secDone.has(lc(b.name)))};
+}
+function badgeIcon(b, got){
+  return `<span class="bdg ${got ? '' : 'off'}" style="--bc:${b.color}">${b.flame ? FLAME : ''}<b>${esc(b.sym)}</b></span>`;
+}
+/* Новые награды — показываем поздравление (один раз) */
+function checkNewBadges(){
+  if (!S.data || !S.student) return;
+  const s = badgeStats(), had = lsGet('badges', null), got = BADGES.filter(b => b.test(s)).map(b => b.id);
+  lsSet('badges', got);
+  if (had === null) return;
+  const fresh = BADGES.filter(b => got.indexOf(b.id) >= 0 && had.indexOf(b.id) < 0);
+  fresh.forEach((b, i) => setTimeout(() => {
+    const t = document.createElement('div'); t.className = 'bpop';
+    t.innerHTML = `${badgeIcon(b, true)}<div><small>Новая награда!</small><b>${esc(b.name)}</b><span>${esc(b.desc)}</span></div>`;
+    document.body.appendChild(t); sfx('win'); setTimeout(() => t.remove(), 3800);
+  }, 900 + i * 4000));
+}
+function renderAwards(v){
+  const st = streakInfo(), s = badgeStats(), today = todayStr();
+  const week = []; for (let i = 6; i >= 0; i--) week.push(dayAdd(today, -i));
+  const WD = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+  const got = BADGES.filter(b => b.test(s)).length;
+  v.innerHTML = `<div class="sec">
+    <div class="panel streakp">
+      <div class="row" style="gap:14px; flex-wrap:nowrap">
+        <span class="bigflame ${st.cur ? 'on' : ''}">${FLAME}</span>
+        <div class="grow"><h2 style="margin:0">${st.cur ? plural(st.cur, 'день', 'дня', 'дней') + ' подряд' : 'Серия не начата'}</h2>
+          <div class="small muted">${st.today ? 'Сегодня ты уже занимался — так держать!' : st.cur ? 'Выполни любое задание сегодня, чтобы не потерять серию' : 'Выполни любое задание — и огонёк загорится'} · рекорд: ${st.best}</div></div>
+      </div>
+      <div class="weekrow">${week.map(d => `<div class="wd ${st.set.has(d) ? 'on' : ''} ${d === today ? 'today' : ''}"><i>${st.set.has(d) ? FLAME : ''}</i><span>${WD[new Date(d + 'T00:00:00Z').getUTCDay()]}</span></div>`).join('')}</div>
+    </div>
+    <h2 style="margin-top:22px">Награды <span class="muted small" style="font-weight:600">${got} из ${BADGES.length}</span></h2>
+    <div class="badges">${BADGES.map(b => { const ok = b.test(s); return `<div class="badge ${ok ? 'got' : ''}">${badgeIcon(b, ok)}<b>${esc(b.name)}</b><span>${esc(b.desc)}</span></div>`; }).join('')}</div>
+  </div>`;
+}
+function dailyCardHtml(){
+  const d = dailyGame(); if (!d) return '';
+  const t = TYPES[d.g.type] || TYPES.quiz;
+  return `<button class="daily ${d.done ? 'done' : ''}" id="dailyBtn">
+    <span class="dl">${d.done ? '✓' : FLAME}</span>
+    <div class="grow"><small>${d.done ? 'Задание дня выполнено!' : 'Задание дня'}</small><b>${esc(d.g.title)}</b><span>${esc(t.name)} · ${esc(d.g.topic)}</span></div>
+    <span class="go">${d.done ? 'Ещё раз' : 'Начать →'}</span></button>`;
+}
+function bindDaily(){
+  const b = document.getElementById('dailyBtn'); if (!b) return;
+  const d = dailyGame();
+  b.onclick = () => { sfx('tap'); navPush(); play(d.g, {onExit: studentHome}); };
+}
+/* Карточки для запоминания: из кроссвордов и «Найди пару» темы */
+function topicCardsItems(t){
+  const out = [], seen = new Set();
+  t.games.forEach(g => {
+    if (g.type === 'cross') PARSE.cross(g.source).items.forEach(x => { const k = lc(x.word); if (!seen.has(k)){ seen.add(k); out.push({front: x.clue, back: x.word.charAt(0) + x.word.slice(1).toLowerCase(), k}); } });
+    if (g.type === 'match') PARSE.match(g.source).items.forEach(x => { const k = lc(x.a + '=' + x.b); if (!seen.has(k)){ seen.add(k); out.push({front: x.a, back: x.b, k}); } });
+  });
+  return out;
+}
+function openCards(t){
+  const all = topicCardsItems(t); if (!all.length) return;
+  helperFab(false);
+  NAV.game = () => { helperFab(true); renderTopic(t.title); };
+  const store = cardsLearned(), learned = new Set(store[t.title] || []);
+  let queue = all.filter(c => !learned.has(c.k)); if (!queue.length) queue = all.slice();
+  queue = shuffle(queue.slice());
+  let flipped = false;
+  const save = () => { const st = cardsLearned(); st[t.title] = [...learned]; lsSet('cards', st); };
+  const exit = () => { if (NAV.on && NAV.depth > 0) history.back(); else { NAV.game = null; helperFab(true); renderTopic(t.title); } };
+  function draw(){
+    const k = all.filter(c => learned.has(c.k)).length;
+    if (!queue.length){
+      app.innerHTML = `<div class="wrap narrow"><div class="panel" style="text-align:center">
+        <div class="bigflame on" style="margin:0 auto">${FLAME}</div><h2>Все карточки выучены!</h2>
+        <p class="muted">${esc(t.title)}: ${k} из ${all.length}. Загляни сюда завтра, чтобы повторить.</p>
+        <div class="row" style="justify-content:center; margin-top:14px"><button class="btn big" id="cAgain">Повторить всё</button><button class="btn primary big" id="cBack">К заданиям</button></div></div></div>`;
+      confetti(); sfx('win'); checkNewBadges();
+      document.getElementById('cAgain').onclick = () => { queue = shuffle(all.slice()); draw(); };
+      document.getElementById('cBack').onclick = exit; return;
+    }
+    const c = queue[0]; flipped = false;
+    app.innerHTML = `<div class="bar"><div class="wrap"><div class="row"><button class="btn sm ghost" id="cX">← Выйти</button>
+        <div class="grow" style="font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">Карточки: ${esc(t.title)}</div><span class="small muted">${k}/${all.length}</span></div>
+        <div class="progress"><span style="width:${Math.round(k * 100 / all.length)}%"></span></div></div></div>
+      <div class="wrap narrow">
+        <p class="small muted" style="text-align:center; margin:4px 0 12px">Вспомни ответ и нажми на карточку, чтобы проверить себя</p>
+        <button class="fc" id="fc"><span class="fside f1"><small>${esc(t.title)}</small><b>${fmt(c.front)}</b><i>нажми, чтобы перевернуть</i></span><span class="fside f2"><small>Ответ</small><b>${fmt(c.back)}</b></span></button>
+        <div class="row fcbtn"><button class="btn big" id="cNo" disabled>Ещё повторю</button><button class="btn primary big" id="cYes" disabled>Знаю ✓</button></div>
+        <div class="tfoot"><div class="row" style="justify-content:center"><button class="btn" id="cX2">← Выйти</button><span class="small muted">Осталось: ${queue.length}</span></div></div>
+      </div>`;
+    const fc = document.getElementById('fc');
+    fc.onclick = () => { flipped = !flipped; fc.classList.toggle('flip', flipped); sfx('tap'); document.getElementById('cNo').disabled = document.getElementById('cYes').disabled = false; };
+    document.getElementById('cNo').onclick = () => { queue.push(queue.shift()); learned.delete(c.k); save(); draw(); };
+    document.getElementById('cYes').onclick = () => { queue.shift(); learned.add(c.k); save(); sfx('good'); draw(); };
+    document.getElementById('cX').onclick = document.getElementById('cX2').onclick = exit;
+  }
+  draw(); window.scrollTo(0, 0);
+}
+
+function renderRating(v, boardAll){
+  const wk = S.boardMode !== 'all' && boardAll.week;
+  const board = wk ? boardAll.week : boardAll;
   v.innerHTML = `<div class="sec"><h2>Рейтинг класса ${esc(S.student.cls)}</h2>
-    <p class="small muted" style="margin:-4px 0 12px">Опыт = сумма ваших лучших процентов по всем заданиям. Улучшайте результаты, чтобы подняться выше.</p>
+    ${boardAll.week ? `<div class="rseg"><button data-m="week" class="${wk ? 'on' : ''}">Эта неделя</button><button data-m="all" class="${wk ? '' : 'on'}">Всё время</button></div>` : ''}
+    <p class="small muted" style="margin:-4px 0 12px">${wk ? 'Опыт за эту неделю (с понедельника). Каждую неделю рейтинг начинается заново — у всех есть шанс!' : 'Опыт = сумма ваших лучших процентов по всем заданиям. Улучшайте результаты, чтобы подняться выше.'}</p>
     ${board.top.length ? `<div class="list">${board.top.map((r, i) => { const L = levelOf(r.xp); return `<div class="rank ${r.me ? 'me' : ''}" style="animation-delay:${i * 40}ms">
       <span class="medal ${i < 3 ? 'm' + (i + 1) : ''}">${i + 1}</span>
       <span class="mini" title="${L.name}">${L.sym}</span>
       <div class="grow"><b>${esc(r.name)}</b>${r.me ? ' <span class="pill none">это вы</span>' : ''}<div class="small muted">Уровень ${L.n} · ${L.name}</div></div>
       <b style="font-variant-numeric:tabular-nums">${r.xp}</b></div>`; }).join('')}</div>
       ${board.myRank > board.top.length ? `<p class="small muted" style="margin-top:12px">Ваше место: ${board.myRank} из ${board.total}</p>` : ''}`
-    : '<div class="empty panel">В вашем классе пока никто не прошёл задания. Будьте первым!</div>'}</div>`;
+    : `<div class="empty panel">${wk ? 'На этой неделе в классе ещё никто не занимался. Стань первым!' : 'В вашем классе пока никто не прошёл задания. Будьте первым!'}</div>`}</div>`;
+  v.querySelectorAll('.rseg button').forEach(b => b.onclick = () => { S.boardMode = b.dataset.m; sfx('tap'); renderRating(v, boardAll); });
 }
 
 function renderHelp(v){
@@ -1423,7 +1655,7 @@ function renderTopic(title){
       <h1 style="margin-top:4px">${esc(t.title)}</h1>
       <div class="small muted" style="margin-top:6px">Выполнено ${t.games.filter(g => my[g.id]).length} из ${t.games.length}. Начните с теста или разомнитесь на играх.</div>
     </section>
-    <div class="grid2" style="margin-top:18px">${t.games.map((g, i) => {
+    <div class="grid2" style="margin-top:18px">${topicCardsItems(t).length ? `<button class="card cardsbtn" id="cardsBtn">${tile('cards')}<div class="grow"><h3>Карточки: ${esc(t.title)}</h3><div class="meta"><span>${plural(topicCardsItems(t).length, 'термин', 'термина', 'терминов')}</span><span>выучено ${(cardsLearned()[t.title] || []).length}</span></div></div><span class="pill none">учить</span></button>` : ''}${t.games.map((g, i) => {
       const p = PARSE[g.type](g.source), r = my[g.id];
       const n = g.type === 'test' && g.count && g.count < p.items.length ? plural(g.count, 'вопрос', 'вопроса', 'вопросов') : p.label(p.items.length);
       return `<button class="card" data-id="${esc(g.id)}" style="animation-delay:${i * 50}ms">${tile(g.type, i + 1)}
@@ -1432,7 +1664,8 @@ function renderTopic(title){
         ${r ? `<span class="pill ${pctClass(r.best)}">${r.best}%</span>` : '<span class="pill none">новое</span>'}
       </button>`; }).join('')}</div></div>`;
   bindTop();
-  app.querySelectorAll('.card').forEach(b => b.onclick = () => { sfx('tap'); navPush(); play(t.games.find(g => g.id === b.dataset.id), {onExit: studentHome}); });
+  app.querySelectorAll('.card[data-id]').forEach(b => b.onclick = () => { sfx('tap'); navPush(); play(t.games.find(g => g.id === b.dataset.id), {onExit: studentHome}); });
+  const cb = document.getElementById('cardsBtn'); if (cb) cb.onclick = () => { sfx('tap'); navPush(); openCards(t); };
 }
 
 /* ================= Учитель ================= */
