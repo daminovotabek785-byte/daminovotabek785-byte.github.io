@@ -222,6 +222,7 @@ body:has(.fab) .wrap{padding-bottom:90px}
 /* Три раздела химии */
 .branches{display:grid; gap:14px; grid-template-columns:1fr; margin-top:6px}
 @media (min-width:860px){ .branches{grid-template-columns:repeat(3,1fr)} }
+@media (min-width:600px){ .branches.b4{grid-template-columns:repeat(2,1fr)} }
 .branch{--bc:var(--accent); position:relative; overflow:hidden; display:flex; flex-direction:column; gap:12px; text-align:left; cursor:pointer; width:100%;
   background:var(--surface); border:2px solid color-mix(in srgb, var(--bc) 35%, var(--line)); border-radius:22px; padding:18px; transition:transform .15s, box-shadow .15s, border-color .15s; animation:rise .4s both}
 .branch:hover{transform:translateY(-3px); border-color:var(--bc); box-shadow:0 14px 30px -16px var(--bc)}
@@ -1013,7 +1014,7 @@ const ART_BIO = `<svg viewBox="0 0 220 200" fill="none" stroke="#fff" stroke-wid
 function renderSubjects(){
   S.subject = null; sstore('chem_subj', null);
   const firstName = S.student.name.split(' ')[1] || S.student.name;
-  const nTests = S.data ? (S.data.games || []).length : 0;
+  const nChem = S.data ? subjGames('chem').length : 0, nBio = S.data ? subjGames('bio').length : 0;
   app.innerHTML = `<div class="wrap subj-page">${topBar(false)}
     <section class="subj-hero">
       <svg class="deco" viewBox="0 0 400 160" preserveAspectRatio="xMidYMid slice" fill="none" stroke="#fff" stroke-width="2">
@@ -1025,27 +1026,14 @@ function renderSubjects(){
     </section>
     <div class="subjects">
       <button class="subj chem" id="sChem" aria-label="Химия"><span class="art">${ART_CHEM}</span>
-        <h3>Химия</h3><span class="sub">Общая, неорганическая и органическая химия${nTests ? ' · ' + nTests + ' заданий' : ''}</span><span class="go">Открыть →</span></button>
-      <button class="subj bio" id="sBio" aria-label="Биология — скоро"><span class="soon">Скоро</span><span class="art">${ART_BIO}</span>
-        <h3>Биология</h3><span class="sub">Клетка, генетика, растения, животные и человек</span><span class="go">Посмотреть</span></button>
+        <h3>Химия</h3><span class="sub">Общая, неорганическая и органическая химия${nChem ? ' · ' + nChem + ' заданий' : ''}</span><span class="go">Открыть →</span></button>
+      <button class="subj bio" id="sBio" aria-label="Биология"><span class="art">${ART_BIO}</span>
+        <h3>Биология</h3><span class="sub">Ботаника, зоология, анатомия человека, общая биология${nBio ? ' · ' + nBio + ' заданий' : ''}</span><span class="go">Открыть →</span></button>
     </div></div>`;
   bindTop();
   document.querySelectorAll('.inst-slot').forEach(fillInstall);
   document.getElementById('sChem').onclick = () => { sfx('tap'); S.subject = 'chem'; sstore('chem_subj', 'chem'); renderHome(); window.scrollTo(0, 0); };
-  document.getElementById('sBio').onclick = () => { sfx('tap'); renderBioSoon(); window.scrollTo(0, 0); };
-}
-function renderBioSoon(){
-  S.subject = 'bio';
-  app.innerHTML = `<div class="wrap subj-page">${topBar('Предметы')}
-    <div class="panel bio-soon" style="margin-top:16px">
-      <div style="background:linear-gradient(135deg,#0E9F6E,#22C55E); border-radius:20px; padding:18px; display:inline-block">${ART_BIO}</div>
-      <h2 style="margin:16px 0 6px">Биология скоро появится</h2>
-      <p class="muted" style="margin:0 auto; max-width:40ch">Учитель уже готовит тесты и задания по биологии. А пока можно потренироваться по химии!</p>
-      <button class="btn primary big" id="toChem" style="margin-top:18px">Перейти к химии</button>
-    </div></div>`;
-  bindTop();
-  document.querySelectorAll('.inst-slot').forEach(fillInstall);
-  document.getElementById('toChem').onclick = () => { S.subject = 'chem'; sstore('chem_subj', 'chem'); renderHome(); };
+  document.getElementById('sBio').onclick = () => { sfx('tap'); S.subject = 'bio'; sstore('chem_subj', 'bio'); renderHome(); window.scrollTo(0, 0); };
 }
 
 /* ================= Ученик ================= */
@@ -1108,21 +1096,36 @@ async function studentHome(){
   try { S.data = await api('getStudentData', S.student.name, S.student.cls); }
   catch (e){ app.innerHTML = `<div class="wrap narrow"><div class="panel">Не удалось загрузить задания: ${esc(e.message)}<br><br><button class="btn" id="retry">Попробовать снова</button></div></div>`; document.getElementById('retry').onclick = studentHome; return; }
   if (!S.subject) S.subject = sstore('chem_subj');
-  if (S.subject !== 'chem') return renderSubjects();
+  if (S.subject !== 'chem' && S.subject !== 'bio') return renderSubjects();
   if (S.topic != null) renderTopic(S.topic); else if (S.section != null) renderSection(S.section); else renderHome();
 }
 
 const TYPE_ORDER = ['test', 'quiz', 'match', 'build', 'cross'];
 /* Три главных раздела. В каталоге тем учитель пишет: # Общая химия, # Органическая химия, # Неорганическая химия */
-const BRANCHES = [
+const CHEM_BRANCHES = [
   {name: 'Общая химия', n: 1, sym: 'H', el: 'Водород', color: 'var(--t-match)', desc: 'Атом и периодический закон, химическая связь, моль, скорость реакций, растворы'},
   {name: 'Органическая химия', n: 6, sym: 'C', el: 'Углерод', color: 'var(--t-build)', desc: 'Углеводороды, спирты, альдегиды, кислоты, жиры, углеводы, белки, полимеры'},
   {name: 'Неорганическая химия', n: 26, sym: 'Fe', el: 'Железо', color: 'var(--t-quiz)', desc: 'Металлы и неметаллы, оксиды, кислоты, основания, соли, генетическая связь'}
 ];
 const lc = s => String(s || '').trim().toLowerCase();
-const branchOf = name => BRANCHES.find(b => lc(b.name) === lc(name));
+/* Биология: # Ботаника, # Зоология, # Анатомия человека, # Общая биология */
+const BIO_BRANCHES = [
+  {name: 'Ботаника', n: 1, sym: 'Bt', el: 'Растения', color: '#16A34A', desc: 'Клетка и ткани растений, корень, побег, лист, цветок, плоды, водоросли, мхи, папоротники, грибы'},
+  {name: 'Зоология', n: 2, sym: 'Zo', el: 'Животные', color: '#D97706', desc: 'Простейшие, черви, моллюски, членистоногие, рыбы, земноводные, пресмыкающиеся, птицы, млекопитающие'},
+  {name: 'Анатомия человека', n: 3, sym: 'An', el: 'Человек', color: '#E0475B', desc: 'Ткани, ОДС, кровь, кровеносная и дыхательная системы, пищеварение, кожа, выделение, нервная система'},
+  {name: 'Общая биология', n: 4, sym: 'Gb', el: 'Клетка, гены', color: '#0D9488', desc: 'Клетка, обмен веществ, деление, генетика, селекция, эволюция, экология и биосфера'}
+];
+const BIO_SET = new Set(BIO_BRANCHES.map(b => b.name.toLowerCase()));
+const curBranches = () => S.subject === 'bio' ? BIO_BRANCHES : CHEM_BRANCHES;
+const branchOf = name => curBranches().find(b => lc(b.name) === lc(name));
+/* задания предмета: биология — темы из разделов BIO_BRANCHES, химия — всё остальное */
+function subjGames(subj){
+  const bio = new Set((S.data.topics || []).filter(t => BIO_SET.has(lc(t.section))).map(t => lc(t.title)));
+  return (S.data.games || []).filter(g => bio.has(lc(g.topic)) === (subj === 'bio'));
+}
 function catalog(){
-  const {games, topics} = S.data, cls = S.student.cls;
+  const isBio = S.subject === 'bio';
+  const topics = S.data.topics.filter(t => BIO_SET.has(lc(t.section)) === isBio), games = subjGames(isBio ? 'bio' : 'chem'), cls = S.student.cls;
   const mine = games.filter(g => !g.className || g.className.toUpperCase().split(/[,\s]+/).includes(cls))
     .sort((a, b) => TYPE_ORDER.indexOf(a.type) - TYPE_ORDER.indexOf(b.type));
   const key = s => String(s || '').trim().toLowerCase();
@@ -1138,7 +1141,7 @@ function catalog(){
     sec.topics.push({title: t.title, num: n, games: gs});
   });
   const rest = mine.filter(g => !used.has(g.id));
-  if (rest.length){
+  if (rest.length && !isBio){
     const sec = {section: 'Другие задания', topics: []};
     rest.forEach(g => { const t = g.topic.trim() || 'Без темы'; let tp = sec.topics.find(x => x.title === t); if (!tp) sec.topics.push(tp = {title: t, num: '•', games: []}); tp.games.push(g); });
     out.push(sec);
@@ -1206,7 +1209,7 @@ function renderHome(){
   if (S.view === 'help') return renderHelp(v);
   const statOf = topics => { const gs = topics.flatMap(t => t.games); return {topics: topics.length, total: gs.length, done: gs.filter(g => my[g.id]).length}; };
   const others = cat.filter(sec => !branchOf(sec.section));
-  v.innerHTML = `<div class="branches">${BRANCHES.map((br, i) => {
+  v.innerHTML = `<div class="branches${S.subject === 'bio' ? ' b4' : ''}">${curBranches().map((br, i) => {
       const sec = cat.find(x => lc(x.section) === lc(br.name)), st = statOf(sec ? sec.topics : []);
       return `<button class="branch ${st.total ? '' : 'soon'}" data-b="${esc(br.name)}" style="--bc:${br.color}; animation-delay:${i * 70}ms">
         <div class="head"><span class="btile"><i>${br.n}</i><b>${br.sym}</b><small>${br.el}</small></span><h2>${br.name}</h2></div>
@@ -1387,7 +1390,7 @@ function renderTopics(){
   ta.addEventListener('input', info); info();
   document.getElementById('tp-tpl').onclick = () => {
     const have = new Set(ta.value.split('\n').filter(l => l.trim()[0] === '#').map(l => lc(l.replace(/^\s*#+/, ''))));
-    const add = BRANCHES.filter(b => !have.has(lc(b.name))).map(b => '# ' + b.name).join('\n\n');
+    const add = CHEM_BRANCHES.filter(b => !have.has(lc(b.name))).map(b => '# ' + b.name).join('\n\n');
     if (!add){ toast('Все три раздела уже есть'); return; }
     ta.value = (ta.value.trim() ? ta.value.trim() + '\n\n' : '') + add + '\n'; info(); toast('Разделы добавлены. Впишите темы под каждым и сохраните');
   };
