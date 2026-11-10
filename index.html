@@ -87,6 +87,29 @@ textarea.field{min-height:260px; font-family:var(--f-mono); font-size:14px; line
 .authtabs{display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:5px; border-radius:14px; background:var(--surface); border:1px solid var(--line)}
 .authtabs button{border:0; background:transparent; padding:10px; border-radius:10px; font-weight:700; color:var(--muted); cursor:pointer; font-size:15px}
 .authtabs button.on{background:var(--accent); color:#fff}
+/* Помощник */
+.fab{position:fixed; right:16px; bottom:16px; z-index:15; display:flex; align-items:center; gap:8px; padding:12px 16px 12px 12px; border-radius:999px; border:0; background:var(--accent); color:#fff; font-weight:700; font-size:15px; box-shadow:0 10px 26px -8px var(--accent); cursor:pointer}
+.fab .el{width:30px; height:30px; border-radius:8px; background:#fff; color:var(--accent); display:grid; place-items:center; font:700 15px var(--f-display)}
+.chat{position:fixed; inset:0; z-index:30; background:rgba(10,12,40,.45); display:flex; justify-content:flex-end}
+.chat .sheet{width:min(460px,100%); height:100%; background:var(--bg); display:flex; flex-direction:column; box-shadow:-10px 0 40px rgba(0,0,0,.25)}
+.chat header{display:flex; align-items:center; gap:10px; padding:14px 16px; background:var(--hero); color:var(--hero-ink)}
+.chat header h2{font:700 1.05rem var(--f-display); margin:0; flex:1}
+.chat header .x{border:0; background:rgba(255,255,255,.15); color:inherit; width:36px; height:36px; border-radius:10px; font-size:20px; cursor:pointer}
+.chat .msgs{flex:1; overflow-y:auto; padding:14px 14px 4px; display:flex; flex-direction:column; gap:10px}
+.msg{max-width:88%; padding:10px 13px; border-radius:14px; line-height:1.45; font-size:15px; white-space:normal; overflow-wrap:anywhere}
+.msg.u{align-self:flex-end; background:var(--accent); color:#fff; border-bottom-right-radius:4px}
+.msg.m{align-self:flex-start; background:var(--surface); border:1px solid var(--line); border-bottom-left-radius:4px}
+.msg img{display:block; max-width:100%; border-radius:10px; margin-bottom:6px}
+.msg.wait{color:var(--muted); font-style:italic}
+.chat .quick{display:flex; gap:6px; flex-wrap:wrap; padding:6px 14px}
+.chat .quick button{border:1px solid var(--line); background:var(--surface); border-radius:999px; padding:6px 12px; font-size:13px; font-weight:600; cursor:pointer; color:var(--ink)}
+.chat form{display:flex; gap:8px; align-items:flex-end; padding:10px 14px 16px; border-top:1px solid var(--line); background:var(--surface)}
+.chat textarea{flex:1; resize:none; max-height:140px; min-height:44px; border:1px solid var(--line); border-radius:12px; padding:10px 12px; font:inherit; font-size:16px; background:var(--bg); color:var(--ink)}
+.chat .ib{width:44px; height:44px; flex:none; border-radius:12px; border:1px solid var(--line); background:var(--bg); cursor:pointer; display:grid; place-items:center; color:var(--ink)}
+.chat .ib.send{background:var(--accent); border-color:var(--accent); color:#fff}
+.chat .pv{padding:0 14px; display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted)}
+.chat .pv img{height:48px; border-radius:8px}
+body:has(.fab) .wrap{padding-bottom:90px}
 /* Element tile */
 .tile{--tc:var(--accent); width:64px; height:72px; flex:none; border-radius:12px; border:2px solid var(--tc); background:color-mix(in srgb, var(--tc) 12%, var(--surface)); position:relative; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding:0 2px 7px; overflow:hidden; color:var(--tc)}
 .tile i{position:absolute; top:3px; left:5px; font-style:normal; font:500 10px/1 var(--f-mono)}
@@ -481,6 +504,7 @@ const EXAMPLES = {
 
 /* ================= Игровой движок ================= */
 function play(game, opts){
+  helperFab(false); const _chat = document.getElementById('chat'); if (_chat) _chat.remove();
   opts = opts || {};
   const parsed = PARSE[game.type](game.source);
   if (!parsed.items.length){ toast('В этой игре нет заданий'); opts.onExit && opts.onExit(); return; }
@@ -831,6 +855,7 @@ function showResult(game, res, opts){
       </div>
       ${review ? `<h3 style="margin-top:24px; font-size:1rem">Разбор ошибок</h3>${review}` : ''}
       <div class="row" style="margin-top:20px">
+        ${!opts.preview && S.data && S.data.helper ? '<button class="btn big" id="askh">Разобрать с помощником</button>' : ''}
         <button class="btn big" id="again">Ещё раз</button>
         <button class="btn primary big grow" id="back">${opts.preview ? 'Назад в редактор' : 'К заданиям'}</button>
       </div>
@@ -841,6 +866,8 @@ function showResult(game, res, opts){
   window.scrollTo(0, 0);
   if (pct >= 80){ sfx('win'); confetti(); }
   document.getElementById('again').onclick = () => play(game, opts);
+  const ah = document.getElementById('askh');
+  if (ah) ah.onclick = () => openHelper('Я решал «' + game.title + '» и получил ' + pct + '%.' + (res.review ? ' Помоги разобраться с ошибками:\n' + stripHtml(res.review).slice(0, 3000) : ' С какими вопросами мне стоит разобраться?'));
   document.getElementById('back').onclick = () => opts.onExit && opts.onExit();
   const st = document.getElementById('sendState');
   if (opts.preview){ st.innerHTML = '<span class="pill warn">Режим проверки — результат не записан</span>'; return; }
@@ -852,6 +879,92 @@ function showResult(game, res, opts){
   };
   send();
 }
+
+/* ================= Помощник (ИИ) ================= */
+const H = {msgs: [], img: null, busy: false};
+function helperKey(){ return 'chem_chat_' + ((S.student && (S.student.email || S.student.name)) || ''); }
+function helperLoad(){ try { H.msgs = JSON.parse(localStorage.getItem(helperKey()) || '[]'); } catch(e){ H.msgs = []; } }
+function helperSave(){ try { localStorage.setItem(helperKey(), JSON.stringify(H.msgs.slice(-30).map(m => ({role: m.role, text: m.text})))); } catch(e){} }
+function helperFab(show){
+  let b = document.getElementById('fab');
+  const on = show && S.student && S.data && S.data.helper;
+  if (!on){ if (b) b.remove(); return; }
+  if (!b){ b = document.createElement('button'); b.id = 'fab'; b.className = 'fab'; b.innerHTML = '<span class="el">?</span>Помощник'; b.onclick = () => openHelper(); document.body.appendChild(b); }
+}
+function mdLite(t){
+  return esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/^\s*[\*\-]\s+/gm, '• ').replace(/\n/g, '<br>');
+}
+function openHelper(prefill){
+  if (!H.msgs.length) helperLoad();
+  helperFab(false);
+  const box = document.createElement('div'); box.className = 'chat'; box.id = 'chat';
+  box.innerHTML = `<div class="sheet" role="dialog" aria-label="Помощник">
+    <header><span class="lvl" style="width:38px;height:42px;padding:0 0 6px;animation:none;box-shadow:none"><b style="font-size:18px">?</b></span><h2>Помощник Ramossitto</h2><button class="x" id="hx" aria-label="Закрыть">×</button></header>
+    <div class="msgs" id="hm"></div>
+    <div class="quick"><button data-q="Дай подсказку, с чего начать">Подсказка</button><button data-q="Покажи полное решение по шагам">Покажи решение</button><button data-q="Объясни эту тему простыми словами">Объясни тему</button><button data-new="1">Новый вопрос</button></div>
+    <div class="pv" id="hpv"></div>
+    <form id="hf"><button type="button" class="ib" id="hcam" aria-label="Прикрепить фото"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h3l2-3h6l2 3h3v13H4z"/><circle cx="12" cy="13" r="4"/></svg></button>
+      <input type="file" id="hfile" accept="image/*" hidden>
+      <textarea id="ht" rows="1" placeholder="Задача или вопрос…"></textarea>
+      <button class="ib send" aria-label="Отправить"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></form>
+  </div>`;
+  document.body.appendChild(box);
+  const close = () => { box.remove(); helperFab(true); };
+  document.getElementById('hx').onclick = close;
+  box.onclick = e => { if (e.target === box) close(); };
+  const ta = document.getElementById('ht');
+  ta.oninput = () => { ta.style.height = 'auto'; ta.style.height = Math.min(140, ta.scrollHeight) + 'px'; };
+  ta.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey && window.innerWidth > 700){ e.preventDefault(); helperSend(); } };
+  document.getElementById('hf').onsubmit = e => { e.preventDefault(); helperSend(); };
+  box.querySelectorAll('.quick button').forEach(b => b.onclick = () => {
+    if (b.dataset.new){ H.msgs = []; helperSave(); helperRender(); return; }
+    ta.value = b.dataset.q; helperSend();
+  });
+  document.getElementById('hcam').onclick = () => document.getElementById('hfile').click();
+  document.getElementById('hfile').onchange = e => { const f = e.target.files[0]; if (f) helperPhoto(f); };
+  if (prefill){ ta.value = prefill; ta.oninput(); }
+  helperRender();
+  setTimeout(() => ta.focus(), 50);
+}
+function helperRender(){
+  const m = document.getElementById('hm'); if (!m) return;
+  const hello = `<div class="msg m">Привет, ${esc((S.student.name.split(' ')[1] || S.student.name))}! Пришлите задачу (текстом или фото) — я подскажу, с чего начать, а если нужно, покажу решение по шагам.</div>`;
+  m.innerHTML = hello + H.msgs.map(x => `<div class="msg ${x.role === 'user' ? 'u' : 'm'}">${x.img ? `<img src="${x.img}" alt="">` : ''}${mdLite(x.text)}</div>`).join('') + (H.busy ? '<div class="msg m wait">Думаю…</div>' : '');
+  m.scrollTop = m.scrollHeight;
+  const pv = document.getElementById('hpv');
+  pv.innerHTML = H.img ? `<img src="${H.img}" alt=""> Фото прикреплено <button class="btn sm ghost" id="hrm">Убрать</button>` : '';
+  if (H.img) document.getElementById('hrm').onclick = () => { H.img = null; helperRender(); };
+}
+function helperPhoto(file){
+  const r = new FileReader();
+  r.onload = () => {
+    const im = new Image();
+    im.onload = () => {
+      const k = Math.min(1, 1280 / Math.max(im.width, im.height));
+      const c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      H.img = c.toDataURL('image/jpeg', 0.8); helperRender();
+    };
+    im.src = r.result;
+  };
+  r.readAsDataURL(file);
+}
+async function helperSend(){
+  const ta = document.getElementById('ht'); if (!ta || H.busy) return;
+  const text = ta.value.trim();
+  if (!text && !H.img){ toast('Напишите вопрос или прикрепите фото'); return; }
+  const img = H.img;
+  H.msgs.push({role: 'user', text: text || 'Помоги с задачей на фото', img: img}); H.img = null; ta.value = ''; ta.style.height = '';
+  H.busy = true; helperRender();
+  try {
+    const res = await api('askHelper', S.student.name, S.student.cls, H.msgs.map(m => ({role: m.role, text: m.text})), img ? img.split(',')[1] : '');
+    H.msgs.push({role: 'model', text: res.text});
+  } catch (e){
+    H.msgs.push({role: 'model', text: 'Не получилось: ' + String(e && e.message || e).replace(/^(Exception|Error):\s*/, '')});
+  }
+  H.busy = false; helperSave(); helperRender();
+}
+function stripHtml(h){ const d = document.createElement('div'); d.innerHTML = h; return (d.innerText || d.textContent || '').replace(/\n{3,}/g, '\n\n').trim(); }
 
 /* ================= Ученик ================= */
 const S = {student: store('chem_student'), data: null, topic: null, section: null, view: 'topics'};
@@ -958,6 +1071,7 @@ function topBar(back){
     </div>`;
 }
 function bindTop(){
+  helperFab(true);
   let chgArmed = false;
   document.getElementById('chg').onclick = e => {
     const btn = e.currentTarget;
@@ -1139,6 +1253,11 @@ function teacherHome(){
       <div class="label" style="margin-bottom:6px">Ссылка для учеников</div>
       <div class="linkbox"><input class="field" id="slink" readonly value="${esc(studentUrl)}"><button class="btn" id="copy">Копировать</button></div>
     </div>
+    <div class="panel" style="margin-top:12px; padding:14px 16px">
+      <div class="label" style="margin-bottom:6px">Помощник для учеников (Google Gemini) — ${d.helper ? '<span class="pill good">включён</span>' : '<span class="pill warn">выключен</span>'}</div>
+      <div class="linkbox"><input class="field" id="gkey" type="password" autocomplete="off" placeholder="${d.helper ? 'Ключ сохранён. Вставьте новый, чтобы заменить' : 'Вставьте ключ из aistudio.google.com/apikey'}"><button class="btn" id="gsave">Сохранить</button>${d.helper ? '<button class="btn ghost" id="goff">Выключить</button>' : ''}</div>
+      <div class="small muted" style="margin-top:6px">Ключ хранится только на вашем Google-сервере. Ученики его не видят.</div>
+    </div>
     <div class="row" style="justify-content:space-between; margin:22px 0 16px">
       <div class="tabs"><button data-t="games" class="${T.tab === 'games' ? 'on' : ''}">Задания (${d.games.length})</button><button data-t="topics" class="${T.tab === 'topics' ? 'on' : ''}">Темы (${(d.topics || []).length})</button><button data-t="results" class="${T.tab === 'results' ? 'on' : ''}">Результаты (${d.results.length})</button></div>
       ${T.tab === 'games' ? '<button class="btn primary" id="new">+ Новое задание</button>' : ''}
@@ -1146,6 +1265,9 @@ function teacherHome(){
     <div id="tbody"></div></div>`;
   app.querySelectorAll('.tabs button').forEach(b => b.onclick = () => { T.tab = b.dataset.t; teacherHome(); });
   document.getElementById('refresh').onclick = teacherLoad;
+  const saveKey = async k => { try { const r = await api('setHelperKey', T.pw, k); T.data.helper = r.enabled; toast(r.enabled ? 'Помощник включён' : 'Помощник выключен'); teacherHome(); } catch (e){ toast(String(e.message || e).replace(/^(Exception|Error):\s*/, '')); } };
+  document.getElementById('gsave').onclick = () => { const k = document.getElementById('gkey').value.trim(); if (!k){ toast('Вставьте ключ'); return; } saveKey(k); };
+  const goff = document.getElementById('goff'); if (goff) goff.onclick = () => saveKey('');
   document.getElementById('logout').onclick = () => { sstore('chem_pw', null); T.pw = null; teacherLogin(); };
   document.getElementById('copy').onclick = () => {
     const inp = document.getElementById('slink');
