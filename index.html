@@ -415,6 +415,56 @@ tr.sub td{background:var(--bg); font-size:.85rem; white-space:normal}
 .rseg{display:inline-flex; gap:4px; background:var(--sunk); padding:4px; border-radius:12px; margin-bottom:12px}
 .rseg button{border:0; background:transparent; padding:7px 14px; border-radius:9px; font-weight:700; color:var(--muted); cursor:pointer}
 .rseg button.on{background:var(--surface); color:var(--accent)}
+
+/* Таблица Менделеева, дуэли, аналитика */
+.ptbtn{display:flex; align-items:center; gap:12px; width:100%; text-align:left; margin:10px 0 4px; padding:12px 14px; border-radius:18px; border:1px solid var(--line); background:var(--surface); cursor:pointer; font:inherit; color:var(--ink)}
+.ptbtn .pte{pointer-events:none}
+.ptbtn b{display:block; font-size:16px} .ptbtn span.s{font-size:13px; color:var(--muted)}
+.ptwrap{overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:8px}
+.ptgrid{display:grid; grid-template-columns:repeat(18, 46px); grid-template-rows:20px repeat(7, 52px) 12px 52px 52px; gap:3px; width:max-content}
+.ptg{font-size:11px; color:var(--muted); text-align:center; font-weight:700}
+.ptlab{font-size:10px; color:var(--muted); display:grid; place-items:center; border:1px dashed var(--line); border-radius:6px; height:100%}
+.pte{width:46px; height:52px; border:0; border-radius:7px; background:color-mix(in srgb, var(--pc) 40%, var(--surface)); color:var(--ink); position:relative; cursor:pointer; padding:0; display:flex; flex-direction:column; align-items:center; justify-content:center; font:inherit}
+.pte i{position:absolute; top:2px; left:3px; font:500 9px/1 var(--f-mono, monospace); font-style:normal; opacity:.8}
+.pte b{font:700 17px/1 var(--f-display)}
+.pte small{font-size:7.5px; line-height:1.1; margin-top:3px; max-width:44px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.pte:active{transform:scale(.95)}
+.ptlegend{display:flex; flex-wrap:wrap; gap:6px 14px; margin-top:10px; font-size:12px; color:var(--muted)}
+.ptlegend i{display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:5px; vertical-align:-2px}
+.ptsheet{position:fixed; inset:0; z-index:40; background:rgba(10,12,40,.45); display:flex; align-items:flex-end; justify-content:center}
+.ptcard{background:var(--bg); width:min(560px,100%); border-radius:22px 22px 0 0; padding:18px 18px calc(22px + env(safe-area-inset-bottom, 0px)); max-height:85vh; overflow-y:auto; animation:up .25s ease-out}
+@keyframes up{from{transform:translateY(40px); opacity:0} to{transform:none; opacity:1}}
+.ptcard .x{border:0; background:var(--sunk); width:38px; height:38px; border-radius:12px; font-size:22px; cursor:pointer; color:var(--ink); flex:none}
+.ptbig{width:76px; height:84px; border-radius:14px; background:color-mix(in srgb, var(--pc) 55%, var(--surface)); display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; flex:none}
+.ptbig i{position:absolute; top:5px; left:7px; font-size:12px; font-style:normal; font-weight:700}
+.ptbig b{font:800 30px/1 var(--f-display)} .ptbig small{font-size:11px; margin-top:4px}
+.ptdl{display:grid; grid-template-columns:auto 1fr; gap:8px 14px; margin:16px 0 0; font-size:15px}
+.ptdl dt{color:var(--muted); font-size:13px; padding-top:2px} .ptdl dd{margin:0; font-weight:600}
+@media (max-width:420px){ .ptdl{grid-template-columns:1fr; gap:2px} .ptdl dd{margin-bottom:8px} }
+.opt.ok{border-color:var(--good) !important; background:color-mix(in srgb, var(--good) 14%, var(--surface))}
+.opt.bad{border-color:var(--bad) !important; background:color-mix(in srgb, var(--bad) 12%, var(--surface))}
+.nav.n5 button{font-size:13px; padding:10px 2px}
+.navbadge{display:inline-grid; place-items:center; min-width:18px; height:18px; padding:0 5px; border-radius:9px; background:var(--bad); color:#fff; font-size:11px; margin-left:3px; vertical-align:1px}
+.dv{width:42px; height:42px; border-radius:12px; background:linear-gradient(140deg,#E2336B,#7B2FF7); color:#fff; display:grid; place-items:center; font:800 14px var(--f-display); flex:none}
+.dv.big{width:56px; height:56px; font-size:18px; border-radius:16px}
+.duel{display:flex; align-items:center; gap:12px; padding:12px 14px; margin-top:8px; border-radius:16px; background:var(--surface); border:1px solid var(--line)}
+.duel.in{border-color:#E2336B; box-shadow:0 0 0 2px color-mix(in srgb, #E2336B 25%, transparent)}
+.dplist{display:grid; gap:6px; max-height:46vh; overflow-y:auto}
+.dpn{text-align:left; padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:var(--surface); font:inherit; font-weight:600; color:var(--ink); cursor:pointer}
+.ankpi{display:grid; grid-template-columns:repeat(4,1fr); gap:10px}
+.ankpi div{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:12px}
+.ankpi b{display:block; font:700 1.4rem var(--f-display)} .ankpi span{font-size:12px; color:var(--muted)}
+@media (max-width:600px){ .ankpi{grid-template-columns:repeat(2,1fr)} }
+.angrid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px}
+@media (max-width:760px){ .angrid{grid-template-columns:1fr} }
+.angrid h3, .panel > h3{margin:0 0 2px}
+.anbar{display:grid; grid-template-columns:minmax(0,1.3fr) 1fr auto; gap:10px; align-items:center; font-size:14px; margin-top:8px}
+.anbar span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.anbar div{height:10px; border-radius:6px; background:var(--sunk); overflow:hidden} .anbar i{display:block; height:100%; border-radius:6px}
+.anrow{display:flex; justify-content:space-between; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid var(--line); font-size:14px}
+.anq{display:flex; gap:12px; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--line)}
+.anq .pill{flex:none; min-width:52px; text-align:center}
+.spark{display:inline-flex; align-items:flex-end; gap:2px; height:22px} .spark i{width:7px; min-height:2px; background:var(--accent); border-radius:2px; opacity:.85}
 </style>
 </head>
 <body>
@@ -971,6 +1021,7 @@ function buildCrossword(words){
 
 /* Экран результата */
 function showResult(game, res, opts){
+  if (opts.onResult) return opts.onResult(res);
   const pct = res.max ? Math.round(res.score * 100 / res.max) : 0;
   const mood = pct >= 90 ? 'Блестяще!' : pct >= 70 ? 'Хорошая работа!' : pct >= 50 ? 'Неплохо, но можно лучше' : 'Стоит повторить тему';
   let xpHtml = '';
@@ -1380,11 +1431,12 @@ function renderHome(){
         <div><b>${board.myRank ? '#' + board.myRank : '—'}</b><span>место в классе</span></div>
       </div>
     </section>
-    <nav class="nav">
+    <nav class="nav n5">
       <button data-v="topics" class="${S.view === 'topics' ? 'on' : ''}">Темы</button>
+      <button data-v="duels" class="${S.view === 'duels' ? 'on' : ''}">Дуэли${S.data.duel && S.data.duel.pending ? `<span class="navbadge">${S.data.duel.pending}</span>` : ''}</button>
       <button data-v="awards" class="${S.view === 'awards' ? 'on' : ''}">Награды</button>
       <button data-v="rating" class="${S.view === 'rating' ? 'on' : ''}">Рейтинг</button>
-      <button data-v="help" class="${S.view === 'help' ? 'on' : ''}">Как играть</button>
+      <button data-v="help" class="${S.view === 'help' ? 'on' : ''}" aria-label="Как играть">?</button>
     </nav>
     <div id="view"></div>
   </div>`;
@@ -1395,9 +1447,10 @@ function renderHome(){
   if (S.view === 'rating') return renderRating(v, board);
   if (S.view === 'help') return renderHelp(v);
   if (S.view === 'awards') return renderAwards(v);
+  if (S.view === 'duels') return renderDuels(v);
   const statOf = topics => { const gs = topics.flatMap(t => t.games); return {topics: topics.length, total: gs.length, done: gs.filter(g => my[g.id]).length}; };
   const others = cat.filter(sec => !branchOf(sec.section));
-  v.innerHTML = dailyCardHtml() + `<div class="branches${S.subject === 'bio' ? ' b4' : ''}">${curBranches().map((br, i) => {
+  v.innerHTML = dailyCardHtml() + (S.subject !== 'bio' ? `<button class="ptbtn" id="ptOpen"><span class="pte" style="--pc:#6FA8DC"><i>26</i><b>Fe</b><small>Железо</small></span><div class="grow"><b>Таблица Менделеева</b><span class="s">Все 118 элементов · игра «Угадай элемент»</span></div><span class="pill none">открыть</span></button>` : '') + `<div class="branches${S.subject === 'bio' ? ' b4' : ''}">${curBranches().map((br, i) => {
       const sec = cat.find(x => lc(x.section) === lc(br.name)), st = statOf(sec ? sec.topics : []);
       return `<button class="branch ${st.total ? '' : 'soon'}" data-b="${esc(br.name)}" style="--bc:${br.color}; animation-delay:${i * 70}ms">
         <div class="head"><span class="btile"><i>${br.n}</i><b>${br.sym}</b><small>${br.el}</small></span><h2>${br.name}</h2></div>
@@ -1407,6 +1460,7 @@ function renderHome(){
       </button>`; }).join('')}</div>
     ${others.map(sec => `<div class="sec"><h2>${esc(sec.section || 'Другие задания')}</h2><div class="grid2">${topicCards(sec.topics, my)}</div></div>`).join('')}`;
   bindDaily(); checkNewBadges();
+  const pto = document.getElementById('ptOpen'); if (pto) pto.onclick = () => { sfx('tap'); navPush(); renderPT(); };
   v.querySelectorAll('.branch').forEach(b => b.onclick = () => { sfx('tap'); navPush(); renderSection(b.dataset.b); window.scrollTo(0, 0); });
   v.querySelectorAll('.card').forEach(b => b.onclick = () => { sfx('tap'); S.section = null; navPush(); renderTopic(b.dataset.t); window.scrollTo(0, 0); });
 }
@@ -1497,7 +1551,10 @@ const BADGES = [
   {id: 'c200', sym: 'К200', name: 'Ходячий словарь', desc: 'Выучи 200 карточек', color: '#0B6E3A', test: s => s.cards >= 200},
   {id: 'topic', sym: '✓', name: 'Тема закрыта', desc: 'Выполни все задания одной темы', color: '#4338F0', test: s => s.fullTopic >= 1},
   {id: 'chem', sym: 'H', name: 'Химик', desc: 'Задания во всех разделах химии', color: '#139E4A', test: s => s.chemAll},
-  {id: 'bio', sym: 'Bt', name: 'Биолог', desc: 'Задания во всех разделах биологии', color: '#16A34A', test: s => s.bioAll}
+  {id: 'bio', sym: 'Bt', name: 'Биолог', desc: 'Задания во всех разделах биологии', color: '#16A34A', test: s => s.bioAll},
+  {id: 'du1', sym: 'VS', name: 'Дуэлянт', desc: 'Выиграй дуэль', color: '#E2336B', test: s => s.duelWins >= 1},
+  {id: 'du5', sym: 'VS5', name: 'Чемпион дуэлей', desc: 'Выиграй 5 дуэлей', color: '#7B2FF7', test: s => s.duelWins >= 5},
+  {id: 'pt9', sym: 'Fe', name: 'Знаток таблицы', desc: '9 из 10 в игре «Угадай элемент»', color: '#0B94D1', test: s => s.ptbest >= 9}
 ];
 function badgeStats(){
   const my = S.data.my, games = S.data.games || [], byId = {};
@@ -1511,7 +1568,8 @@ function badgeStats(){
   return {done: doneIds.length, perfect: doneIds.filter(id => my[id].best >= 100).length, tests: cnt('test'), cross: cnt('cross'), match: cnt('match'),
     streak: st.best, daily: lsGet('dailydone', []).length, cards: cardsTotalLearned(),
     fullTopic: Object.values(topicGames).filter(ids => ids.length >= 2 && ids.every(id => my[id])).length,
-    chemAll: CHEM_BRANCHES.every(b => secDone.has(lc(b.name))), bioAll: BIO_BRANCHES.every(b => secDone.has(lc(b.name)))};
+    chemAll: CHEM_BRANCHES.every(b => secDone.has(lc(b.name))), bioAll: BIO_BRANCHES.every(b => secDone.has(lc(b.name))),
+    duelWins: (S.data.duel && S.data.duel.wins) || 0, ptbest: lsGet('ptbest', 0)};
 }
 function badgeIcon(b, got){
   return `<span class="bdg ${got ? '' : 'off'}" style="--bc:${b.color}">${b.flame ? FLAME : ''}<b>${esc(b.sym)}</b></span>`;
@@ -1607,6 +1665,244 @@ function openCards(t){
     document.getElementById('cX').onclick = document.getElementById('cX2').onclick = exit;
   }
   draw(); window.scrollTo(0, 0);
+}
+
+/* ================= Таблица Менделеева ================= */
+const PT = [[1,"H","Водород","1.008",1,1,"nm","1s¹",2.2,"+1, −1"],[2,"He","Гелий","4.003",1,18,"ng","1s²",null,""],[3,"Li","Литий","6.94",2,1,"alk","[He] 2s¹",0.98,"+1"],[4,"Be","Бериллий","9.012",2,2,"ae","[He] 2s²",1.57,"+2"],[5,"B","Бор","10.81",2,13,"met","[He] 2s²2p¹",2.04,"+3"],[6,"C","Углерод","12.011",2,14,"nm","[He] 2s²2p²",2.55,"−4, +2, +4"],[7,"N","Азот","14.007",2,15,"nm","[He] 2s²2p³",3.04,"−3, +1…+5"],[8,"O","Кислород","15.999",2,16,"nm","[He] 2s²2p⁴",3.44,"−2 (−1 в пероксидах)"],[9,"F","Фтор","18.998",2,17,"hal","[He] 2s²2p⁵",3.98,"−1"],[10,"Ne","Неон","20.180",2,18,"ng","[He] 2s²2p⁶",null,""],[11,"Na","Натрий","22.990",3,1,"alk","[Ne] 3s¹",0.93,"+1"],[12,"Mg","Магний","24.305",3,2,"ae","[Ne] 3s²",1.31,"+2"],[13,"Al","Алюминий","26.982",3,13,"pt","[Ne] 3s²3p¹",1.61,"+3"],[14,"Si","Кремний","28.085",3,14,"met","[Ne] 3s²3p²",1.9,"−4, +4"],[15,"P","Фосфор","30.974",3,15,"nm","[Ne] 3s²3p³",2.19,"−3, +3, +5"],[16,"S","Сера","32.06",3,16,"nm","[Ne] 3s²3p⁴",2.58,"−2, +4, +6"],[17,"Cl","Хлор","35.45",3,17,"hal","[Ne] 3s²3p⁵",3.16,"−1, +1, +3, +5, +7"],[18,"Ar","Аргон","39.95",3,18,"ng","[Ne] 3s²3p⁶",null,""],[19,"K","Калий","39.098",4,1,"alk","[Ar] 4s¹",0.82,"+1"],[20,"Ca","Кальций","40.078",4,2,"ae","[Ar] 4s²",1.0,"+2"],[21,"Sc","Скандий","44.956",4,3,"tm","[Ar] 3d¹4s²",1.36,""],[22,"Ti","Титан","47.867",4,4,"tm","[Ar] 3d²4s²",1.54,"+4"],[23,"V","Ванадий","50.942",4,5,"tm","[Ar] 3d³4s²",1.63,""],[24,"Cr","Хром","51.996",4,6,"tm","[Ar] 3d⁵4s¹",1.66,"+2, +3, +6"],[25,"Mn","Марганец","54.938",4,7,"tm","[Ar] 3d⁵4s²",1.55,"+2, +4, +6, +7"],[26,"Fe","Железо","55.845",4,8,"tm","[Ar] 3d⁶4s²",1.83,"+2, +3"],[27,"Co","Кобальт","58.933",4,9,"tm","[Ar] 3d⁷4s²",1.88,"+2, +3"],[28,"Ni","Никель","58.693",4,10,"tm","[Ar] 3d⁸4s²",1.91,"+2"],[29,"Cu","Медь","63.546",4,11,"tm","[Ar] 3d¹⁰4s¹",1.9,"+1, +2"],[30,"Zn","Цинк","65.38",4,12,"tm","[Ar] 3d¹⁰4s²",1.65,"+2"],[31,"Ga","Галлий","69.723",4,13,"pt","[Ar] 3d¹⁰4s²4p¹",1.81,""],[32,"Ge","Германий","72.630",4,14,"met","[Ar] 3d¹⁰4s²4p²",2.01,""],[33,"As","Мышьяк","74.922",4,15,"met","[Ar] 3d¹⁰4s²4p³",2.18,"−3, +3, +5"],[34,"Se","Селен","78.971",4,16,"nm","[Ar] 3d¹⁰4s²4p⁴",2.55,"−2, +4, +6"],[35,"Br","Бром","79.904",4,17,"hal","[Ar] 3d¹⁰4s²4p⁵",2.96,"−1, +1, +5"],[36,"Kr","Криптон","83.798",4,18,"ng","[Ar] 3d¹⁰4s²4p⁶",3.0,""],[37,"Rb","Рубидий","85.468",5,1,"alk","[Kr] 5s¹",0.82,"+1"],[38,"Sr","Стронций","87.62",5,2,"ae","[Kr] 5s²",0.95,"+2"],[39,"Y","Иттрий","88.906",5,3,"tm","[Kr] 4d¹5s²",1.22,""],[40,"Zr","Цирконий","91.224",5,4,"tm","[Kr] 4d²5s²",1.33,""],[41,"Nb","Ниобий","92.906",5,5,"tm","[Kr] 4d⁴5s¹",1.6,""],[42,"Mo","Молибден","95.95",5,6,"tm","[Kr] 4d⁵5s¹",2.16,""],[43,"Tc","Технеций","[98]",5,7,"tm","[Kr] 4d⁵5s²",1.9,""],[44,"Ru","Рутений","101.07",5,8,"tm","[Kr] 4d⁷5s¹",2.2,""],[45,"Rh","Родий","102.906",5,9,"tm","[Kr] 4d⁸5s¹",2.28,""],[46,"Pd","Палладий","106.42",5,10,"tm","[Kr] 4d¹⁰",2.2,""],[47,"Ag","Серебро","107.868",5,11,"tm","[Kr] 4d¹⁰5s¹",1.93,"+1"],[48,"Cd","Кадмий","112.414",5,12,"tm","[Kr] 4d¹⁰5s²",1.69,"+2"],[49,"In","Индий","114.818",5,13,"pt","[Kr] 4d¹⁰5s²5p¹",1.78,""],[50,"Sn","Олово","118.710",5,14,"pt","[Kr] 4d¹⁰5s²5p²",1.96,"+2, +4"],[51,"Sb","Сурьма","121.760",5,15,"met","[Kr] 4d¹⁰5s²5p³",2.05,""],[52,"Te","Теллур","127.60",5,16,"met","[Kr] 4d¹⁰5s²5p⁴",2.1,""],[53,"I","Иод","126.904",5,17,"hal","[Kr] 4d¹⁰5s²5p⁵",2.66,"−1, +1, +5, +7"],[54,"Xe","Ксенон","131.293",5,18,"ng","[Kr] 4d¹⁰5s²5p⁶",2.6,""],[55,"Cs","Цезий","132.905",6,1,"alk","[Xe] 6s¹",0.79,"+1"],[56,"Ba","Барий","137.327",6,2,"ae","[Xe] 6s²",0.89,"+2"],[57,"La","Лантан","138.905",6,null,"ln","[Xe] 5d¹6s²",1.1,""],[58,"Ce","Церий","140.116",6,null,"ln","[Xe] 4f¹5d¹6s²",1.12,""],[59,"Pr","Празеодим","140.908",6,null,"ln","[Xe] 4f³6s²",1.13,""],[60,"Nd","Неодим","144.242",6,null,"ln","[Xe] 4f⁴6s²",1.14,""],[61,"Pm","Прометий","[145]",6,null,"ln","[Xe] 4f⁵6s²",null,""],[62,"Sm","Самарий","150.36",6,null,"ln","[Xe] 4f⁶6s²",1.17,""],[63,"Eu","Европий","151.964",6,null,"ln","[Xe] 4f⁷6s²",null,""],[64,"Gd","Гадолиний","157.25",6,null,"ln","[Xe] 4f⁷5d¹6s²",1.2,""],[65,"Tb","Тербий","158.925",6,null,"ln","[Xe] 4f⁹6s²",null,""],[66,"Dy","Диспрозий","162.500",6,null,"ln","[Xe] 4f¹⁰6s²",1.22,""],[67,"Ho","Гольмий","164.930",6,null,"ln","[Xe] 4f¹¹6s²",1.23,""],[68,"Er","Эрбий","167.259",6,null,"ln","[Xe] 4f¹²6s²",1.24,""],[69,"Tm","Тулий","168.934",6,null,"ln","[Xe] 4f¹³6s²",1.25,""],[70,"Yb","Иттербий","173.045",6,null,"ln","[Xe] 4f¹⁴6s²",null,""],[71,"Lu","Лютеций","174.967",6,null,"ln","[Xe] 4f¹⁴5d¹6s²",1.27,""],[72,"Hf","Гафний","178.49",6,4,"tm","[Xe] 4f¹⁴5d²6s²",1.3,""],[73,"Ta","Тантал","180.948",6,5,"tm","[Xe] 4f¹⁴5d³6s²",1.5,""],[74,"W","Вольфрам","183.84",6,6,"tm","[Xe] 4f¹⁴5d⁴6s²",2.36,""],[75,"Re","Рений","186.207",6,7,"tm","[Xe] 4f¹⁴5d⁵6s²",1.9,""],[76,"Os","Осмий","190.23",6,8,"tm","[Xe] 4f¹⁴5d⁶6s²",2.2,""],[77,"Ir","Иридий","192.217",6,9,"tm","[Xe] 4f¹⁴5d⁷6s²",2.2,""],[78,"Pt","Платина","195.084",6,10,"tm","[Xe] 4f¹⁴5d⁹6s¹",2.28,"+2, +4"],[79,"Au","Золото","196.967",6,11,"tm","[Xe] 4f¹⁴5d¹⁰6s¹",2.54,"+1, +3"],[80,"Hg","Ртуть","200.592",6,12,"tm","[Xe] 4f¹⁴5d¹⁰6s²",2.0,"+1, +2"],[81,"Tl","Таллий","204.38",6,13,"pt","[Xe] 4f¹⁴5d¹⁰6s²6p¹",1.62,""],[82,"Pb","Свинец","207.2",6,14,"pt","[Xe] 4f¹⁴5d¹⁰6s²6p²",2.33,"+2, +4"],[83,"Bi","Висмут","208.980",6,15,"pt","[Xe] 4f¹⁴5d¹⁰6s²6p³",2.02,"+3"],[84,"Po","Полоний","[209]",6,16,"pt","[Xe] 4f¹⁴5d¹⁰6s²6p⁴",2.0,""],[85,"At","Астат","[210]",6,17,"hal","[Xe] 4f¹⁴5d¹⁰6s²6p⁵",2.2,""],[86,"Rn","Радон","[222]",6,18,"ng","[Xe] 4f¹⁴5d¹⁰6s²6p⁶",2.2,""],[87,"Fr","Франций","[223]",7,1,"alk","[Rn] 7s¹",0.7,""],[88,"Ra","Радий","[226]",7,2,"ae","[Rn] 7s²",0.9,""],[89,"Ac","Актиний","[227]",7,null,"an","[Rn] 6d¹7s²",1.1,""],[90,"Th","Торий","232.038",7,null,"an","[Rn] 6d²7s²",1.3,""],[91,"Pa","Протактиний","231.036",7,null,"an","[Rn] 5f²6d¹7s²",1.5,""],[92,"U","Уран","238.029",7,null,"an","[Rn] 5f³6d¹7s²",1.38,"+4, +6"],[93,"Np","Нептуний","[237]",7,null,"an","[Rn] 5f⁴6d¹7s²",null,""],[94,"Pu","Плутоний","[244]",7,null,"an","[Rn] 5f⁶7s²",null,""],[95,"Am","Америций","[243]",7,null,"an","[Rn] 5f⁷7s²",null,""],[96,"Cm","Кюрий","[247]",7,null,"an","[Rn] 5f⁷6d¹7s²",null,""],[97,"Bk","Берклий","[247]",7,null,"an","[Rn] 5f⁹7s²",null,""],[98,"Cf","Калифорний","[251]",7,null,"an","[Rn] 5f¹⁰7s²",null,""],[99,"Es","Эйнштейний","[252]",7,null,"an","[Rn] 5f¹¹7s²",null,""],[100,"Fm","Фермий","[257]",7,null,"an","[Rn] 5f¹²7s²",null,""],[101,"Md","Менделевий","[258]",7,null,"an","[Rn] 5f¹³7s²",null,""],[102,"No","Нобелий","[259]",7,null,"an","[Rn] 5f¹⁴7s²",null,""],[103,"Lr","Лоуренсий","[266]",7,null,"an","[Rn] 5f¹⁴7s²7p¹",null,""],[104,"Rf","Резерфордий","[267]",7,4,"tm","[Rn] 5f¹⁴6d²7s²",null,""],[105,"Db","Дубний","[268]",7,5,"tm","[Rn] 5f¹⁴6d³7s²",null,""],[106,"Sg","Сиборгий","[269]",7,6,"tm","[Rn] 5f¹⁴6d⁴7s²",null,""],[107,"Bh","Борий","[270]",7,7,"tm","[Rn] 5f¹⁴6d⁵7s²",null,""],[108,"Hs","Хассий","[269]",7,8,"tm","[Rn] 5f¹⁴6d⁶7s²",null,""],[109,"Mt","Мейтнерий","[278]",7,9,"tm","[Rn] 5f¹⁴6d⁷7s²",null,""],[110,"Ds","Дармштадтий","[281]",7,10,"tm","[Rn] 5f¹⁴6d⁸7s²",null,""],[111,"Rg","Рентгений","[282]",7,11,"tm","[Rn] 5f¹⁴6d⁹7s²",null,""],[112,"Cn","Коперниций","[285]",7,12,"tm","[Rn] 5f¹⁴6d¹⁰7s²",null,""],[113,"Nh","Нихоний","[286]",7,13,"pt","[Rn] 5f¹⁴6d¹⁰7s²7p¹",null,""],[114,"Fl","Флеровий","[289]",7,14,"pt","[Rn] 5f¹⁴6d¹⁰7s²7p²",null,""],[115,"Mc","Московий","[290]",7,15,"pt","[Rn] 5f¹⁴6d¹⁰7s²7p³",null,""],[116,"Lv","Ливерморий","[293]",7,16,"pt","[Rn] 5f¹⁴6d¹⁰7s²7p⁴",null,""],[117,"Ts","Теннессин","[294]",7,17,"pt","[Rn] 5f¹⁴6d¹⁰7s²7p⁵",null,""],[118,"Og","Оганесон","[294]",7,18,"ng","[Rn] 5f¹⁴6d¹⁰7s²7p⁶",null,""]];
+const PT_CAT = {alk:['Щелочные металлы','#F2765B'], ae:['Щелочноземельные металлы','#F5A35C'], tm:['Переходные металлы','#E9C46A'], pt:['Другие металлы','#9EC1A3'],
+  met:['Полуметаллы','#7FC8B5'], nm:['Неметаллы','#6FA8DC'], hal:['Галогены','#A78BDA'], ng:['Благородные газы','#C38BD9'], ln:['Лантаноиды','#F2A7C3'], an:['Актиноиды','#E58FB0']};
+const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
+function ptGroupName(g){ if (!g) return 'f-элемент (лантаноиды/актиноиды)'; if (g <= 2) return ROMAN[g] + 'A (главная подгруппа)'; if (g >= 13) return ROMAN[g - 10] + 'A (главная подгруппа)'; if (g >= 8 && g <= 10) return 'VIIIB (побочная подгруппа)'; if (g === 11) return 'IB (побочная подгруппа)'; if (g === 12) return 'IIB (побочная подгруппа)'; return ROMAN[g] + 'B (побочная подгруппа)'; }
+function ptCell(e){
+  const [z, s, n, m, , , c] = e;
+  return `<button class="pte" data-z="${z}" style="--pc:${PT_CAT[c][1]}"><i>${z}</i><b>${s}</b><small>${esc(n)}</small></button>`;
+}
+function renderPT(){
+  helperFab(false);
+  NAV.game = () => { helperFab(true); renderHome(); };
+  const grid = []; // [row][col]
+  PT.forEach(e => {
+    const [z, , , , per, g, c] = e; let row = per + 1, col = g;
+    if (c === 'ln' || c === 'an'){ row = c === 'ln' ? 10 : 11; col = 3 + (z - (c === 'ln' ? 57 : 89)); }
+    grid.push({e, row, col});
+  });
+  const cells = grid.map(x => `<div style="grid-row:${x.row}; grid-column:${x.col}">${ptCell(x.e)}</div>`).join('')
+    + `<div class="ptlab" style="grid-row:7; grid-column:3">57–71</div><div class="ptlab" style="grid-row:8; grid-column:3">89–103</div>`
+    + Array.from({length: 18}, (_, i) => `<div class="ptg" style="grid-row:1; grid-column:${i + 1}">${i + 1}</div>`).join('');
+  app.innerHTML = `<div class="bar"><div class="wrap"><div class="row"><button class="btn sm ghost" id="ptX">← Выйти</button>
+      <div class="grow" style="font-weight:700">Таблица Менделеева</div><button class="btn sm primary" id="ptQ">Угадай элемент</button></div></div></div>
+    <div class="wrap" style="padding-top:12px">
+      <p class="small muted" style="margin:0 0 10px">Нажми на элемент, чтобы узнать о нём больше. Таблицу можно листать вбок.</p>
+      <div class="ptwrap"><div class="ptgrid">${cells}</div></div>
+      <div class="ptlegend">${Object.keys(PT_CAT).map(k => `<span><i style="background:${PT_CAT[k][1]}"></i>${PT_CAT[k][0]}</span>`).join('')}</div>
+      <div class="tfoot"><div class="row" style="justify-content:center"><button class="btn" id="ptX2">← Выйти</button><button class="btn primary" id="ptQ2">Угадай элемент</button></div></div>
+    </div>`;
+  const exit = () => { if (NAV.on && NAV.depth > 0) history.back(); else { NAV.game = null; helperFab(true); renderHome(); } };
+  document.getElementById('ptX').onclick = document.getElementById('ptX2').onclick = exit;
+  document.getElementById('ptQ').onclick = document.getElementById('ptQ2').onclick = () => ptQuiz();
+  app.querySelectorAll('.pte').forEach(b => b.onclick = () => { sfx('tap'); ptInfo(PT[+b.dataset.z - 1]); });
+  window.scrollTo(0, 0);
+}
+function ptInfo(e){
+  const [z, s, n, m, per, g, c, conf, en, ox] = e;
+  const old = document.getElementById('ptsheet'); if (old) old.remove();
+  const box = document.createElement('div'); box.className = 'ptsheet'; box.id = 'ptsheet';
+  const neutrons = /^\d/.test(m) ? Math.round(parseFloat(m)) - z : null;
+  box.innerHTML = `<div class="ptcard" role="dialog" aria-label="${esc(n)}">
+    <div class="row" style="gap:14px; flex-wrap:nowrap; align-items:center">
+      <span class="ptbig" style="--pc:${PT_CAT[c][1]}"><i>${z}</i><b>${s}</b><small>${m}</small></span>
+      <div class="grow"><h2 style="margin:0">${esc(n)}</h2><div class="small muted">${PT_CAT[c][0]}</div></div>
+      <button class="x" id="ptc" aria-label="Закрыть">×</button></div>
+    <dl class="ptdl">
+      <dt>Порядковый номер</dt><dd>${z} (протонов ${z}, электронов ${z}${neutrons != null ? ', нейтронов ≈ ' + neutrons : ''})</dd>
+      <dt>Атомная масса</dt><dd>${m}${/^\d/.test(m) ? ' (≈ ' + (z === 17 ? '35,5' : Math.round(parseFloat(m))) + ')' : ' — радиоактивный'}</dd>
+      <dt>Период / группа</dt><dd>${per}-й период, ${ptGroupName(g)}</dd>
+      <dt>Электронная формула</dt><dd>${esc(conf)}</dd>
+      ${en ? `<dt>Электроотрицательность</dt><dd>${String(en).replace('.', ',')} (по Полингу)</dd>` : ''}
+      ${ox ? `<dt>Степени окисления</dt><dd>${esc(ox)}</dd>` : ''}
+    </dl></div>`;
+  document.body.appendChild(box);
+  const close = () => box.remove();
+  box.onclick = ev => { if (ev.target === box) close(); };
+  document.getElementById('ptc').onclick = close;
+}
+function ptQuiz(){
+  const old = document.getElementById('ptsheet'); if (old) old.remove();
+  const pool = PT.filter(e => e[0] <= 56 || [78, 79, 80, 82, 92].includes(e[0]));
+  const rounds = shuffle(pool).slice(0, 10).map((e, i) => {
+    const kind = i % 3, others = shuffle(pool.filter(x => x !== e)).slice(0, 3), opts = shuffle([e, ...others]);
+    if (kind === 0) return {q: `Какой символ у элемента «${e[2]}»?`, opts: opts.map(x => x[1]), ok: opts.indexOf(e)};
+    if (kind === 1) return {q: `Как называется элемент ${e[1]}?`, opts: opts.map(x => x[2]), ok: opts.indexOf(e)};
+    return {q: `Какой элемент стоит под номером ${e[0]}?`, opts: opts.map(x => x[2] + ' (' + x[1] + ')'), ok: opts.indexOf(e)};
+  });
+  let i = 0, score = 0, lock = false;
+  const exit = () => renderPT();
+  function show(){
+    if (i >= rounds.length){
+      const best = Math.max(score, lsGet('ptbest', 0)); lsSet('ptbest', best);
+      app.innerHTML = `<div class="wrap narrow"><div class="panel" style="text-align:center">
+        <div class="score" style="color:var(--${score >= 8 ? 'good' : score >= 5 ? 'warn' : 'bad'})">${score}/10</div>
+        <h2>${score >= 9 ? 'Ты знаток таблицы!' : score >= 6 ? 'Хорошо! Ещё немного практики' : 'Повтори таблицу и попробуй снова'}</h2>
+        <p class="muted">Твой рекорд: ${best} из 10</p>
+        <div class="row" style="justify-content:center"><button class="btn big" id="pqA">Ещё раз</button><button class="btn primary big" id="pqB">К таблице</button></div></div></div>`;
+      if (score >= 8){ confetti(); sfx('win'); }
+      checkNewBadges();
+      document.getElementById('pqA').onclick = ptQuiz; document.getElementById('pqB').onclick = exit; return;
+    }
+    const r = rounds[i]; lock = false;
+    app.innerHTML = `<div class="bar"><div class="wrap"><div class="row"><button class="btn sm ghost" id="pqX">← Выйти</button><div class="grow" style="font-weight:700">Угадай элемент</div><span class="small muted">${i + 1}/10 · ✓ ${score}</span></div>
+      <div class="progress"><span style="width:${i * 10}%"></span></div></div></div>
+      <div class="wrap narrow"><div class="panel"><h3 style="margin:0 0 14px">${esc(r.q)}</h3>
+      <div class="opts">${r.opts.map((o, k) => `<button class="opt" data-k="${k}"><span class="k">${'АБВГ'[k]}</span><span>${esc(o)}</span></button>`).join('')}</div></div>
+      <div class="tfoot"><div class="row" style="justify-content:center"><button class="btn" id="pqX2">← Выйти</button></div></div></div>`;
+    document.getElementById('pqX').onclick = document.getElementById('pqX2').onclick = exit;
+    app.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+      if (lock) return; lock = true; const k = +b.dataset.k;
+      if (k === r.ok){ score++; b.classList.add('ok'); sfx('good'); } else { b.classList.add('bad'); app.querySelector(`.opt[data-k="${r.ok}"]`).classList.add('ok'); sfx('bad'); }
+      setTimeout(() => { i++; show(); }, 900);
+    });
+  }
+  show(); window.scrollTo(0, 0);
+}
+
+/* ================= Дуэли ================= */
+const DU = {list: null, roster: null};
+async function renderDuels(v){
+  v.innerHTML = '<div class="loading" style="min-height:120px">Загружаем дуэли…</div>';
+  try { DU.list = await api('duelList', S.student.name, S.student.cls); } catch (e){ v.innerHTML = `<div class="panel">Не удалось загрузить дуэли: ${esc(e.message)}</div>`; return; }
+  if (!document.body.contains(v)) return;
+  const me = S.student.name, wins = DU.list.filter(d => (d.winner === 'from' && d.me === 'from') || (d.winner === 'to' && d.me === 'to')).length;
+  const incoming = DU.list.filter(d => d.me === 'to' && d.s2 == null);
+  const rest = DU.list.filter(d => !(d.me === 'to' && d.s2 == null));
+  const subjName = s => s === 'bio' ? 'Биология' : 'Химия';
+  const row = d => {
+    const opp = d.me === 'from' ? d.to : d.from, my = d.me === 'from' ? d.s1 : d.s2, their = d.me === 'from' ? d.s2 : d.s1;
+    const myT = d.me === 'from' ? d.t1 : d.t2, thT = d.me === 'from' ? d.t2 : d.t1;
+    let st;
+    if (d.winner === 'draw') st = '<span class="pill warn">Ничья</span>';
+    else if (d.winner) st = d.winner === d.me ? '<span class="pill good">Победа!</span>' : '<span class="pill bad">Поражение</span>';
+    else st = '<span class="pill none">Ждём соперника</span>';
+    return `<div class="duel"><span class="dv">VS</span><div class="grow"><b>${esc(opp)}</b><div class="small muted">${subjName(d.subject)} · ${esc(d.created.slice(0, 10))}</div>
+      <div class="small">Ты: <b>${my == null ? '—' : my + '/10'}</b>${my != null ? ' за ' + fmtSec(myT) : ''} · Соперник: <b>${their == null ? '—' : their + '/10'}</b>${their != null ? ' за ' + fmtSec(thT) : ''}</div></div>${st}</div>`;
+  };
+  v.innerHTML = `<div class="sec">
+    <div class="panel duelhero"><div class="row" style="gap:14px; flex-wrap:nowrap"><span class="dv big">VS</span>
+      <div class="grow"><h2 style="margin:0">Дуэли</h2><div class="small muted">10 одинаковых вопросов. Побеждает тот, кто ответит точнее, а при равенстве — быстрее. Побед: <b>${wins}</b></div></div></div>
+      <button class="btn primary big" id="duNew" style="width:100%; margin-top:14px">Вызвать одноклассника</button></div>
+    ${incoming.length ? `<h2 style="margin-top:20px">Тебя вызвали!</h2>${incoming.map(d => `<div class="duel in"><span class="dv">VS</span><div class="grow"><b>${esc(d.from)}</b><div class="small muted">${subjName(d.subject)} · результат соперника скрыт до твоей игры</div></div><button class="btn primary" data-play="${esc(d.id)}">Принять</button></div>`).join('')}` : ''}
+    <h2 style="margin-top:20px">История</h2>
+    ${rest.length ? rest.map(row).join('') : '<div class="empty panel">Пока нет дуэлей. Вызови кого-нибудь из класса!</div>'}
+  </div>`;
+  document.getElementById('duNew').onclick = () => duelPick(v);
+  v.querySelectorAll('[data-play]').forEach(b => b.onclick = () => duelAccept(DU.list.find(d => d.id === b.dataset.play)));
+}
+async function duelPick(v){
+  const box = document.createElement('div'); box.className = 'ptsheet'; box.id = 'ptsheet';
+  box.innerHTML = `<div class="ptcard"><div class="row" style="flex-wrap:nowrap"><h2 class="grow" style="margin:0">Кого вызвать?</h2><button class="x" id="dpx" aria-label="Закрыть">×</button></div>
+    <div class="rseg" style="margin-top:12px"><button data-s="chem" class="${S.subject !== 'bio' ? 'on' : ''}">Химия</button><button data-s="bio" class="${S.subject === 'bio' ? 'on' : ''}">Биология</button></div>
+    <input class="field" id="dpq" placeholder="Поиск по имени" style="margin-bottom:10px"><div id="dpl" class="dplist"><div class="small muted">Загружаем класс…</div></div></div>`;
+  document.body.appendChild(box);
+  let subj = S.subject === 'bio' ? 'bio' : 'chem';
+  const close = () => box.remove();
+  box.onclick = e => { if (e.target === box) close(); };
+  document.getElementById('dpx').onclick = close;
+  box.querySelectorAll('.rseg button').forEach(b => b.onclick = () => { subj = b.dataset.s; box.querySelectorAll('.rseg button').forEach(x => x.classList.toggle('on', x === b)); });
+  try { DU.roster = DU.roster || await api('duelRoster', S.student.name, S.student.cls); } catch (e){ document.getElementById('dpl').innerHTML = `<div class="small" style="color:var(--bad)">${esc(e.message)}</div>`; return; }
+  const draw = () => {
+    const q = lc(document.getElementById('dpq').value), list = DU.roster.filter(n => lc(n).includes(q));
+    document.getElementById('dpl').innerHTML = list.length ? list.map(n => `<button class="dpn" data-n="${esc(n)}">${esc(n)}</button>`).join('') : '<div class="small muted">В твоём классе пока никого нет. Позови друзей зарегистрироваться!</div>';
+    box.querySelectorAll('.dpn').forEach(b => b.onclick = () => { close(); duelStart(b.dataset.n, subj); });
+  };
+  document.getElementById('dpq').oninput = draw; draw();
+}
+function duelQuestions(subj){
+  const games = subjGames(subj).filter(g => g.type === 'test' || g.type === 'quiz');
+  const all = [];
+  games.forEach(g => PARSE.quiz(g.source).items.forEach(it => { if (it.options.length >= 2 && it.q.length < 300) all.push(it); }));
+  return shuffle(all).slice(0, 10);
+}
+function duelSource(qs){ return qs.map(it => it.q + '\n' + it.options.map((o, j) => (j === it.correct ? '*' : '') + o).join('\n')).join('\n\n'); }
+function duelPlay(title, src, onDone){
+  helperFab(false);
+  play({id: 'duel', title, type: 'quiz', source: src, timeLimit: 5}, {onExit: () => { helperFab(true); S.view = 'duels'; renderHome(); }, onResult: res => onDone(res)});
+}
+function duelStart(opp, subj){
+  const qs = duelQuestions(subj);
+  if (qs.length < 5){ toast('Недостаточно вопросов для дуэли по этому предмету'); return; }
+  const src = duelSource(qs);
+  navPush();
+  duelPlay('Дуэль с ' + opp, src, async res => {
+    duelResultScreen('Отправляем вызов…', res);
+    try { await api('duelCreate', S.student.name, S.student.cls, opp, subj, src, res.score, Math.round(res.seconds));
+      duelResultScreen(`Вызов отправлен! ${opp} увидит его во вкладке «Дуэли». Результат появится, когда соперник сыграет.`, res); sfx('win');
+    } catch (e){ duelResultScreen('Не удалось отправить вызов: ' + String(e.message || e).replace(/^(Exception|Error):\s*/, ''), res); }
+  });
+}
+function duelAccept(d){
+  if (!d || !d.questions) return;
+  navPush();
+  duelPlay('Дуэль с ' + d.from, d.questions, async res => {
+    duelResultScreen('Считаем результат…', res);
+    try { const r = await api('duelSubmit', S.student.name, S.student.cls, d.id, res.score, Math.round(res.seconds));
+      const msg = r.winner === 'draw' ? 'Ничья! Одинаковые баллы и время.' : r.winner === 'to' ? `Победа! Ты обыграл(а) ${d.from} — счёт ${r.s2} : ${r.s1}.` : `${d.from} победил(а) — счёт ${r.s1} : ${r.s2}. Вызови на реванш!`;
+      duelResultScreen(msg, res, r.winner === 'to'); if (r.winner === 'to'){ S.data.duel = S.data.duel || {}; S.data.duel.wins = (S.data.duel.wins || 0) + 1; checkNewBadges(); }
+    } catch (e){ duelResultScreen('Не удалось отправить результат: ' + String(e.message || e).replace(/^(Exception|Error):\s*/, ''), res); }
+  });
+}
+function duelResultScreen(msg, res, won){
+  app.innerHTML = `<div class="wrap narrow"><div class="panel" style="text-align:center">
+    <span class="dv big" style="margin:0 auto">VS</span>
+    <div class="score" style="margin-top:10px">${res.score}/${res.max}</div><div class="muted small">Время: ${fmtSec(res.seconds)}</div>
+    <p style="font-weight:700; margin-top:12px">${esc(msg)}</p>
+    ${res.review ? `<details style="text-align:left; margin-top:10px"><summary>Разбор ошибок</summary><div class="review">${res.review}</div></details>` : ''}
+    <button class="btn primary big" id="duBack" style="margin-top:14px">К дуэлям</button></div></div>`;
+  if (won){ confetti(); sfx('win'); }
+  document.getElementById('duBack').onclick = () => { if (NAV.game && NAV.on && NAV.depth > 0) history.back(); else { NAV.game = null; helperFab(true); S.view = 'duels'; renderHome(); } };
+}
+
+/* ================= Аналитика для учителя ================= */
+function renderAnalytics(){
+  const box = document.getElementById('tbody'), d = T.data, f = T.filter;
+  const classes = [...new Set(d.results.map(r => r.className).filter(Boolean))].sort();
+  const rs = d.results.filter(r => !f.cls || r.className === f.cls);
+  const byGame = {}; d.games.forEach(g => byGame[g.id] = g);
+  const now = new Date(), dstr = x => String(x).slice(0, 10);
+  const daysAgo = s => Math.floor((now - new Date(dstr(s) + 'T00:00:00')) / 864e5);
+  const week = rs.filter(r => daysAgo(r.time) < 7);
+  // ученики
+  const st = {};
+  rs.forEach(r => { const k = lc(r.student) + '|' + lc(r.className); const s = st[k] || (st[k] = {name: r.student, cls: r.className, n: 0, best: {}, last: '', weeks: [0, 0, 0, 0, 0, 0]});
+    s.n++; s.best[r.gameId] = Math.max(s.best[r.gameId] || 0, r.percent); if (r.time > s.last) s.last = r.time;
+    const w = Math.floor(daysAgo(r.time) / 7); if (w < 6) s.weeks[5 - w]++; });
+  const studs = Object.values(st).map(s => ({...s, done: Object.keys(s.best).length, avg: Math.round(Object.values(s.best).reduce((a, b) => a + b, 0) / Math.max(1, Object.keys(s.best).length))}));
+  const idle = studs.filter(s => daysAgo(s.last) >= 7).sort((a, b) => a.last.localeCompare(b.last));
+  // темы
+  const tp = {};
+  studs.forEach(s => Object.keys(s.best).forEach(id => { const g = byGame[id]; if (!g) return; const t = g.topic || 'Без темы'; (tp[t] = tp[t] || []).push(s.best[id]); }));
+  const topics = Object.keys(tp).map(t => ({t, avg: Math.round(tp[t].reduce((a, b) => a + b, 0) / tp[t].length), n: tp[t].length})).filter(x => x.n >= 2).sort((a, b) => a.avg - b.avg).slice(0, 10);
+  // вопросы тестов
+  const qs = {}, att = {};
+  rs.forEach(r => { const g = byGame[r.gameId]; if (!g || (g.type !== 'test' && g.type !== 'quiz')) return; att[r.gameId] = (att[r.gameId] || 0) + 1;
+    const m = String(r.details).match(/:\s*([\d,\s]+)$/); if (!m) return;
+    [...new Set(m[1].split(',').map(x => parseInt(x, 10)).filter(Boolean))].forEach(n => { const k = r.gameId + '#' + n; qs[k] = (qs[k] || 0) + 1; }); });
+  const hard = Object.keys(qs).map(k => { const [id, n] = k.split('#'); const g = byGame[id]; const it = g ? PARSE.quiz(g.source).items[n - 1] : null;
+    return it ? {g, it, pct: Math.min(100, Math.round(qs[k] * 100 / att[id])), wrong: qs[k], att: att[id]} : null; }).filter(x => x && x.att >= 2).sort((a, b) => b.pct - a.pct || b.wrong - a.wrong).slice(0, 10);
+  const avgAll = studs.length ? Math.round(studs.reduce((a, s) => a + s.avg, 0) / studs.length) : 0;
+  const spark = w => { const mx = Math.max(1, ...w); return `<span class="spark">${w.map(x => `<i style="height:${Math.round(x * 100 / mx)}%" title="${x}"></i>`).join('')}</span>`; };
+  box.innerHTML = `<div class="row" style="margin-bottom:14px"><select class="field" id="anCls" style="max-width:220px"><option value="">Все классы</option>${classes.map(c => `<option ${f.cls === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></div>
+    <div class="ankpi"><div><b>${studs.length}</b><span>учеников</span></div><div><b>${new Set(week.map(r => lc(r.student))).size}</b><span>занимались за 7 дней</span></div><div><b>${week.length}</b><span>попыток за неделю</span></div><div><b>${avgAll}%</b><span>средний результат</span></div></div>
+    <div class="angrid">
+      <div class="panel"><h3>Трудные темы</h3><p class="small muted">Средний лучший результат учеников по теме</p>
+        ${topics.length ? topics.map(x => `<div class="anbar"><span>${esc(x.t)}</span><div><i style="width:${x.avg}%; background:var(--${x.avg >= 70 ? 'good' : x.avg >= 50 ? 'warn' : 'bad'})"></i></div><b>${x.avg}%</b></div>`).join('') : '<div class="small muted">Мало данных</div>'}</div>
+      <div class="panel"><h3>Давно не заходили</h3><p class="small muted">Больше 7 дней без заданий</p>
+        ${idle.length ? idle.slice(0, 15).map(s => `<div class="anrow"><span>${esc(s.name)} <span class="muted small">${esc(s.cls)}</span></span><span class="pill bad">${daysAgo(s.last)} дн.</span></div>`).join('') : '<div class="small" style="color:var(--good)">Все занимались на этой неделе</div>'}</div>
+    </div>
+    <div class="panel" style="margin-top:14px"><h3>Самые трудные вопросы</h3><p class="small muted">Доля попыток, где ученики ошиблись в этом вопросе</p>
+      ${hard.length ? hard.map(x => `<div class="anq"><span class="pill ${x.pct >= 60 ? 'bad' : 'warn'}">${x.pct}%</span><div><b>${fmt(x.it.q)}</b><div class="small muted">Верно: ${fmt(x.it.options[x.it.correct])} · ${esc(x.g.title)} · ошибок ${x.wrong} из ${x.att}</div></div></div>`).join('') : '<div class="small muted">Пока мало результатов тестов</div>'}</div>
+    <div class="panel" style="margin-top:14px; overflow-x:auto"><h3>Ученики</h3>
+      <table><thead><tr><th>Ученик</th><th>Класс</th><th>Заданий</th><th>Средний</th><th>Активность (6 нед.)</th><th>Последний раз</th></tr></thead>
+      <tbody>${studs.sort((a, b) => b.avg - a.avg).map(s => `<tr><td>${esc(s.name)}</td><td>${esc(s.cls)}</td><td>${s.done}</td><td><span class="pill ${pctClass(s.avg)}">${s.avg}%</span></td><td>${spark(s.weeks)}</td><td class="num">${esc(dstr(s.last))}</td></tr>`).join('')}</tbody></table></div>`;
+  document.getElementById('anCls').onchange = e => { f.cls = e.target.value; renderAnalytics(); };
 }
 
 function renderRating(v, boardAll){
@@ -1706,7 +2002,7 @@ function teacherHome(){
       <div class="small muted" style="margin-top:6px">Ключ хранится только на вашем Google-сервере. Ученики его не видят.</div>
     </div>
     <div class="row" style="justify-content:space-between; margin:22px 0 16px">
-      <div class="tabs"><button data-t="games" class="${T.tab === 'games' ? 'on' : ''}">Задания (${d.games.length})</button><button data-t="topics" class="${T.tab === 'topics' ? 'on' : ''}">Темы (${(d.topics || []).length})</button><button data-t="results" class="${T.tab === 'results' ? 'on' : ''}">Результаты (${d.results.length})</button></div>
+      <div class="tabs"><button data-t="games" class="${T.tab === 'games' ? 'on' : ''}">Задания (${d.games.length})</button><button data-t="topics" class="${T.tab === 'topics' ? 'on' : ''}">Темы (${(d.topics || []).length})</button><button data-t="results" class="${T.tab === 'results' ? 'on' : ''}">Результаты (${d.results.length})</button><button data-t="analytics" class="${T.tab === 'analytics' ? 'on' : ''}">Аналитика</button></div>
       ${T.tab === 'games' ? '<button class="btn primary" id="new">+ Новое задание</button>' : ''}
     </div>
     <div id="tbody"></div></div>`;
@@ -1723,6 +2019,7 @@ function teacherHome(){
   };
   if (T.tab === 'games'){ document.getElementById('new').onclick = () => editor(null); renderGames(); }
   else if (T.tab === 'topics') renderTopics();
+  else if (T.tab === 'analytics') renderAnalytics();
   else renderResults();
 }
 
