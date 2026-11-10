@@ -89,7 +89,13 @@ textarea.field{min-height:260px; font-family:var(--f-mono); font-size:14px; line
 .authtabs button.on{background:var(--accent); color:#fff}
 /* Помощник */
 .fab{position:fixed; right:16px; bottom:16px; z-index:15; display:flex; align-items:center; gap:8px; padding:12px 16px 12px 12px; border-radius:999px; border:0; background:var(--accent); color:#fff; font-weight:700; font-size:15px; box-shadow:0 10px 26px -8px var(--accent); cursor:pointer}
-.fab .el{width:30px; height:30px; border-radius:8px; background:#fff; color:var(--accent); display:grid; place-items:center; font:700 15px var(--f-display)}
+.fab .av{width:40px; height:40px; border-radius:50%; background:#fff; display:grid; place-items:center; overflow:hidden; margin:-6px 0 -6px -4px}
+.fab .av svg{width:100%; height:100%}
+.chat .hav{width:46px; height:46px; border-radius:50%; background:#fff; overflow:hidden; display:grid; place-items:center; flex:none}
+.chat .hav svg{width:100%; height:100%}
+.mini-hi{align-self:center; width:120px; height:132px; margin:4px 0 -4px}
+.mini-hi svg{width:100%; height:100%}
+.chat header h2 small{display:block; font:500 12px var(--f-body, inherit); opacity:.75; margin-top:2px}
 .chat{position:fixed; inset:0; z-index:30; background:rgba(10,12,40,.45); display:flex; justify-content:flex-end}
 .chat .sheet{width:min(460px,100%); height:100%; background:var(--bg); display:flex; flex-direction:column; box-shadow:-10px 0 40px rgba(0,0,0,.25)}
 .chat header{display:flex; align-items:center; gap:10px; padding:14px 16px; background:var(--hero); color:var(--hero-ink)}
@@ -855,7 +861,7 @@ function showResult(game, res, opts){
       </div>
       ${review ? `<h3 style="margin-top:24px; font-size:1rem">Разбор ошибок</h3>${review}` : ''}
       <div class="row" style="margin-top:20px">
-        ${!opts.preview && S.data && S.data.helper ? '<button class="btn big" id="askh">Разобрать с помощником</button>' : ''}
+        ${!opts.preview && S.data && S.data.helper ? '<button class="btn big" id="askh">Разобрать с mini-Ramossitto</button>' : ''}
         <button class="btn big" id="again">Ещё раз</button>
         <button class="btn primary big grow" id="back">${opts.preview ? 'Назад в редактор' : 'К заданиям'}</button>
       </div>
@@ -881,6 +887,8 @@ function showResult(game, res, opts){
 }
 
 /* ================= Помощник (ИИ) ================= */
+const MINI = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" aria-hidden="true"><defs><linearGradient id="mrj" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E4002B"/><stop offset="1" stop-color="#B8001F"/></linearGradient><linearGradient id="mrf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7CF0C9"/><stop offset="1" stop-color="#20C08A"/></linearGradient></defs><rect x="72" y="182" width="20" height="30" rx="8" fill="#F2C29B"/><rect x="108" y="182" width="20" height="30" rx="8" fill="#F2C29B"/><path d="M66 166h68l4 26H62z" fill="#0B6E3A"/><rect x="66" y="206" width="30" height="12" rx="6" fill="#1B1B2F"/><rect x="104" y="206" width="30" height="12" rx="6" fill="#1B1B2F"/><path d="M60 112c8-10 22-14 40-14s32 4 40 14l18 18-14 16-10-8v34H66v-34l-10 8-14-16z" fill="url(#mrj)"/><path d="M42 130l14 16 8-6M158 130l-14 16-8-6" fill="none" stroke="#0B6E3A" stroke-width="5" stroke-linecap="round"/><path d="M86 100c4 8 24 8 28 0" fill="none" stroke="#0B6E3A" stroke-width="6" stroke-linecap="round"/><path d="M66 172h68" stroke="#0B6E3A" stroke-width="4"/><text x="100" y="160" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="38" fill="#FFD447" stroke="#7A5A00" stroke-width="1.2">7</text><circle cx="160" cy="140" r="9" fill="#F2C29B"/><path d="M168 104h10v12l12 22a8 8 0 0 1-7 12h-20a8 8 0 0 1-7-12l12-22z" fill="url(#mrf)" stroke="#2A2F55" stroke-width="2.5" stroke-linejoin="round"/><rect x="165" y="99" width="16" height="6" rx="3" fill="#2A2F55"/><circle cx="176" cy="138" r="2.4" fill="#fff" opacity=".8"/><circle cx="181" cy="131" r="1.6" fill="#fff" opacity=".8"/><circle cx="40" cy="140" r="9" fill="#F2C29B"/><rect x="91" y="88" width="18" height="14" rx="6" fill="#E8B48C"/><circle cx="100" cy="62" r="40" fill="#F2C29B"/><circle cx="61" cy="66" r="8" fill="#F2C29B"/><circle cx="139" cy="66" r="8" fill="#F2C29B"/><path d="M62 56c-2-22 16-38 38-38 10 0 16 2 22-4 4 6 2 10 0 12 12 4 18 16 16 30-6-10-14-14-24-14-14 0-20-8-24-8-10 2-14 14-28 22z" fill="#2B1D16"/><ellipse cx="85" cy="66" rx="6" ry="7.5" fill="#1B1B2F"/><ellipse cx="115" cy="66" rx="6" ry="7.5" fill="#1B1B2F"/><circle cx="87" cy="63" r="2.2" fill="#fff"/><circle cx="117" cy="63" r="2.2" fill="#fff"/><path d="M76 52q9-5 16 0M108 52q8-5 16 0" stroke="#2B1D16" stroke-width="3.5" fill="none" stroke-linecap="round"/><ellipse cx="74" cy="80" rx="7" ry="4" fill="#F49A9A" opacity=".6"/><ellipse cx="126" cy="80" rx="7" ry="4" fill="#F49A9A" opacity=".6"/><path d="M86 82q14 14 28 0" fill="#fff" stroke="#7A2E2E" stroke-width="3" stroke-linejoin="round"/></svg>`;
+const MINI_HEAD = MINI.replace('viewBox="0 0 200 220"', 'viewBox="48 18 104 104"').replace(/id="mr/g, 'id="mh').replace(/url\(#mr/g, 'url(#mh');
 const H = {msgs: [], img: null, busy: false};
 function helperKey(){ return 'chem_chat_' + ((S.student && (S.student.email || S.student.name)) || ''); }
 function helperLoad(){ try { H.msgs = JSON.parse(localStorage.getItem(helperKey()) || '[]'); } catch(e){ H.msgs = []; } }
@@ -889,9 +897,10 @@ function helperFab(show){
   let b = document.getElementById('fab');
   const on = show && S.student && S.data && S.data.helper;
   if (!on){ if (b) b.remove(); return; }
-  if (!b){ b = document.createElement('button'); b.id = 'fab'; b.className = 'fab'; b.innerHTML = '<span class="el">?</span>Помощник'; b.onclick = () => openHelper(); document.body.appendChild(b); }
+  if (!b){ b = document.createElement('button'); b.id = 'fab'; b.className = 'fab'; b.innerHTML = '<span class="av">' + MINI_HEAD + '</span>mini-Ramossitto'; b.setAttribute('aria-label', 'Помощник mini-Ramossitto'); b.onclick = () => openHelper(); document.body.appendChild(b); }
 }
 function mdLite(t){
+  t = String(t).replace(/\$([^$\n]{1,80})\$/g, (m, x) => x.replace(/\\cdot/g, '·').replace(/\\times/g, '×').replace(/\\frac\{([^}]*)\}\{([^}]*)\}/g, '$1/$2').replace(/_\{?(\d+)\}?/g, (q, d) => d.replace(/\d/g, c => '₀₁₂₃₄₅₆₇₈₉'[c])).replace(/\^\{?([0-9+\-]+)\}?/g, (q, d) => d.replace(/[0-9+\-]/g, c => '⁰¹²³⁴⁵⁶⁷⁸⁹'['0123456789'.indexOf(c)] || (c === '+' ? '⁺' : '⁻'))).replace(/[{}\\]/g, ''));
   return esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/^\s*[\*\-]\s+/gm, '• ').replace(/\n/g, '<br>');
 }
 function openHelper(prefill){
@@ -899,7 +908,7 @@ function openHelper(prefill){
   helperFab(false);
   const box = document.createElement('div'); box.className = 'chat'; box.id = 'chat';
   box.innerHTML = `<div class="sheet" role="dialog" aria-label="Помощник">
-    <header><span class="lvl" style="width:38px;height:42px;padding:0 0 6px;animation:none;box-shadow:none"><b style="font-size:18px">?</b></span><h2>Помощник Ramossitto</h2><button class="x" id="hx" aria-label="Закрыть">×</button></header>
+    <header><span class="hav">${MINI_HEAD}</span><h2>mini-Ramossitto<small>помощник по химии</small></h2><button class="x" id="hx" aria-label="Закрыть">×</button></header>
     <div class="msgs" id="hm"></div>
     <div class="quick"><button data-q="Дай подсказку, с чего начать">Подсказка</button><button data-q="Покажи полное решение по шагам">Покажи решение</button><button data-q="Объясни эту тему простыми словами">Объясни тему</button><button data-new="1">Новый вопрос</button></div>
     <div class="pv" id="hpv"></div>
@@ -928,7 +937,7 @@ function openHelper(prefill){
 }
 function helperRender(){
   const m = document.getElementById('hm'); if (!m) return;
-  const hello = `<div class="msg m">Привет, ${esc((S.student.name.split(' ')[1] || S.student.name))}! Пришлите задачу (текстом или фото) — я подскажу, с чего начать, а если нужно, покажу решение по шагам.</div>`;
+  const hello = `<div class="mini-hi">${MINI}</div><div class="msg m">Привет, ${esc((S.student.name.split(' ')[1] || S.student.name))}! Я mini-Ramossitto. Пришли задачу текстом или фото — подскажу, с чего начать, а если нужно, покажу решение по шагам.</div>`;
   m.innerHTML = hello + H.msgs.map(x => `<div class="msg ${x.role === 'user' ? 'u' : 'm'}">${x.img ? `<img src="${x.img}" alt="">` : ''}${mdLite(x.text)}</div>`).join('') + (H.busy ? '<div class="msg m wait">Думаю…</div>' : '');
   m.scrollTop = m.scrollHeight;
   const pv = document.getElementById('hpv');
@@ -1254,7 +1263,7 @@ function teacherHome(){
       <div class="linkbox"><input class="field" id="slink" readonly value="${esc(studentUrl)}"><button class="btn" id="copy">Копировать</button></div>
     </div>
     <div class="panel" style="margin-top:12px; padding:14px 16px">
-      <div class="label" style="margin-bottom:6px">Помощник для учеников (Google Gemini) — ${d.helper ? '<span class="pill good">включён</span>' : '<span class="pill warn">выключен</span>'}</div>
+      <div class="label" style="margin-bottom:6px">Помощник mini-Ramossitto (Google Gemini) — ${d.helper ? '<span class="pill good">включён</span>' : '<span class="pill warn">выключен</span>'}</div>
       <div class="linkbox"><input class="field" id="gkey" type="password" autocomplete="off" placeholder="${d.helper ? 'Ключ сохранён. Вставьте новый, чтобы заменить' : 'Вставьте ключ из aistudio.google.com/apikey'}"><button class="btn" id="gsave">Сохранить</button>${d.helper ? '<button class="btn ghost" id="goff">Выключить</button>' : ''}</div>
       <div class="small muted" style="margin-top:6px">Ключ хранится только на вашем Google-сервере. Ученики его не видят.</div>
     </div>
