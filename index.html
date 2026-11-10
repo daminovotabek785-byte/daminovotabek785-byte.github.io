@@ -465,6 +465,26 @@ tr.sub td{background:var(--bg); font-size:.85rem; white-space:normal}
 .anq{display:flex; gap:12px; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--line)}
 .anq .pill{flex:none; min-width:52px; text-align:center}
 .spark{display:inline-flex; align-items:flex-end; gap:2px; height:22px} .spark i{width:7px; min-height:2px; background:var(--accent); border-radius:2px; opacity:.85}
+
+/* Монеты и призы */
+.coin{display:inline-flex; align-items:center; gap:4px; font-weight:800; font-variant-numeric:tabular-nums; background:#FFF4CC; color:#7A5A00; border:1px solid #F2D16B; border-radius:999px; padding:4px 10px 4px 5px; cursor:pointer; font-size:14px}
+.coin svg{width:20px; height:20px}
+.coinp{background:linear-gradient(135deg,#FFE58A,#F2BE00); color:#4A3600; border:0}
+.coinp .big{font:800 2.2rem/1 var(--f-display); display:flex; align-items:center; gap:8px}
+.coinp .big svg{width:40px; height:40px}
+.prize{display:flex; align-items:center; gap:12px; padding:12px 14px; margin-top:8px; border-radius:16px; background:var(--surface); border:1px solid var(--line)}
+.prize .pc{display:inline-flex; align-items:center; gap:3px; font-weight:800; color:#7A5A00; white-space:nowrap}
+.prize .pc svg{width:18px; height:18px}
+.prize .bar2{margin-top:6px}
+.prize.ok{border-color:var(--good)}
+.chist{display:flex; justify-content:space-between; gap:8px; padding:7px 0; border-bottom:1px solid var(--line); font-size:14px}
+.chist b.p{color:var(--good)} .chist b.m{color:var(--bad)}
+.stakepill{display:inline-flex; align-items:center; gap:3px; font-weight:800; font-size:13px; padding:2px 8px; border-radius:999px}
+.stakepill svg{width:16px; height:16px}
+.stakepill.p{background:color-mix(in srgb, var(--good) 15%, var(--surface)); color:var(--good)}
+.stakepill.m{background:color-mix(in srgb, var(--bad) 12%, var(--surface)); color:var(--bad)}
+.ctbl input.field, .ctbl select.field{padding:6px 8px; font-size:14px; min-width:0}
+.ctbl td{vertical-align:middle}
 </style>
 </head>
 <body>
@@ -1032,7 +1052,9 @@ function showResult(game, res, opts){
     if (!(S.data.days || []).includes(m.last)) (S.data.days = S.data.days || []).push(m.last);
     setTimeout(checkNewBadges, 600);
     const lb = levelOf(before), la = levelOf(before + gain);
-    xpHtml = gain ? `<div><span class="xp-gain">+${gain} опыта</span></div>` : `<div class="small muted" style="margin-top:10px">Опыт растёт, когда вы улучшаете свой лучший результат (сейчас ${prev}%)</div>`;
+    const cg = Math.floor((before + gain) / 10) - Math.floor(before / 10);
+    if (cg && S.data.coins) S.data.coins.balance += cg;
+    xpHtml = gain ? `<div><span class="xp-gain">+${gain} опыта</span>${cg ? ` <span class="stakepill p">${COIN}+${cg}</span>` : ''}</div>` : `<div class="small muted" style="margin-top:10px">Опыт растёт, когда вы улучшаете свой лучший результат (сейчас ${prev}%)</div>`;
     if (la.n > lb.n) xpHtml += `<div class="lvlup">Новый уровень! Теперь вы — ${la.name} <b>${la.sym}</b> (№ ${la.n})</div>`;
   }
   const review = res.review ? `<div class="review">${res.review}</div>` : '';
@@ -1388,13 +1410,14 @@ function catalog(){
 function topBar(back){
   return `<div class="row" style="justify-content:space-between">
       ${back ? `<button class="btn sm ghost" id="backCat">← ${esc(back)}</button>` : '<div class="brand"><span class="el"><i>7</i>N</span><h1>Ramossitto</h1></div>'}
-      <div class="row" style="gap:8px"><span class="inst-slot"></span><span class="small muted">${esc(S.student.name)} · ${esc(S.student.cls)}</span>
+      <div class="row" style="gap:8px"><span class="inst-slot"></span>${S.data && S.data.coins ? `<button class="coin" id="coinChip" aria-label="Мои монеты">${COIN}${coinBal()}</button>` : ''}<span class="small muted">${esc(S.student.name)} · ${esc(S.student.cls)}</span>
         <button class="iconbtn" id="snd" aria-label="${SOUND ? 'Выключить звук' : 'Включить звук'}">${soundIcon()}</button>
         <button class="btn sm" id="chg" title="Войти под другим именем">Сменить</button></div>
     </div>`;
 }
 function bindTop(){
   helperFab(true);
+  const cc = document.getElementById('coinChip'); if (cc) cc.onclick = () => { sfx('tap'); S.topic = null; S.section = null; S.view = 'awards'; renderHome(); window.scrollTo(0, 0); };
   let chgArmed = false;
   document.getElementById('chg').onclick = e => {
     const btn = e.currentTarget;
@@ -1592,8 +1615,8 @@ function renderAwards(v){
   const week = []; for (let i = 6; i >= 0; i--) week.push(dayAdd(today, -i));
   const WD = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
   const got = BADGES.filter(b => b.test(s)).length;
-  v.innerHTML = `<div class="sec">
-    <div class="panel streakp">
+  v.innerHTML = `<div class="sec">${coinsPanelHtml()}
+    <div class="panel streakp" style="margin-top:20px">
       <div class="row" style="gap:14px; flex-wrap:nowrap">
         <span class="bigflame ${st.cur ? 'on' : ''}">${FLAME}</span>
         <div class="grow"><h2 style="margin:0">${st.cur ? plural(st.cur, 'день', 'дня', 'дней') + ' подряд' : 'Серия не начата'}</h2>
@@ -1780,14 +1803,14 @@ async function renderDuels(v){
     const myT = d.me === 'from' ? d.t1 : d.t2, thT = d.me === 'from' ? d.t2 : d.t1;
     let st;
     if (d.winner === 'draw') st = '<span class="pill warn">Ничья</span>';
-    else if (d.winner) st = d.winner === d.me ? '<span class="pill good">Победа!</span>' : '<span class="pill bad">Поражение</span>';
+    else if (d.winner) st = d.winner === d.me ? `<span class="pill good">Победа!</span>${d.stake ? `<span class="stakepill p">${COIN}+${d.stake}</span>` : ''}` : `<span class="pill bad">Поражение</span>${d.stake ? `<span class="stakepill m">${COIN}−${d.stake}</span>` : ''}`;
     else st = '<span class="pill none">Ждём соперника</span>';
     return `<div class="duel"><span class="dv">VS</span><div class="grow"><b>${esc(opp)}</b><div class="small muted">${subjName(d.subject)} · ${esc(d.created.slice(0, 10))}</div>
       <div class="small">Ты: <b>${my == null ? '—' : my + '/10'}</b>${my != null ? ' за ' + fmtSec(myT) : ''} · Соперник: <b>${their == null ? '—' : their + '/10'}</b>${their != null ? ' за ' + fmtSec(thT) : ''}</div></div>${st}</div>`;
   };
   v.innerHTML = `<div class="sec">
     <div class="panel duelhero"><div class="row" style="gap:14px; flex-wrap:nowrap"><span class="dv big">VS</span>
-      <div class="grow"><h2 style="margin:0">Дуэли</h2><div class="small muted">10 одинаковых вопросов. Побеждает тот, кто ответит точнее, а при равенстве — быстрее. Побед: <b>${wins}</b></div></div></div>
+      <div class="grow"><h2 style="margin:0">Дуэли</h2><div class="small muted">10 одинаковых вопросов. Побеждает тот, кто ответит точнее, а при равенстве — быстрее. <b>Победитель забирает у проигравшего ${S.data.stake || 10} монет.</b> Побед: <b>${wins}</b> · у тебя ${COIN.replace('<svg', '<svg style="width:16px;height:16px;vertical-align:-3px"')} <b>${coinBal()}</b></div></div></div>
       <button class="btn primary big" id="duNew" style="width:100%; margin-top:14px">Вызвать одноклассника</button></div>
     ${incoming.length ? `<h2 style="margin-top:20px">Тебя вызвали!</h2>${incoming.map(d => `<div class="duel in"><span class="dv">VS</span><div class="grow"><b>${esc(d.from)}</b><div class="small muted">${subjName(d.subject)} · результат соперника скрыт до твоей игры</div></div><button class="btn primary" data-play="${esc(d.id)}">Принять</button></div>`).join('')}` : ''}
     <h2 style="margin-top:20px">История</h2>
@@ -1833,6 +1856,7 @@ function duelStart(opp, subj){
   navPush();
   duelPlay('Дуэль с ' + opp, src, async res => {
     duelResultScreen('Отправляем вызов…', res);
+    /* ставка: монеты переходят, когда соперник сыграет */
     try { await api('duelCreate', S.student.name, S.student.cls, opp, subj, src, res.score, Math.round(res.seconds));
       duelResultScreen(`Вызов отправлен! ${opp} увидит его во вкладке «Дуэли». Результат появится, когда соперник сыграет.`, res); sfx('win');
     } catch (e){ duelResultScreen('Не удалось отправить вызов: ' + String(e.message || e).replace(/^(Exception|Error):\s*/, ''), res); }
@@ -1844,7 +1868,9 @@ function duelAccept(d){
   duelPlay('Дуэль с ' + d.from, d.questions, async res => {
     duelResultScreen('Считаем результат…', res);
     try { const r = await api('duelSubmit', S.student.name, S.student.cls, d.id, res.score, Math.round(res.seconds));
-      const msg = r.winner === 'draw' ? 'Ничья! Одинаковые баллы и время.' : r.winner === 'to' ? `Победа! Ты обыграл(а) ${d.from} — счёт ${r.s2} : ${r.s1}.` : `${d.from} победил(а) — счёт ${r.s1} : ${r.s2}. Вызови на реванш!`;
+      const stk = r.stake || 0;
+      if (S.data.coins && stk) S.data.coins.balance += r.winner === 'to' ? stk : -stk;
+      const msg = r.winner === 'draw' ? 'Ничья! Одинаковые баллы и время — монеты остаются у всех.' : r.winner === 'to' ? `Победа! Ты обыграл(а) ${d.from} — счёт ${r.s2} : ${r.s1}.${stk ? ' Ты забираешь ' + stk + ' монет!' : ''}` : `${d.from} победил(а) — счёт ${r.s1} : ${r.s2}.${stk ? ' Ты отдаёшь ' + stk + ' монет.' : ''} Вызови на реванш!`;
       duelResultScreen(msg, res, r.winner === 'to'); if (r.winner === 'to'){ S.data.duel = S.data.duel || {}; S.data.duel.wins = (S.data.duel.wins || 0) + 1; checkNewBadges(); }
     } catch (e){ duelResultScreen('Не удалось отправить результат: ' + String(e.message || e).replace(/^(Exception|Error):\s*/, ''), res); }
   });
@@ -1903,6 +1929,62 @@ function renderAnalytics(){
       <table><thead><tr><th>Ученик</th><th>Класс</th><th>Заданий</th><th>Средний</th><th>Активность (6 нед.)</th><th>Последний раз</th></tr></thead>
       <tbody>${studs.sort((a, b) => b.avg - a.avg).map(s => `<tr><td>${esc(s.name)}</td><td>${esc(s.cls)}</td><td>${s.done}</td><td><span class="pill ${pctClass(s.avg)}">${s.avg}%</span></td><td>${spark(s.weeks)}</td><td class="num">${esc(dstr(s.last))}</td></tr>`).join('')}</tbody></table></div>`;
   document.getElementById('anCls').onchange = e => { f.cls = e.target.value; renderAnalytics(); };
+}
+
+/* ================= Монеты и призы ================= */
+const COIN = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="#F2BE00" stroke="#B88A00" stroke-width="1.2"/><circle cx="12" cy="12" r="7" fill="none" stroke="#FFE58A" stroke-width="1.4"/><text x="12" y="16.2" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-size="10" font-weight="900" fill="#7A5A00">R</text></svg>';
+function coinBal(){ return (S.data && S.data.coins && S.data.coins.balance) || 0; }
+function coinsPanelHtml(){
+  if (!S.data || !S.data.coins) return '';
+  const bal = coinBal(), prizes = (S.data.prizes || []).slice().sort((a, b) => a.cost - b.cost), hist = S.data.coins.history || [];
+  return `<div class="panel coinp"><div class="row" style="justify-content:space-between; align-items:center">
+      <div><div class="small" style="font-weight:700; opacity:.8">МОИ МОНЕТЫ</div><div class="big">${COIN}${bal}</div></div>
+      <div class="small" style="max-width:24ch; opacity:.85">1 монета за каждые 10 очков опыта + победы в дуэлях. Копи и обменивай у учителя на призы!</div></div></div>
+    <h2 style="margin-top:20px">Призы</h2>
+    ${prizes.length ? prizes.map(p => { const ok = bal >= p.cost; return `<div class="prize ${ok ? 'ok' : ''}"><div class="grow"><b>${esc(p.name)}</b>
+        <div class="small ${ok ? '' : 'muted'}" style="${ok ? 'color:var(--good); font-weight:700' : ''}">${ok ? 'Хватает монет — попроси учителя обменять!' : 'Ещё ' + (p.cost - bal) + ' монет'}</div>
+        <div class="bar2"><span style="width:${Math.min(100, Math.round(bal * 100 / p.cost))}%"></span></div></div><span class="pc">${COIN}${p.cost}</span></div>`; }).join('')
+      : '<div class="empty panel">Учитель ещё не добавил призы. Копи монеты — они пригодятся!</div>'}
+    ${hist.length ? `<h2 style="margin-top:20px">История монет</h2><div class="panel">${hist.map(h => `<div class="chist"><span>${esc(h.reason)} <span class="muted small">${esc(String(h.time).slice(0, 10))}</span></span><b class="${h.delta > 0 ? 'p' : 'm'}">${h.delta > 0 ? '+' : ''}${h.delta}</b></div>`).join('')}</div>` : ''}`;
+}
+/* Учитель: монеты и призы */
+async function renderCoinsAdmin(){
+  const box = document.getElementById('tbody');
+  box.innerHTML = '<div class="loading" style="min-height:120px">Загружаем монеты…</div>';
+  let d; try { d = T.coins = await api('teacherCoins', T.pw); } catch (e){ box.innerHTML = `<div class="panel">Ошибка: ${esc(e.message)}</div>`; return; }
+  const f = T.filter, classes = [...new Set(d.students.map(x => x.cls).filter(Boolean))].sort();
+  const list = d.students.filter(x => !f.cls || x.cls === f.cls);
+  const prizeOpts = d.prizes.map((p, i) => `<option value="${i}">${esc(p.name)} — ${p.cost}</option>`).join('');
+  box.innerHTML = `<div class="angrid" style="margin-top:0">
+      <div class="panel"><h3>Призы</h3><p class="small muted">Каждая строка: «Название = цена в монетах». Ученики видят этот список в «Наградах».</p>
+        <textarea class="field" id="przT" rows="7" style="width:100%; font-family:inherit">${esc(d.prizes.map(p => p.name + ' = ' + p.cost).join('\n'))}</textarea>
+        <div class="row" style="margin-top:8px"><button class="btn primary" id="przS">Сохранить призы</button><span class="small muted">Пример: Пятёрка за домашку = 150</span></div></div>
+      <div class="panel"><h3>Как считаются монеты</h3><p class="small">1 монета за каждые 10 очков опыта (лучшие проценты по заданиям). Победа в дуэли забирает у проигравшего ${(S.data && S.data.stake) || 10} монет. Когда выдаёте приз — монеты списываются. Все движения видны в листе «Монеты» Google-таблицы.</p>
+        ${d.log.length ? `<h3 style="margin-top:10px">Последние операции</h3>${d.log.slice(0, 8).map(l => `<div class="chist"><span>${esc(l.student)} · ${esc(l.reason)}</span><b class="${l.delta > 0 ? 'p' : 'm'}">${l.delta > 0 ? '+' : ''}${l.delta}</b></div>`).join('')}` : ''}</div>
+    </div>
+    <div class="panel" style="margin-top:14px; overflow-x:auto"><div class="row" style="justify-content:space-between"><h3>Монеты учеников</h3>
+      <select class="field" id="coCls" style="max-width:200px"><option value="">Все классы</option>${classes.map(c => `<option ${f.cls === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></div>
+      <table class="ctbl"><thead><tr><th>Ученик</th><th>Класс</th><th>Монеты</th><th>Выдать приз</th><th>Бонус / штраф</th></tr></thead><tbody>
+      ${list.map((x, i) => `<tr data-i="${d.students.indexOf(x)}"><td>${esc(x.name)}</td><td>${esc(x.cls)}</td><td><b>${x.balance}</b></td>
+        <td>${d.prizes.length ? `<div class="row" style="gap:6px; flex-wrap:nowrap"><select class="field pz">${prizeOpts}</select><button class="btn sm" data-a="prize">Выдать</button></div>` : '<span class="small muted">нет призов</span>'}</td>
+        <td><div class="row" style="gap:6px; flex-wrap:nowrap"><input class="field am" type="number" placeholder="+20 / −10" style="width:100px"><button class="btn sm ghost" data-a="adj">OK</button></div></td></tr>`).join('')}
+      </tbody></table></div>`;
+  document.getElementById('coCls').onchange = e => { f.cls = e.target.value; renderCoinsAdmin(); };
+  document.getElementById('przS').onclick = async () => {
+    const lines = document.getElementById('przT').value.split('\n').map(l => l.trim()).filter(Boolean);
+    const list = lines.map(l => { const k = l.lastIndexOf('='); return {name: (k > 0 ? l.slice(0, k) : l).trim(), cost: k > 0 ? parseInt(l.slice(k + 1), 10) : 0}; }).filter(p => p.name && p.cost > 0);
+    try { await api('savePrizes', T.pw, list); toast('Призы сохранены: ' + list.length); renderCoinsAdmin(); } catch (e){ toast(String(e.message || e)); }
+  };
+  box.querySelectorAll('tr[data-i] button').forEach(b => b.onclick = async () => {
+    const tr = b.closest('tr'), st = d.students[+tr.dataset.i];
+    let delta, reason;
+    if (b.dataset.a === 'prize'){ const p = d.prizes[+tr.querySelector('.pz').value]; delta = -p.cost; reason = 'Приз: ' + p.name; }
+    else { delta = parseInt(tr.querySelector('.am').value, 10); reason = delta > 0 ? 'Бонус от учителя' : 'Штраф'; if (!delta){ toast('Впишите число монет'); return; } }
+    if (b.dataset.armed !== '1'){ b.dataset.armed = '1'; const t = b.textContent; b.textContent = (delta > 0 ? '+' : '') + delta + '?'; setTimeout(() => { if (b.isConnected){ b.dataset.armed = ''; b.textContent = t; } }, 3000); return; }
+    b.disabled = true;
+    try { const r = await api('teacherCoinsChange', T.pw, st.name, st.cls, delta, reason); toast(`${st.name}: теперь ${r.balance} монет`); renderCoinsAdmin(); }
+    catch (e){ toast(String(e.message || e).replace(/^(Exception|Error):\s*/, '')); b.disabled = false; }
+  });
 }
 
 function renderRating(v, boardAll){
@@ -2002,7 +2084,7 @@ function teacherHome(){
       <div class="small muted" style="margin-top:6px">Ключ хранится только на вашем Google-сервере. Ученики его не видят.</div>
     </div>
     <div class="row" style="justify-content:space-between; margin:22px 0 16px">
-      <div class="tabs"><button data-t="games" class="${T.tab === 'games' ? 'on' : ''}">Задания (${d.games.length})</button><button data-t="topics" class="${T.tab === 'topics' ? 'on' : ''}">Темы (${(d.topics || []).length})</button><button data-t="results" class="${T.tab === 'results' ? 'on' : ''}">Результаты (${d.results.length})</button><button data-t="analytics" class="${T.tab === 'analytics' ? 'on' : ''}">Аналитика</button></div>
+      <div class="tabs"><button data-t="games" class="${T.tab === 'games' ? 'on' : ''}">Задания (${d.games.length})</button><button data-t="topics" class="${T.tab === 'topics' ? 'on' : ''}">Темы (${(d.topics || []).length})</button><button data-t="results" class="${T.tab === 'results' ? 'on' : ''}">Результаты (${d.results.length})</button><button data-t="analytics" class="${T.tab === 'analytics' ? 'on' : ''}">Аналитика</button><button data-t="coins" class="${T.tab === 'coins' ? 'on' : ''}">Монеты и призы</button></div>
       ${T.tab === 'games' ? '<button class="btn primary" id="new">+ Новое задание</button>' : ''}
     </div>
     <div id="tbody"></div></div>`;
@@ -2020,6 +2102,7 @@ function teacherHome(){
   if (T.tab === 'games'){ document.getElementById('new').onclick = () => editor(null); renderGames(); }
   else if (T.tab === 'topics') renderTopics();
   else if (T.tab === 'analytics') renderAnalytics();
+  else if (T.tab === 'coins') renderCoinsAdmin();
   else renderResults();
 }
 
