@@ -485,6 +485,23 @@ tr.sub td{background:var(--bg); font-size:.85rem; white-space:normal}
 .prize.ok{border-color:var(--good)}
 .chist{display:flex; justify-content:space-between; gap:8px; padding:7px 0; border-bottom:1px solid var(--line); font-size:14px}
 .chist b.p{color:var(--good)} .chist b.m{color:var(--bad)}
+/* Калькулятор */
+.calctab{position:fixed; right:0; top:46%; z-index:16; width:34px; height:58px; border:0; border-radius:14px 0 0 14px; background:var(--accent); color:#fff; display:grid; place-items:center; cursor:pointer; box-shadow:-4px 6px 18px -6px var(--accent); padding:0 0 0 2px}
+.calctab svg{width:22px; height:22px}
+.calc{position:fixed; z-index:25; width:252px; background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:20px; box-shadow:0 24px 50px -16px rgba(10,12,40,.45); overflow:hidden; touch-action:none; user-select:none; -webkit-user-select:none}
+.calc .ch{display:flex; align-items:center; gap:8px; padding:8px 8px 8px 14px; background:var(--sunk); cursor:grab; font-weight:700; font-size:14px}
+.calc .ch .grip{flex:1; opacity:.75}
+.calc .ch button{width:30px; height:30px; border:0; border-radius:9px; background:var(--surface); color:var(--ink); font-size:18px; line-height:1; cursor:pointer}
+.calc .cd{padding:10px 14px 6px; text-align:right; min-height:64px}
+.calc .ce{font-size:14px; color:var(--muted); word-break:break-all; min-height:18px; font-variant-numeric:tabular-nums}
+.calc .cr{font:800 26px/1.2 var(--f-display); word-break:break-all; font-variant-numeric:tabular-nums}
+.calc .cr.err{color:var(--bad); font-size:16px}
+.calc .ck{display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; padding:6px 10px 12px}
+.calc .ck button{height:42px; border:0; border-radius:12px; background:var(--sunk); color:var(--ink); font:700 17px/1 inherit; font-family:inherit; cursor:pointer}
+.calc .ck button.op{background:color-mix(in srgb, var(--accent) 14%, var(--surface)); color:var(--accent)}
+.calc .ck button.eq{background:var(--accent); color:#fff}
+.calc .ck button.cl{color:var(--bad)}
+.calc .ck button:active{transform:scale(.94)}
 /* Сообщения разработчику */
 .mailbtn{position:relative}
 .mailbtn .navbadge{position:absolute; top:-6px; right:-6px; margin:0}
@@ -1175,6 +1192,86 @@ try { if (localStorage.getItem('chem_helper') === 'toir') H.who = 'toir'; } catc
 function helperKey(){ return 'chem_chat_' + (H.who === 'mini' ? '' : H.who + '_') + ((S.student && (S.student.email || S.student.name)) || ''); }
 function helperLoad(){ try { H.msgs = JSON.parse(localStorage.getItem(helperKey()) || '[]'); } catch(e){ H.msgs = []; } }
 function helperSave(){ try { localStorage.setItem(helperKey(), JSON.stringify(H.msgs.filter(m => !m.err).slice(-30).map(m => ({role: m.role, text: m.text})))); } catch(e){} }
+/* ================= Калькулятор (плавающее окно, условие задачи остаётся видно) ================= */
+const CALC_IC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2.5"/><rect x="8" y="5.5" width="8" height="4" rx="1"/><path d="M8.5 13h.01M12 13h.01M15.5 13h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>';
+const CALC = {expr: '', last: ''};
+function calcEval(src){
+  const s = src.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-').replace(/,/g, '.');
+  let i = 0;
+  const peek = () => s[i], eat = c => { if (s[i] === c){ i++; return true; } return false; };
+  const fail = () => { throw new Error('bad'); };
+  function num(){ const m = /^\d*\.?\d+(e[+-]?\d+)?|^\d+\.?/.exec(s.slice(i)); if (!m) fail(); i += m[0].length; return parseFloat(m[0]); }
+  function prim(){
+    if (eat('(')){ const v = add(); eat(')'); return v; }
+    if (eat('√')){ const v = unary(); if (v < 0) fail(); return Math.sqrt(v); }
+    return num();
+  }
+  function post(){ let v = prim(); while (true){ if (eat('%')) v /= 100; else if (eat('^')) v = Math.pow(v, unary()); else return v; } }
+  function unary(){ if (eat('-')) return -unary(); if (eat('+')) return unary(); return post(); }
+  function mul(){ let v = unary(); while (true){ if (eat('*')) v *= unary(); else if (eat('/')){ const d = unary(); if (d === 0) throw new Error('div0'); v /= d; } else if (peek() === '(' || peek() === '√') v *= unary(); else return v; } }
+  function add(){ let v = mul(); while (true){ if (eat('+')) v += mul(); else if (eat('-')) v -= mul(); else return v; } }
+  if (!s.trim()) return null;
+  const v = add(); if (i < s.length) fail();
+  if (!isFinite(v)) fail();
+  return v;
+}
+function calcFmt(v){ if (v == null) return ''; let t = Math.abs(v) >= 1e15 || (Math.abs(v) < 1e-9 && v !== 0) ? v.toExponential(6) : String(+v.toPrecision(12)); return t.replace('.', ',').replace(/^-/, '−'); }
+function calcClose(c){ c.remove(); try { localStorage.setItem('chem_calc_open', '0'); } catch(e){} }
+function calcOpen(){
+  let c = document.getElementById('calc'); if (c){ calcClose(c); return; }
+  c = document.createElement('div'); c.id = 'calc'; c.className = 'calc'; c.setAttribute('role', 'dialog'); c.setAttribute('aria-label', 'Калькулятор');
+  const keys = [['C', 'cl'], ['(', 'op'], [')', 'op'], ['⌫', 'op'], ['√', 'op'], ['x²', 'op'], ['%', 'op'], ['÷', 'op'], '7', '8', '9', ['×', 'op'], '4', '5', '6', ['−', 'op'], '1', '2', '3', ['+', 'op'], ['±', 'op'], '0', ',', ['=', 'eq']];
+  c.innerHTML = `<div class="ch" id="calcH"><span class="grip">⠿ Калькулятор</span><button id="calcX" aria-label="Закрыть калькулятор">×</button></div>
+    <div class="cd"><div class="ce" id="calcE"></div><div class="cr" id="calcR">0</div></div>
+    <div class="ck">${keys.map(k => { const [t, cl] = Array.isArray(k) ? k : [k, '']; return `<button class="${cl}" data-k="${t}">${t}</button>`; }).join('')}</div>`;
+  document.body.appendChild(c);
+  let pos = null; try { pos = JSON.parse(localStorage.getItem('chem_calc_pos') || 'null'); } catch(e){}
+  const place = (x, y) => { const W = innerWidth, H = innerHeight, w = c.offsetWidth, h = c.offsetHeight; x = Math.max(4, Math.min(W - w - 4, x)); y = Math.max(4, Math.min(H - h - 4, y)); c.style.left = x + 'px'; c.style.top = y + 'px'; return {x, y}; };
+  if (pos) place(pos.x, pos.y); else place(innerWidth - c.offsetWidth - 12, innerHeight - c.offsetHeight - 12);
+  try { localStorage.setItem('chem_calc_open', '1'); } catch(e){}
+  const E = c.querySelector('#calcE'), R = c.querySelector('#calcR');
+  const show = () => {
+    E.textContent = CALC.expr;
+    R.classList.remove('err');
+    try { const v = calcEval(CALC.expr); R.textContent = v == null ? (CALC.last || '0') : calcFmt(v); }
+    catch (e){ R.textContent = CALC.expr ? '…' : '0'; }
+  };
+  const press = k => {
+    if (k === 'C'){ CALC.expr = ''; CALC.last = ''; }
+    else if (k === '⌫') CALC.expr = CALC.expr.slice(0, -1);
+    else if (k === 'x²') CALC.expr += '^2';
+    else if (k === '±'){ const m = /(\d*[,.]?\d+[,.]?)$/.exec(CALC.expr); if (!m) CALC.expr += '−'; else { const st = CALC.expr.length - m[1].length; CALC.expr = CALC.expr.slice(st - 2, st) === '(−' ? CALC.expr.slice(0, st - 2) + m[1] : CALC.expr.slice(0, st) + '(−' + m[1]; } }
+    else if (k === '='){
+      try { const v = calcEval(CALC.expr); if (v == null) return; CALC.last = calcFmt(v); CALC.expr = CALC.last.replace(/^-/, '−'); E.textContent = ''; R.textContent = CALC.last; sfx('tap'); return; }
+      catch (e){ R.textContent = String(e.message) === 'div0' ? 'На ноль делить нельзя' : 'Проверь выражение'; R.classList.add('err'); return; }
+    }
+    else { if (CALC.expr.length > 80) return; CALC.expr += k; }
+    show();
+  };
+  c.querySelectorAll('.ck button').forEach(b => b.onclick = () => press(b.dataset.k));
+  c.querySelector('#calcX').onclick = () => calcClose(c);
+  c._key = ev => {
+    if (!document.getElementById('calc')) return document.removeEventListener('keydown', c._key);
+    const t = ev.target; if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+    const map = {'*': '×', '/': '÷', '-': '−', '.': ',', 'Enter': '=', 'Backspace': '⌫', 'Escape': 'C', '^': '^'};
+    let k = map[ev.key] || ev.key;
+    if (/^[0-9+%(),×÷−=⌫C^]$/.test(k) || k === '⌫'){ ev.preventDefault(); if (k === '^') { CALC.expr += '^'; show(); } else press(k); }
+  };
+  document.addEventListener('keydown', c._key);
+  const H = c.querySelector('#calcH'); let drag = null;
+  H.addEventListener('pointerdown', ev => { if (ev.target.closest('button')) return; drag = {dx: ev.clientX - c.offsetLeft, dy: ev.clientY - c.offsetTop}; H.setPointerCapture(ev.pointerId); H.style.cursor = 'grabbing'; });
+  H.addEventListener('pointermove', ev => { if (drag) place(ev.clientX - drag.dx, ev.clientY - drag.dy); });
+  const end = () => { if (!drag) return; drag = null; H.style.cursor = ''; try { localStorage.setItem('chem_calc_pos', JSON.stringify({x: c.offsetLeft, y: c.offsetTop})); } catch(e){} };
+  H.addEventListener('pointerup', end); H.addEventListener('pointercancel', end);
+  show();
+}
+function calcInit(){
+  if (document.getElementById('calcTab')) return;
+  const b = document.createElement('button'); b.id = 'calcTab'; b.className = 'calctab'; b.innerHTML = CALC_IC; b.title = 'Калькулятор'; b.setAttribute('aria-label', 'Калькулятор');
+  b.onclick = () => { sfx('tap'); calcOpen(); };
+  document.body.appendChild(b);
+  addEventListener('resize', () => { const c = document.getElementById('calc'); if (c){ const x = Math.min(c.offsetLeft, innerWidth - c.offsetWidth - 4), y = Math.min(c.offsetTop, innerHeight - c.offsetHeight - 4); c.style.left = Math.max(4, x) + 'px'; c.style.top = Math.max(4, y) + 'px'; } });
+}
 function helperFab(show){
   let b = document.getElementById('fab');
   const on = show && S.student && S.data && S.data.helper;
@@ -1444,7 +1541,7 @@ function topBar(back){
     </div>`;
 }
 function bindTop(){
-  helperFab(true);
+  helperFab(true); calcInit();
   const mb = document.getElementById('mailBtn'); if (mb) mb.onclick = () => { sfx('tap'); S.topic = null; S.section = null; S.view = 'mail'; renderHome(); window.scrollTo(0, 0); };
   const cc = document.getElementById('coinChip'); if (cc) cc.onclick = () => { sfx('tap'); S.topic = null; S.section = null; S.view = 'awards'; renderHome(); window.scrollTo(0, 0); };
   let chgArmed = false;
