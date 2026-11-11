@@ -421,7 +421,13 @@ tr.sub td{background:var(--bg); font-size:.85rem; white-space:normal}
 .ptbtn .pte{pointer-events:none}
 .ptbtn b{display:block; font-size:16px} .ptbtn span.s{font-size:13px; color:var(--muted)}
 .ptwrap{overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:8px}
-.ptgrid{display:grid; grid-template-columns:repeat(18, 46px); grid-template-rows:20px repeat(7, 52px) 12px 52px 52px; gap:3px; width:max-content}
+.ptgrid{display:grid; grid-template-columns:repeat(18, 62px); grid-template-rows:20px repeat(7, 76px) 12px 76px 76px; gap:3px; width:max-content}
+.pte.ptx{width:62px; height:76px; justify-content:flex-end; padding:0 2px 4px}
+.ptx i{top:3px; left:4px; font:700 11px/1 var(--f-display); opacity:1}
+.ptx u{position:absolute; top:2px; right:2px; min-width:22px; height:22px; padding:0 2px; border:1.5px solid currentColor; border-radius:50%; display:grid; place-items:center; font:600 9.5px/1 var(--f-body, inherit); text-decoration:none; opacity:.85; box-sizing:border-box}
+.ptx b{font-size:19px}
+.ptx em{font-style:normal; font-weight:700; font-size:10.5px; line-height:1; margin-top:3px; font-variant-numeric:tabular-nums}
+.ptx small{font-size:8px; margin-top:3px; max-width:58px}
 .ptg{font-size:11px; color:var(--muted); text-align:center; font-weight:700}
 .ptlab{font-size:10px; color:var(--muted); display:grid; place-items:center; border:1px dashed var(--line); border-radius:6px; height:100%}
 .pte{width:46px; height:52px; border:0; border-radius:7px; background:color-mix(in srgb, var(--pc) 40%, var(--surface)); color:var(--ink); position:relative; cursor:pointer; padding:0; display:flex; flex-direction:column; align-items:center; justify-content:center; font:inherit}
@@ -1720,9 +1726,14 @@ const PT_CAT = {alk:['Щелочные металлы','#F2765B'], ae:['Щело
   met:['Полуметаллы','#7FC8B5'], nm:['Неметаллы','#6FA8DC'], hal:['Галогены','#A78BDA'], ng:['Благородные газы','#C38BD9'], ln:['Лантаноиды','#F2A7C3'], an:['Актиноиды','#E58FB0']};
 const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
 function ptGroupName(g){ if (!g) return 'f-элемент (лантаноиды/актиноиды)'; if (g <= 2) return ROMAN[g] + 'A (главная подгруппа)'; if (g >= 13) return ROMAN[g - 10] + 'A (главная подгруппа)'; if (g >= 8 && g <= 10) return 'VIIIB (побочная подгруппа)'; if (g === 11) return 'IB (побочная подгруппа)'; if (g === 12) return 'IIB (побочная подгруппа)'; return ROMAN[g] + 'B (побочная подгруппа)'; }
+/* Порядковый номер, масса [..] и электроотрицательность — как в таблице А.В. Алижонова */
+const PT_MASS = ["1", "4", "7", "9", "11", "12", "14", "16", "19", "20", "23", "24", "27", "28", "31", "32", "35,5", "40", "39", "40", "45", "48", "51", "52", "55", "56", "59", "59", "64", "65", "70", "73", "75", "79", "80", "84", "85", "88", "89", "91", "93", "96", "99", "101", "103", "106", "108", "112", "115", "119", "122", "128", "127", "131", "133", "137", "139", "140", "141", "144", "145", "150", "152", "157", "159", "163", "165", "167", "169", "173", "175", "178", "181", "184", "186", "190", "192", "195", "197", "201", "204", "207", "209", "209", "210", "222", "223", "226", "227", "232", "231", "238", "237", "244", "243", "247", "247", "251", "254", "257", "258", "259", "260", "261", "262", "263", "262", "265", "266", "271", "272", "285", "286", "289", "288", "293", "294", "294"];
+const PT_EN = {"H": 2.1, "Li": 1.0, "Be": 1.5, "B": 2.0, "C": 2.5, "N": 3.0, "O": 3.5, "F": 4.1, "Na": 0.9, "Mg": 1.2, "Al": 1.5, "Si": 1.8, "P": 2.2, "S": 2.5, "Cl": 3.0, "K": 0.8, "Ca": 1.0, "Sc": 1.3, "Ti": 1.5, "V": 1.6, "Cr": 1.6, "Mn": 1.5, "Fe": 1.8, "Co": 1.9, "Ni": 1.9, "Cu": 1.9, "Zn": 1.6, "Ga": 1.6, "Ge": 1.8, "As": 2.0, "Se": 2.4, "Br": 2.8, "Rb": 0.8, "Sr": 1.0, "Y": 1.2, "Zr": 1.4, "Nb": 1.6, "Mo": 1.8, "Tc": 1.9, "Ru": 2.2, "Rh": 2.2, "Pd": 2.2, "Ag": 1.9, "Cd": 1.7, "In": 1.7, "Sn": 1.8, "Sb": 1.9, "Te": 2.1, "I": 2.5, "Cs": 0.7, "Ba": 0.9, "La": 1.0, "Hf": 1.3, "Ta": 1.5, "W": 1.7, "Re": 1.9, "Os": 2.2, "Ir": 2.2, "Pt": 2.2, "Au": 2.1, "Hg": 1.9, "Tl": 1.6, "Pb": 1.9, "Bi": 1.9, "Po": 2.0, "At": 2.2, "Fr": 0.7, "Ra": 0.9, "Ac": 1.1};
+PT.forEach(e => { e[8] = PT_EN[e[1]] != null ? PT_EN[e[1]] : null; });
+const enTxt = x => String(x.toFixed ? x.toFixed(1) : x).replace('.', ',');
 function ptCell(e){
-  const [z, s, n, m, , , c] = e;
-  return `<button class="pte" data-z="${z}" style="--pc:${PT_CAT[c][1]}"><i>${z}</i><b>${s}</b><small>${esc(n)}</small></button>`;
+  const [z, s, n, , , , c, , en] = e;
+  return `<button class="pte ptx" data-z="${z}" style="--pc:${PT_CAT[c][1]}"><i>${z}</i>${en != null ? `<u title="Электроотрицательность">${enTxt(en)}</u>` : ''}<b>${s}</b><em>[${PT_MASS[z - 1]}]</em><small>${esc(n)}</small></button>`;
 }
 function renderPT(){
   helperFab(false);
@@ -1739,7 +1750,7 @@ function renderPT(){
   app.innerHTML = `<div class="bar"><div class="wrap"><div class="row"><button class="btn sm ghost" id="ptX">← Выйти</button>
       <div class="grow" style="font-weight:700">Таблица Менделеева</div><button class="btn sm primary" id="ptQ">Угадай элемент</button></div></div></div>
     <div class="wrap" style="padding-top:12px">
-      <p class="small muted" style="margin:0 0 10px">Нажми на элемент, чтобы узнать о нём больше. Таблицу можно листать вбок.</p>
+      <p class="small muted" style="margin:0 0 10px">В клетке: порядковый номер, в кружке — электроотрицательность, в скобках — атомная масса. Нажми на элемент, чтобы узнать больше. Таблицу можно листать вбок.</p>
       <div class="ptwrap"><div class="ptgrid">${cells}</div></div>
       <div class="ptlegend">${Object.keys(PT_CAT).map(k => `<span><i style="background:${PT_CAT[k][1]}"></i>${PT_CAT[k][0]}</span>`).join('')}</div>
       <div class="tfoot"><div class="row" style="justify-content:center"><button class="btn" id="ptX2">← Выйти</button><button class="btn primary" id="ptQ2">Угадай элемент</button></div></div>
@@ -1757,15 +1768,15 @@ function ptInfo(e){
   const neutrons = /^\d/.test(m) ? Math.round(parseFloat(m)) - z : null;
   box.innerHTML = `<div class="ptcard" role="dialog" aria-label="${esc(n)}">
     <div class="row" style="gap:14px; flex-wrap:nowrap; align-items:center">
-      <span class="ptbig" style="--pc:${PT_CAT[c][1]}"><i>${z}</i><b>${s}</b><small>${m}</small></span>
+      <span class="ptbig" style="--pc:${PT_CAT[c][1]}"><i>${z}</i><b>${s}</b><small>[${PT_MASS[z - 1]}]</small></span>
       <div class="grow"><h2 style="margin:0">${esc(n)}</h2><div class="small muted">${PT_CAT[c][0]}</div></div>
       <button class="x" id="ptc" aria-label="Закрыть">×</button></div>
     <dl class="ptdl">
       <dt>Порядковый номер</dt><dd>${z} (протонов ${z}, электронов ${z}${neutrons != null ? ', нейтронов ≈ ' + neutrons : ''})</dd>
-      <dt>Атомная масса</dt><dd>${m}${/^\d/.test(m) ? ' (≈ ' + (z === 17 ? '35,5' : Math.round(parseFloat(m))) + ')' : ' — радиоактивный'}</dd>
+      <dt>Атомная масса</dt><dd>${PT_MASS[z - 1]} <span class="muted small">(точно: ${String(m).replace('.', ',')}${/^\d/.test(m) ? '' : ', радиоактивный'})</span></dd>
       <dt>Период / группа</dt><dd>${per}-й период, ${ptGroupName(g)}</dd>
       <dt>Электронная формула</dt><dd>${esc(conf)}</dd>
-      ${en ? `<dt>Электроотрицательность</dt><dd>${String(en).replace('.', ',')} (по Полингу)</dd>` : ''}
+      ${en != null ? `<dt>Электроотрицательность</dt><dd>${enTxt(en)}</dd>` : ''}
       ${ox ? `<dt>Степени окисления</dt><dd>${esc(ox)}</dd>` : ''}
     </dl></div>`;
   document.body.appendChild(box);
