@@ -479,6 +479,26 @@ tr.sub td{background:var(--bg); font-size:.85rem; white-space:normal}
 .prize.ok{border-color:var(--good)}
 .chist{display:flex; justify-content:space-between; gap:8px; padding:7px 0; border-bottom:1px solid var(--line); font-size:14px}
 .chist b.p{color:var(--good)} .chist b.m{color:var(--bad)}
+/* Сообщения разработчику */
+.mailbtn{position:relative}
+.mailbtn .navbadge{position:absolute; top:-6px; right:-6px; margin:0}
+.mkinds{display:flex; flex-wrap:wrap; gap:8px; margin:10px 0}
+.mkinds button{border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:999px; padding:7px 14px; font:inherit; font-weight:700; cursor:pointer}
+.mkinds button.on{background:var(--accent, #4338F0); border-color:transparent; color:#fff}
+textarea.field.mtext{width:100%; min-height:110px; resize:vertical; font-family:inherit; font-size:16px; line-height:1.45}
+.msg textarea.field{font-family:inherit; font-size:15px; height:64px; min-height:0; resize:vertical}
+.mic{width:46px; height:46px; border-radius:14px; display:grid; place-items:center; flex:none}
+#mList{padding-bottom:70px}
+.msg{padding:14px 16px; margin-top:10px; border-radius:16px; background:var(--surface); border:1px solid var(--line)}
+.msg .mh{display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; font-size:13px; opacity:.75}
+.msg .mt{margin-top:6px; white-space:pre-wrap; word-break:break-word}
+.msg .mr{margin-top:10px; padding:10px 12px; border-radius:12px; background:color-mix(in srgb, var(--good) 12%, var(--surface)); white-space:pre-wrap; word-break:break-word}
+.msg .mr b{display:block; font-size:13px; margin-bottom:3px; color:var(--good)}
+.msg.new{border-color:var(--good); box-shadow:0 0 0 2px color-mix(in srgb, var(--good) 25%, transparent)}
+.msg .mw{margin-top:8px; font-size:13px; opacity:.6}
+.msg.unans{border-left:4px solid var(--bad)}
+.mailcta{display:flex; align-items:center; gap:14px; width:100%; text-align:left; cursor:pointer; font:inherit; color:inherit}
+.mailcta .ic, .mic{width:46px; height:46px; border-radius:14px; display:grid; place-items:center; background:color-mix(in srgb, #4338F0 14%, var(--surface)); color:#4338F0; flex:none}
 .stakepill{display:inline-flex; align-items:center; gap:3px; font-weight:800; font-size:13px; padding:2px 8px; border-radius:999px}
 .stakepill svg{width:16px; height:16px}
 .stakepill.p{background:color-mix(in srgb, var(--good) 15%, var(--surface)); color:var(--good)}
@@ -1407,16 +1427,19 @@ function catalog(){
   return out;
 }
 
+const MAIL_IC = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>';
 function topBar(back){
   return `<div class="row" style="justify-content:space-between">
       ${back ? `<button class="btn sm ghost" id="backCat">← ${esc(back)}</button>` : '<div class="brand"><span class="el"><i>7</i>N</span><h1>Ramossitto</h1></div>'}
       <div class="row" style="gap:8px"><span class="inst-slot"></span>${S.data && S.data.coins ? `<button class="coin" id="coinChip" aria-label="Мои монеты">${COIN}${coinBal()}</button>` : ''}<span class="small muted">${esc(S.student.name)} · ${esc(S.student.cls)}</span>
+        ${S.data ? `<button class="iconbtn mailbtn" id="mailBtn" aria-label="Написать разработчику" title="Написать разработчику">${MAIL_IC}${S.data.mail && S.data.mail.unread ? `<span class="navbadge">${S.data.mail.unread}</span>` : ''}</button>` : ''}
         <button class="iconbtn" id="snd" aria-label="${SOUND ? 'Выключить звук' : 'Включить звук'}">${soundIcon()}</button>
         <button class="btn sm" id="chg" title="Войти под другим именем">Сменить</button></div>
     </div>`;
 }
 function bindTop(){
   helperFab(true);
+  const mb = document.getElementById('mailBtn'); if (mb) mb.onclick = () => { sfx('tap'); S.topic = null; S.section = null; S.view = 'mail'; renderHome(); window.scrollTo(0, 0); };
   const cc = document.getElementById('coinChip'); if (cc) cc.onclick = () => { sfx('tap'); S.topic = null; S.section = null; S.view = 'awards'; renderHome(); window.scrollTo(0, 0); };
   let chgArmed = false;
   document.getElementById('chg').onclick = e => {
@@ -1471,6 +1494,7 @@ function renderHome(){
   if (S.view === 'help') return renderHelp(v);
   if (S.view === 'awards') return renderAwards(v);
   if (S.view === 'duels') return renderDuels(v);
+  if (S.view === 'mail') return renderMail(v);
   const statOf = topics => { const gs = topics.flatMap(t => t.games); return {topics: topics.length, total: gs.length, done: gs.filter(g => my[g.id]).length}; };
   const others = cat.filter(sec => !branchOf(sec.section));
   v.innerHTML = dailyCardHtml() + (S.subject !== 'bio' ? `<button class="ptbtn" id="ptOpen"><span class="pte" style="--pc:#6FA8DC"><i>26</i><b>Fe</b><small>Железо</small></span><div class="grow"><b>Таблица Менделеева</b><span class="s">Все 118 элементов · игра «Угадай элемент»</span></div><span class="pill none">открыть</span></button>` : '') + `<div class="branches${S.subject === 'bio' ? ' b4' : ''}">${curBranches().map((br, i) => {
@@ -1947,6 +1971,36 @@ function coinsPanelHtml(){
       : '<div class="empty panel">Учитель ещё не добавил призы. Копи монеты — они пригодятся!</div>'}
     ${hist.length ? `<h2 style="margin-top:20px">История монет</h2><div class="panel">${hist.map(h => `<div class="chist"><span>${esc(h.reason)} <span class="muted small">${esc(String(h.time).slice(0, 10))}</span></span><b class="${h.delta > 0 ? 'p' : 'm'}">${h.delta > 0 ? '+' : ''}${h.delta}</b></div>`).join('')}</div>` : ''}`;
 }
+/* Учитель: сообщения учеников */
+async function renderMailAdmin(){
+  const box = document.getElementById('tbody');
+  box.innerHTML = '<div class="loading" style="min-height:120px">Загружаем сообщения…</div>';
+  let list; try { list = await api('teacherFeedback', T.pw); } catch (e){ box.innerHTML = `<div class="panel">Ошибка: ${esc(e.message)}</div>`; return; }
+  const f = T.mailF || 'new', shown = list.filter(m => f === 'all' || !m.reply);
+  const nNew = list.filter(m => !m.reply).length;
+  if (T.data) T.data.mailNew = nNew;
+  box.innerHTML = `<div class="row" style="justify-content:space-between; margin-bottom:6px"><div class="rseg"><button data-f="new" class="${f === 'new' ? 'on' : ''}">Без ответа (${nNew})</button><button data-f="all" class="${f === 'all' ? 'on' : ''}">Все (${list.length})</button></div>
+      <span class="small muted">Все сообщения хранятся в листе «Сообщения» Google-таблицы</span></div>
+    ${shown.length ? shown.map(m => `<div class="msg ${m.reply ? '' : 'unans'}" data-id="${esc(m.id)}"><div class="mh"><span><b>${esc(m.student)}</b> · ${esc(m.cls)} · ${esc(m.kind)}</span><span>${esc(m.time)}</span></div>
+        <div class="mt">${esc(m.text)}</div>
+        ${m.reply ? `<div class="mr"><b>Ваш ответ · ${esc(m.replyTime)}${m.seen ? ' · прочитан' : ''}</b>${esc(m.reply)}</div>` : ''}
+        <div class="row" style="gap:8px; margin-top:10px; align-items:flex-end"><textarea class="field grow" rows="2" maxlength="1500" placeholder="${m.reply ? 'Изменить ответ…' : 'Ответить ученику…'}" style="min-width:200px"></textarea>
+          <button class="btn primary sm" data-a="reply">Ответить</button><button class="btn ghost sm" data-a="del">Удалить</button></div></div>`).join('')
+      : `<div class="empty panel">${f === 'new' ? 'Все сообщения отвечены' : 'Пока никто не писал.'}</div>`}`;
+  box.querySelectorAll('.rseg button').forEach(b => b.onclick = () => { T.mailF = b.dataset.f; renderMailAdmin(); });
+  box.querySelectorAll('.msg button').forEach(b => b.onclick = async () => {
+    const card = b.closest('.msg'), id = card.dataset.id;
+    if (b.dataset.a === 'reply'){
+      const t = card.querySelector('textarea').value.trim(); if (!t){ toast('Напишите ответ'); return; }
+      b.disabled = true;
+      try { await api('replyFeedback', T.pw, id, t); toast('Ответ отправлен — ученик увидит его в приложении'); renderMailAdmin(); } catch (e){ toast(String(e.message || e)); b.disabled = false; }
+    } else {
+      if (b.dataset.armed !== '1'){ b.dataset.armed = '1'; b.textContent = 'Точно удалить?'; setTimeout(() => { if (b.isConnected){ b.dataset.armed = ''; b.textContent = 'Удалить'; } }, 3000); return; }
+      b.disabled = true;
+      try { await api('deleteFeedback', T.pw, id); toast('Удалено'); renderMailAdmin(); } catch (e){ toast(String(e.message || e)); b.disabled = false; }
+    }
+  });
+}
 /* Учитель: монеты и призы */
 async function renderCoinsAdmin(){
   const box = document.getElementById('tbody');
@@ -2011,7 +2065,8 @@ function renderHelp(v){
     ['build', 'Собери формулу', 'Нажимайте на плитки, чтобы собрать ответ по порядку. Нажмите на плитку в ответе, чтобы убрать её. Осторожно: есть лишние плитки-ловушки.'],
     ['cross', 'Кроссворд', 'Нажмите на клетку или на подсказку и печатайте буквы — курсор сам переходит дальше. Нажмите на клетку ещё раз, чтобы сменить направление. В конце — «Проверить и сдать».']
   ];
-  v.innerHTML = `<div class="sec"><h2>Виды заданий</h2><div class="grid2">${types.map(t => `<div class="panel helpc">${tile(t[0])}<div><h3>${t[1]}</h3><p>${t[2]}</p></div></div>`).join('')}</div></div>
+  v.innerHTML = `<div class="sec"><button class="panel mailcta" id="helpMail"><span class="ic">${MAIL_IC}</span><div class="grow"><h3 style="margin:0">Написать разработчику</h3><div class="small muted">Нашёл ошибку, есть идея или вопрос? Напиши — ответ придёт сюда же.</div></div><span class="pill none">написать</span></button></div>
+    <div class="sec"><h2>Виды заданий</h2><div class="grid2">${types.map(t => `<div class="panel helpc">${tile(t[0])}<div><h3>${t[1]}</h3><p>${t[2]}</p></div></div>`).join('')}</div></div>
     <div class="sec"><h2>Опыт и уровни</h2><div class="panel helpc"><div class="mini" style="width:46px;height:52px;font-size:1.2rem">Li</div><div><p>Каждое задание даёт до 100 опыта — столько, сколько процентов вы набрали. Пройдёте ещё раз лучше — получите разницу. Каждые 100 опыта — новый уровень, следующий элемент таблицы Менделеева: от Водорода H до Ксенона Xe.</p></div></div></div>
     <div class="sec"><h2>Установить как приложение</h2><div class="grid2">
       <div class="panel"><h3 style="font-size:1rem">Android</h3><ol class="steps"><li>Если учитель прислал файл .apk — откройте его и нажмите «Установить» (разрешите установку из этого источника)</li><li>Или откройте ссылку в Chrome и нажмите «Установить» вверху экрана либо ⋮ → «Установить приложение»</li></ol></div>
@@ -2019,6 +2074,47 @@ function renderHelp(v){
       <div class="panel"><h3 style="font-size:1rem">Компьютер (Chrome)</h3><ol class="steps"><li>Откройте ссылку в Chrome</li><li>Нажмите значок установки справа в адресной строке или кнопку «Установить»</li><li>Приложение появится в меню «Пуск» и на рабочем столе</li></ol></div>
       <div class="panel"><h3 style="font-size:1rem">Важно</h3><ol class="steps"><li>Пишите имя и класс одинаково</li><li>Нужен интернет</li><li>Результат уходит учителю сам — после каждой попытки</li></ol></div>
     </div></div>`;
+  document.getElementById('helpMail').onclick = () => { sfx('tap'); S.view = 'mail'; renderHome(); window.scrollTo(0, 0); };
+}
+
+/* ================= Сообщения разработчику ================= */
+const MAIL_KIND_LIST = [['idea', 'Идея'], ['bug', 'Ошибка'], ['question', 'Вопрос'], ['other', 'Другое']];
+async function renderMail(v){
+  const draftKey = 'chem_maildraft_' + S.student.name;
+  let kind = 'idea', draft = ''; try { draft = localStorage.getItem(draftKey) || ''; } catch(e){}
+  v.innerHTML = `<div class="sec"><div class="panel">
+      <div style="display:flex; gap:12px; align-items:center"><span class="mic">${MAIL_IC}</span><div style="flex:1; min-width:0"><h3 style="margin:0; font-size:1.15rem">Написать разработчику</h3><div class="small muted">Сообщение увидит только разработчик. Ответ появится ниже, а на конверте сверху загорится цифра.</div></div></div>
+      <div class="mkinds">${MAIL_KIND_LIST.map(k => `<button data-k="${k[0]}" class="${k[0] === kind ? 'on' : ''}">${k[1]}</button>`).join('')}</div>
+      <textarea class="field mtext" id="mText" maxlength="1500" placeholder="Например: в тесте «Алканы» вопрос 5 — правильный ответ Б, а засчитывает В. Или: добавьте игру про…">${esc(draft)}</textarea>
+      <div class="row" style="justify-content:space-between; margin-top:10px"><span class="small muted" id="mCnt">${draft.length} / 1500</span><button class="btn primary" id="mSend">Отправить</button></div>
+    </div></div>
+    <div class="sec"><h2>Мои сообщения</h2><div id="mList"><div class="loading" style="min-height:90px">Загружаем…</div></div></div>`;
+  const ta = document.getElementById('mText'), cnt = document.getElementById('mCnt');
+  ta.oninput = () => { cnt.textContent = ta.value.length + ' / 1500'; try { localStorage.setItem(draftKey, ta.value); } catch(e){} };
+  v.querySelectorAll('.mkinds button').forEach(b => b.onclick = () => { kind = b.dataset.k; v.querySelectorAll('.mkinds button').forEach(x => x.classList.toggle('on', x === b)); });
+  const load = async () => {
+    const box = document.getElementById('mList'); if (!box) return;
+    try {
+      const list = await api('myFeedback', S.student.name, S.student.cls);
+      if (S.data.mail && S.data.mail.unread){ S.data.mail.unread = 0; const bd = document.querySelector('#mailBtn .navbadge'); if (bd) bd.remove(); }
+      box.innerHTML = list.length ? list.map(m => `<div class="msg ${m.isNew ? 'new' : ''}"><div class="mh"><span><b>${esc(m.kind)}</b></span><span>${esc(m.time)}</span></div>
+          <div class="mt">${esc(m.text)}</div>
+          ${m.reply ? `<div class="mr"><b>Ответ разработчика${m.isNew ? ' · новое' : ''} · ${esc(m.replyTime)}</b>${esc(m.reply)}</div>` : '<div class="mw">Ждёт ответа…</div>'}</div>`).join('')
+        : '<div class="empty panel">Ты ещё ничего не писал. Первое сообщение — самое ценное!</div>';
+    } catch (e){ box.innerHTML = `<div class="panel">Не удалось загрузить: ${esc(String(e.message || e))}</div>`; }
+  };
+  document.getElementById('mSend').onclick = async e => {
+    const btn = e.currentTarget, text = ta.value.trim();
+    if (text.length < 3){ toast('Напиши сообщение'); ta.focus(); return; }
+    btn.disabled = true; btn.textContent = 'Отправляем…';
+    try {
+      await api('sendFeedback', S.student.name, S.student.cls, kind, text);
+      ta.value = ''; cnt.textContent = '0 / 1500'; try { localStorage.removeItem(draftKey); } catch(e){}
+      sfx('win'); toast('Отправлено! Спасибо'); load();
+    } catch (err){ toast(String(err.message || err).replace(/^(Exception|Error):\s*/, '')); }
+    btn.disabled = false; btn.textContent = 'Отправить';
+  };
+  load();
 }
 
 function renderTopic(title){
@@ -2084,7 +2180,7 @@ function teacherHome(){
       <div class="small muted" style="margin-top:6px">Ключ хранится только на вашем Google-сервере. Ученики его не видят.</div>
     </div>
     <div class="row" style="justify-content:space-between; margin:22px 0 16px">
-      <div class="tabs"><button data-t="games" class="${T.tab === 'games' ? 'on' : ''}">Задания (${d.games.length})</button><button data-t="topics" class="${T.tab === 'topics' ? 'on' : ''}">Темы (${(d.topics || []).length})</button><button data-t="results" class="${T.tab === 'results' ? 'on' : ''}">Результаты (${d.results.length})</button><button data-t="analytics" class="${T.tab === 'analytics' ? 'on' : ''}">Аналитика</button><button data-t="coins" class="${T.tab === 'coins' ? 'on' : ''}">Монеты и призы</button></div>
+      <div class="tabs"><button data-t="games" class="${T.tab === 'games' ? 'on' : ''}">Задания (${d.games.length})</button><button data-t="topics" class="${T.tab === 'topics' ? 'on' : ''}">Темы (${(d.topics || []).length})</button><button data-t="results" class="${T.tab === 'results' ? 'on' : ''}">Результаты (${d.results.length})</button><button data-t="analytics" class="${T.tab === 'analytics' ? 'on' : ''}">Аналитика</button><button data-t="coins" class="${T.tab === 'coins' ? 'on' : ''}">Монеты и призы</button><button data-t="mail" class="${T.tab === 'mail' ? 'on' : ''}">Сообщения${d.mailNew ? `<span class="navbadge">${d.mailNew}</span>` : ''}</button></div>
       ${T.tab === 'games' ? '<button class="btn primary" id="new">+ Новое задание</button>' : ''}
     </div>
     <div id="tbody"></div></div>`;
@@ -2103,6 +2199,7 @@ function teacherHome(){
   else if (T.tab === 'topics') renderTopics();
   else if (T.tab === 'analytics') renderAnalytics();
   else if (T.tab === 'coins') renderCoinsAdmin();
+  else if (T.tab === 'mail') renderMailAdmin();
   else renderResults();
 }
 
