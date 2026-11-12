@@ -154,6 +154,23 @@ body:has(.fab) .wrap{padding-bottom:90px}
 .subj .sub{position:relative; opacity:.9; font-size:.95rem; max-width:24ch}
 .subj .go{position:relative; margin-top:10px; align-self:flex-start; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); border-radius:999px; padding:8px 16px; font-weight:700; font-size:.95rem; backdrop-filter:blur(4px)}
 .subj .soon{position:absolute; right:18px; top:18px; background:#FFD447; color:#5A4300; font-weight:800; font-size:.8rem; padding:5px 12px; border-radius:999px; letter-spacing:.02em}
+.subj.alevel{--sc:#B7791F; background:radial-gradient(120% 120% at 100% 0%, #3B2A8A 0%, #16204F 55%, #0B1230 100%); animation-delay:.16s; min-height:190px}
+.subj.alevel h3{font-size:1.9rem; letter-spacing:.01em}
+.subj.alevel h3 em{font-style:normal; color:#FFD27A}
+.subj .tag{position:relative; align-self:flex-start; font-size:.72rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#FFD27A; opacity:.95}
+.al-hero{background:radial-gradient(120% 120% at 100% 0%, #3B2A8A 0%, #16204F 55%, #0B1230 100%)}
+.al-hero h2 em{font-style:normal; color:#FFD27A}
+.alsubj{display:grid; gap:14px; margin-top:16px; grid-template-columns:1fr 1fr}
+@media (max-width:560px){ .alsubj{grid-template-columns:1fr} }
+.alsubj .subj{min-height:180px}
+.subj.alchem{--sc:#5B3BF0; background:linear-gradient(150deg,#1E1B6E 0%,#4338F0 55%,#8B5CF6 100%)}
+.subj.albio{--sc:#13A06B; background:linear-gradient(150deg,#064E3B 0%,#0E9F6E 55%,#4ADE80 100%); animation-delay:.08s}
+.alsubj .subj .art{width:52%}
+.alsoon{text-align:center; padding:30px 20px}
+.alsoon .ic{width:64px; height:64px; margin:0 auto 12px; border-radius:20px; display:grid; place-items:center; background:color-mix(in srgb, var(--accent) 12%, var(--surface)); color:var(--accent)}
+.alsoon .ic svg{width:34px; height:34px}
+.alchips{display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:14px}
+.alchips span{padding:6px 12px; border-radius:999px; background:var(--sunk); font-size:13px; font-weight:700; color:var(--muted)}
 .subj-page{position:relative}
 .subj-page::before{content:""; position:fixed; inset:0; z-index:-1; background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22240%22%20height%3D%22240%22%20viewBox%3D%220%200%20240%20240%22%20fill%3D%22none%22%20stroke%3D%22%236D5BF5%22%20stroke-opacity%3D%22.13%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M30%2020l18%2010v20L30%2060%2012%2050V30z%22/%3E%3Cpath%20d%3D%22M48%2030l18-10%2018%2010v20L66%2060%22/%3E%3Ccircle%20cx%3D%2240%22%20cy%3D%22150%22%20r%3D%227%22/%3E%3Ccircle%20cx%3D%2266%22%20cy%3D%22136%22%20r%3D%225%22/%3E%3Cpath%20d%3D%22M46%20146l15-7%22/%3E%3Cpath%20d%3D%22M150%2020h18M154%2020v26l-18%2034a8%208%200%200%200%207%2012h30a8%208%200%200%200%207-12l-18-34V20%22/%3E%3Cg%20stroke%3D%22%2316A34A%22%20stroke-opacity%3D%22.15%22%3E%3Cpath%20d%3D%22M180%20120c18%2014%2018%2028%200%2042s-18%2028%200%2042%22/%3E%3Cpath%20d%3D%22M204%20120c-18%2014-18%2028%200%2042s18%2028%200%2042%22/%3E%3Cpath%20d%3D%22M185%20133h14M185%20175h14%22/%3E%3Cpath%20d%3D%22M90%20200c0-22%2016-36%2036-38%202%2020-14%2038-36%2038z%22/%3E%3Cellipse%20cx%3D%22110%22%20cy%3D%2290%22%20rx%3D%2218%22%20ry%3D%2213%22/%3E%3Ccircle%20cx%3D%22113%22%20cy%3D%2289%22%20r%3D%224%22/%3E%3C/g%3E%3C/svg%3E") repeat, var(--bg)}
 @media (max-width:600px){ .subj .art{width:48%; right:-14px; top:auto; bottom:-8px; opacity:.55} .subj .sub{max-width:26ch} .subj{min-height:190px} }
@@ -742,6 +759,7 @@ function navBack(){
   if (window.MODE === 'teacher' || !S.student || !S.data) return;
   if (S.topic != null){ S.topic = null; S.section != null ? renderSection(S.section) : renderHome(); }
   else if (S.section != null){ S.section = null; renderHome(); }
+  else if (isAL(S.subject)) renderALevel();
   else if (S.subject) renderSubjects();
   window.scrollTo(0, 0);
 }
@@ -1392,6 +1410,42 @@ const ART_BIO = `<svg viewBox="0 0 220 200" fill="none" stroke="#fff" stroke-wid
   <path d="M66 30h38M72 55h26M66 80h38M66 120h38M72 145h26M66 170h38" opacity=".7"/></g>
   <g opacity=".8" transform="translate(130 20)"><path d="M10 70C10 30 40 6 76 4c2 36-22 66-62 66z"/><path d="M14 66C30 48 46 32 66 16" opacity=".7"/></g>
   <g opacity=".7"><ellipse cx="170" cy="150" rx="34" ry="26"/><circle cx="176" cy="148" r="9" fill="#fff" fill-opacity=".35"/><circle cx="152" cy="160" r="3" fill="#fff"/><circle cx="190" cy="134" r="3" fill="#fff"/></g></svg>`;
+const ART_AL = `<svg viewBox="0 0 220 200" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g opacity=".9"><path d="M30 78l80-36 80 36-80 36z"/><path d="M62 94v38c0 12 22 24 48 24s48-12 48-24V94"/><path d="M190 78v46"/><circle cx="190" cy="130" r="6" fill="#FFD27A" stroke="#FFD27A"/></g><g stroke="#FFD27A" stroke-width="4" opacity=".9"><path d="M150 22l4 9 9 4-9 4-4 9-4-9-9-4 9-4z"/><path d="M40 150l3 6 6 3-6 3-3 6-3-6-6-3 6-3z"/></g></svg>`;
+const AL_INFO = {
+  al_chem: {name: 'Chemistry', ru: 'Химия', full: 'A Level Chemistry', cls: 'alchem', art: () => ART_CHEM, areas: ['Physical chemistry', 'Inorganic chemistry', 'Organic chemistry', 'Analysis']},
+  al_bio: {name: 'Biology', ru: 'Биология', full: 'A Level Biology', cls: 'albio', art: () => ART_BIO, areas: ['Cells & molecules', 'Physiology', 'Genetics & evolution', 'Ecology']}
+};
+const isAL = subj => subj === 'al_chem' || subj === 'al_bio';
+/* предмет раздела: «A Level Chemistry…», «A Level Biology…», разделы биологии, остальное — химия */
+function subjOfSection(sec){
+  const x = lc(sec).replace(/\s+/g, ' ');
+  if (/^a[ -]?level bio/.test(x)) return 'al_bio';
+  if (/^a[ -]?level chem/.test(x)) return 'al_chem';
+  return BIO_SET.has(x) ? 'bio' : 'chem';
+}
+function renderALevel(){
+  S.subject = 'alevel'; sstore('chem_subj', 'alevel'); S.topic = null; S.section = null; S.view = 'topics';
+  const n = k => S.data ? subjGames(k).length : 0;
+  app.innerHTML = `<div class="wrap subj-page">${topBar('Предметы')}
+    <section class="subj-hero al-hero">
+      <svg class="deco" viewBox="0 0 400 160" preserveAspectRatio="xMidYMid slice" fill="none" stroke="#fff" stroke-width="2"><g><path d="M20 30l14 8v16l-14 8-14-8V38z"/><circle cx="90" cy="120" r="8"/></g><g><path d="M300 0c26 20 26 40 0 60s-26 40 0 60s26 40 0 60"/><path d="M330 0c-26 20-26 40 0 60s26 40 0 60s-26 40 0 60"/></g></svg>
+      <h2><em>A Level</em> — международная программа</h2>
+      <p>Тесты и задания на английском языке. Выбери предмет.</p>
+    </section>
+    <div class="alsubj">${['al_bio', 'al_chem'].map(k => { const a = AL_INFO[k], c = n(k); return `<button class="subj ${a.cls}" data-al="${k}" aria-label="A Level ${a.name}"><span class="art">${a.art()}</span>
+        <span class="tag">A Level</span><h3>${a.name}</h3><span class="sub">${a.ru}${c ? ' · ' + c + ' заданий' : ' · скоро тесты'}</span><span class="go">Open →</span></button>`; }).join('')}</div></div>`;
+  bindTop();
+  document.querySelectorAll('.inst-slot').forEach(fillInstall);
+  app.querySelectorAll('[data-al]').forEach(b => b.onclick = () => { sfx('tap'); S.subject = b.dataset.al; sstore('chem_subj', S.subject); S.view = 'topics'; navPush(); renderHome(); window.scrollTo(0, 0); });
+}
+function alTopicsHtml(cat, my){
+  const a = AL_INFO[S.subject];
+  const secs = cat.filter(sec => sec.topics.length);
+  if (!secs.length) return `<div class="panel alsoon"><div class="ic">${ART_AL.replace('stroke="#fff"', 'stroke="currentColor"')}</div>
+      <h2 style="margin:0">${a.full}</h2><p class="muted" style="margin:8px auto 0; max-width:40ch">Здесь скоро появятся тесты и задания на английском языке. Загляни позже!</p>
+      <div class="alchips">${a.areas.map(x => `<span>${x}</span>`).join('')}</div></div>`;
+  return secs.map(sec => `<div class="sec"><h2>${esc(secs.length > 1 ? sec.section.replace(/^a[ -]?level\s+(biology|chemistry)\s*[:—–-]?\s*/i, '') || sec.section : 'Topics')}</h2><div class="grid2">${topicCards(sec.topics, my)}</div></div>`).join('');
+}
 function renderSubjects(){
   S.subject = null; sstore('chem_subj', null);
   const firstName = S.student.name.split(' ')[1] || S.student.name;
@@ -1410,11 +1464,14 @@ function renderSubjects(){
         <h3>Химия</h3><span class="sub">Общая, неорганическая и органическая химия${nChem ? ' · ' + nChem + ' заданий' : ''}</span><span class="go">Открыть →</span></button>
       <button class="subj bio" id="sBio" aria-label="Биология"><span class="art">${ART_BIO}</span>
         <h3>Биология</h3><span class="sub">Ботаника, зоология, анатомия человека, общая биология${nBio ? ' · ' + nBio + ' заданий' : ''}</span><span class="go">Открыть →</span></button>
+      <button class="subj alevel" id="sAL" aria-label="A Level"><span class="art">${ART_AL}</span>
+        <span class="tag">International</span><h3><em>A</em> Level</h3><span class="sub">Biology и Chemistry на английском языке</span><span class="go">Открыть →</span></button>
     </div></div>`;
   bindTop();
   document.querySelectorAll('.inst-slot').forEach(fillInstall);
   document.getElementById('sChem').onclick = () => { sfx('tap'); S.subject = 'chem'; sstore('chem_subj', 'chem'); navPush(); renderHome(); window.scrollTo(0, 0); };
   document.getElementById('sBio').onclick = () => { sfx('tap'); S.subject = 'bio'; sstore('chem_subj', 'bio'); navPush(); renderHome(); window.scrollTo(0, 0); };
+  document.getElementById('sAL').onclick = () => { sfx('tap'); navPush(); renderALevel(); window.scrollTo(0, 0); };
 }
 
 /* ================= Ученик ================= */
@@ -1477,7 +1534,8 @@ async function studentHome(){
   try { S.data = await api('getStudentData', S.student.name, S.student.cls); }
   catch (e){ app.innerHTML = `<div class="wrap narrow"><div class="panel">Не удалось загрузить задания: ${esc(e.message)}<br><br><button class="btn" id="retry">Попробовать снова</button></div></div>`; document.getElementById('retry').onclick = studentHome; return; }
   if (!S.subject) S.subject = sstore('chem_subj');
-  if (S.subject !== 'chem' && S.subject !== 'bio') return renderSubjects();
+  if (S.subject === 'alevel') return renderALevel();
+  if (S.subject !== 'chem' && S.subject !== 'bio' && !isAL(S.subject)) return renderSubjects();
   if (S.topic != null) renderTopic(S.topic); else if (S.section != null) renderSection(S.section); else renderHome();
 }
 
@@ -1501,12 +1559,12 @@ const curBranches = () => S.subject === 'bio' ? BIO_BRANCHES : CHEM_BRANCHES;
 const branchOf = name => curBranches().find(b => lc(b.name) === lc(name));
 /* задания предмета: биология — темы из разделов BIO_BRANCHES, химия — всё остальное */
 function subjGames(subj){
-  const bio = new Set((S.data.topics || []).filter(t => BIO_SET.has(lc(t.section))).map(t => lc(t.title)));
-  return (S.data.games || []).filter(g => bio.has(lc(g.topic)) === (subj === 'bio'));
+  const of = {}; (S.data.topics || []).forEach(t => { of[lc(t.title)] = subjOfSection(t.section); });
+  return (S.data.games || []).filter(g => (of[lc(g.topic)] || 'chem') === subj);
 }
 function catalog(){
-  const isBio = S.subject === 'bio';
-  const topics = S.data.topics.filter(t => BIO_SET.has(lc(t.section)) === isBio), games = subjGames(isBio ? 'bio' : 'chem'), cls = S.student.cls;
+  const subj = S.subject === 'bio' || isAL(S.subject) ? S.subject : 'chem', isBio = subj !== 'chem';
+  const topics = S.data.topics.filter(t => subjOfSection(t.section) === subj), games = subjGames(subj), cls = S.student.cls;
   const mine = games.filter(g => !g.className || g.className.toUpperCase().split(/[,\s]+/).includes(cls))
     .sort((a, b) => TYPE_ORDER.indexOf(a.type) - TYPE_ORDER.indexOf(b.type));
   const key = s => String(s || '').trim().toLowerCase();
@@ -1562,7 +1620,7 @@ function renderHome(){
   const avg = done.length ? Math.round(done.reduce((s, g) => s + my[g.id].best, 0) / done.length) : 0;
   const xp = xpOf(my), L = levelOf(xp);
   const firstName = S.student.name.split(' ')[1] || S.student.name, stk = streakInfo();
-  app.innerHTML = `<div class="wrap">${topBar('Предметы')}
+  app.innerHTML = `<div class="wrap">${topBar(isAL(S.subject) ? 'A Level' : 'Предметы')}
     <section class="hero">
       <div class="row" style="gap:18px; align-items:center; flex-wrap:nowrap">
         <div class="lvl"><i>${L.n}</i><b>${L.sym}</b><small>${L.name}</small></div>
@@ -1599,6 +1657,12 @@ function renderHome(){
   if (S.view === 'duels') return renderDuels(v);
   if (S.view === 'mail') return renderMail(v);
   const statOf = topics => { const gs = topics.flatMap(t => t.games); return {topics: topics.length, total: gs.length, done: gs.filter(g => my[g.id]).length}; };
+  if (isAL(S.subject)){
+    v.innerHTML = dailyCardHtml() + alTopicsHtml(cat, my);
+    bindDaily(); checkNewBadges();
+    v.querySelectorAll('.card').forEach(b => b.onclick = () => { sfx('tap'); S.section = null; navPush(); renderTopic(b.dataset.t); window.scrollTo(0, 0); });
+    return;
+  }
   const others = cat.filter(sec => !branchOf(sec.section));
   v.innerHTML = dailyCardHtml() + (S.subject !== 'bio' ? `<button class="ptbtn" id="ptOpen"><span class="pte" style="--pc:#6FA8DC"><i>26</i><b>Fe</b><small>Железо</small></span><div class="grow"><b>Таблица Менделеева</b><span class="s">Все 118 элементов · игра «Угадай элемент»</span></div><span class="pill none">открыть</span></button>` : '') + `<div class="branches${S.subject === 'bio' ? ' b4' : ''}">${curBranches().map((br, i) => {
       const sec = cat.find(x => lc(x.section) === lc(br.name)), st = statOf(sec ? sec.topics : []);
@@ -1665,7 +1729,7 @@ function streakInfo(){
 function hashStr(s){ let h = 2166136261; for (const c of s){ h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
 function dailyGame(){
   const today = todayStr(), key = 'daily_' + (S.subject || 'chem');
-  const games = subjGames(S.subject === 'bio' ? 'bio' : 'chem'), my = S.data.my;
+  const games = subjGames(S.subject === 'bio' || isAL(S.subject) ? S.subject : 'chem'), my = S.data.my;
   let pick = lsGet(key, null);
   if (!pick || pick.date !== today || !games.some(g => g.id === pick.id)){
     if (!games.length) return null;
