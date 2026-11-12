@@ -16,7 +16,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <style>
 /* Layout: universal-indicator pH strip as the brand rainbow; element tiles for games and levels. One column on phones, two on desktop. */
 :root{
@@ -136,7 +137,7 @@ textarea.field{min-height:260px; font-family:var(--f-mono); font-size:14px; line
 .chat .ib.send{background:var(--accent); border-color:var(--accent); color:#fff}
 .chat .pv{padding:0 14px; display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted)}
 .chat .pv img{height:48px; border-radius:8px}
-body:has(.fab) .wrap{padding-bottom:90px}
+body.hasfab .wrap{padding-bottom:90px}
 /* Выбор предмета */
 .subj-hero{position:relative; overflow:hidden; border-radius:24px; padding:26px 20px 22px; margin-top:14px; background:radial-gradient(120% 90% at 0% 0%, #2B1F7A 0%, #171A45 55%, #0B3B2E 100%); color:#fff}
 .subj-hero h2{font:700 1.6rem/1.15 var(--f-display); margin:0; position:relative}
@@ -152,7 +153,7 @@ body:has(.fab) .wrap{padding-bottom:90px}
 .subj .art{position:absolute; right:-10px; top:-6px; width:62%; max-width:260px; opacity:.95; pointer-events:none}
 .subj h3{font:700 1.7rem/1 var(--f-display); margin:0; position:relative}
 .subj .sub{position:relative; opacity:.9; font-size:.95rem; max-width:24ch}
-.subj .go{position:relative; margin-top:10px; align-self:flex-start; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); border-radius:999px; padding:8px 16px; font-weight:700; font-size:.95rem; backdrop-filter:blur(4px)}
+.subj .go{position:relative; margin-top:10px; align-self:flex-start; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); border-radius:999px; padding:8px 16px; font-weight:700; font-size:.95rem}
 .subj .soon{position:absolute; right:18px; top:18px; background:#FFD447; color:#5A4300; font-weight:800; font-size:.8rem; padding:5px 12px; border-radius:999px; letter-spacing:.02em}
 .subj.alevel{--sc:#B7791F; background:radial-gradient(120% 120% at 100% 0%, #3B2A8A 0%, #16204F 55%, #0B1230 100%); animation-delay:.16s; min-height:190px}
 .subj.alevel h3{font-size:1.9rem; letter-spacing:.01em}
@@ -175,7 +176,7 @@ body:has(.fab) .wrap{padding-bottom:90px}
 .alpaper .apn{width:46px; height:46px; flex:none; border-radius:14px; display:grid; place-items:center; font:800 17px/1 var(--f-display); color:#FFD27A; background:linear-gradient(150deg,#16204F,#3B2A8A)}
 .alchips span{padding:6px 12px; border-radius:999px; background:var(--sunk); font-size:13px; font-weight:700; color:var(--muted)}
 .subj-page{position:relative}
-.subj-page::before{content:""; position:fixed; inset:0; z-index:-1; background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22240%22%20height%3D%22240%22%20viewBox%3D%220%200%20240%20240%22%20fill%3D%22none%22%20stroke%3D%22%236D5BF5%22%20stroke-opacity%3D%22.13%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M30%2020l18%2010v20L30%2060%2012%2050V30z%22/%3E%3Cpath%20d%3D%22M48%2030l18-10%2018%2010v20L66%2060%22/%3E%3Ccircle%20cx%3D%2240%22%20cy%3D%22150%22%20r%3D%227%22/%3E%3Ccircle%20cx%3D%2266%22%20cy%3D%22136%22%20r%3D%225%22/%3E%3Cpath%20d%3D%22M46%20146l15-7%22/%3E%3Cpath%20d%3D%22M150%2020h18M154%2020v26l-18%2034a8%208%200%200%200%207%2012h30a8%208%200%200%200%207-12l-18-34V20%22/%3E%3Cg%20stroke%3D%22%2316A34A%22%20stroke-opacity%3D%22.15%22%3E%3Cpath%20d%3D%22M180%20120c18%2014%2018%2028%200%2042s-18%2028%200%2042%22/%3E%3Cpath%20d%3D%22M204%20120c-18%2014-18%2028%200%2042s18%2028%200%2042%22/%3E%3Cpath%20d%3D%22M185%20133h14M185%20175h14%22/%3E%3Cpath%20d%3D%22M90%20200c0-22%2016-36%2036-38%202%2020-14%2038-36%2038z%22/%3E%3Cellipse%20cx%3D%22110%22%20cy%3D%2290%22%20rx%3D%2218%22%20ry%3D%2213%22/%3E%3Ccircle%20cx%3D%22113%22%20cy%3D%2289%22%20r%3D%224%22/%3E%3C/g%3E%3C/svg%3E") repeat, var(--bg)}
+.subj-page::before{content:""; position:fixed; inset:0; z-index:-1; pointer-events:none; transform:translateZ(0); will-change:transform; background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22240%22%20height%3D%22240%22%20viewBox%3D%220%200%20240%20240%22%20fill%3D%22none%22%20stroke%3D%22%236D5BF5%22%20stroke-opacity%3D%22.13%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M30%2020l18%2010v20L30%2060%2012%2050V30z%22/%3E%3Cpath%20d%3D%22M48%2030l18-10%2018%2010v20L66%2060%22/%3E%3Ccircle%20cx%3D%2240%22%20cy%3D%22150%22%20r%3D%227%22/%3E%3Ccircle%20cx%3D%2266%22%20cy%3D%22136%22%20r%3D%225%22/%3E%3Cpath%20d%3D%22M46%20146l15-7%22/%3E%3Cpath%20d%3D%22M150%2020h18M154%2020v26l-18%2034a8%208%200%200%200%207%2012h30a8%208%200%200%200%207-12l-18-34V20%22/%3E%3Cg%20stroke%3D%22%2316A34A%22%20stroke-opacity%3D%22.15%22%3E%3Cpath%20d%3D%22M180%20120c18%2014%2018%2028%200%2042s-18%2028%200%2042%22/%3E%3Cpath%20d%3D%22M204%20120c-18%2014-18%2028%200%2042s18%2028%200%2042%22/%3E%3Cpath%20d%3D%22M185%20133h14M185%20175h14%22/%3E%3Cpath%20d%3D%22M90%20200c0-22%2016-36%2036-38%202%2020-14%2038-36%2038z%22/%3E%3Cellipse%20cx%3D%22110%22%20cy%3D%2290%22%20rx%3D%2218%22%20ry%3D%2213%22/%3E%3Ccircle%20cx%3D%22113%22%20cy%3D%2289%22%20r%3D%224%22/%3E%3C/g%3E%3C/svg%3E") repeat, var(--bg)}
 @media (max-width:600px){ .subj .art{width:48%; right:-14px; top:auto; bottom:-8px; opacity:.55} .subj .sub{max-width:26ch} .subj{min-height:190px} }
 .subj h3,.subj .sub,.subj .go{z-index:1}
 .bio-soon{text-align:center; padding:28px 20px}
@@ -1296,6 +1297,7 @@ function calcInit(){
 function helperFab(show){
   let b = document.getElementById('fab');
   const on = show && S.student && S.data && S.data.helper;
+  document.body.classList.toggle('hasfab', !!on);
   if (!on){ if (b) b.remove(); return; }
   if (!b){ b = document.createElement('button'); b.id = 'fab'; b.className = 'fab'; b.innerHTML = '<span class="av">' + MINI_HEAD + '</span><span class="av">' + TOIR_HEAD + '</span>Помощники'; b.setAttribute('aria-label', 'Помощники mini-Ramossitto и Toirbek'); b.onclick = () => openHelper(); document.body.appendChild(b); }
 }
@@ -1538,9 +1540,24 @@ function studentLogin(mode){
 
 /* Быстрый старт: показываем сохранённые данные сразу, свежие подгружаем в фоне.
    Задания (самая тяжёлая часть) сервер присылает, только если они изменились. */
-function dataCacheKey(){ return 'chem_data_' + lc((S.student && (S.student.email || S.student.name)) || '') + '|' + lc(S.student && S.student.cls); }
-function loadDataCache(){ try { const d = JSON.parse(localStorage.getItem(dataCacheKey()) || 'null'); return d && Array.isArray(d.games) ? d : null; } catch(e){ return null; } }
-function saveDataCache(d){ try { localStorage.setItem(dataCacheKey(), JSON.stringify(d)); } catch(e){ try { localStorage.removeItem(dataCacheKey()); } catch(_){} } }
+/* Кэш в двух частях: задания (большие, общие, меняются редко) и данные ученика (маленькие). */
+function dataCacheKey(){ return 'chem_d2_' + lc((S.student && (S.student.email || S.student.name)) || '') + '|' + lc(S.student && S.student.cls); }
+const CAT_KEY = 'chem_cat2';
+function smallData(d){ const o = {}; for (const k in d) if (k !== 'games' && k !== 'topics') o[k] = d[k]; return o; }
+function loadDataCache(){
+  try {
+    try { Object.keys(localStorage).filter(k => k.indexOf('chem_data_') === 0).forEach(k => localStorage.removeItem(k)); } catch(e){}
+    const d = JSON.parse(localStorage.getItem(dataCacheKey()) || 'null'), c = JSON.parse(localStorage.getItem(CAT_KEY) || 'null');
+    if (!d || !c || !Array.isArray(c.games)) return null;
+    d.games = c.games; d.topics = c.topics; d.ver = c.ver; return d;
+  } catch(e){ return null; }
+}
+function saveDataCache(d, catChanged){
+  try {
+    if (catChanged) localStorage.setItem(CAT_KEY, JSON.stringify({ver: d.ver, games: d.games, topics: d.topics}));
+    localStorage.setItem(dataCacheKey(), JSON.stringify(smallData(d)));
+  } catch(e){ try { localStorage.removeItem(CAT_KEY); localStorage.removeItem(dataCacheKey()); } catch(_){} }
+}
 function renderStudentView(){
   if (!S.subject) S.subject = sstore('chem_subj');
   if (S.subject === 'alevel') return renderALevel();
@@ -1558,17 +1575,19 @@ async function studentHome(){
   if (!S.data) S.data = loadDataCache();
   const had = !!S.data;
   if (had) renderStudentView(); else app.innerHTML = '<div class="loading">Загружаем задания…</div>';
-  let fresh;
+  let fresh, catChanged = false;
   try {
     fresh = await api('getStudentData', S.student.name, S.student.cls, had ? S.data.ver || '' : '');
-    if (!fresh.games){ if (S.data && S.data.games){ fresh.games = S.data.games; fresh.topics = S.data.topics; } else fresh = await api('getStudentData', S.student.name, S.student.cls, ''); }
+    catChanged = !!fresh.games;
+    if (!fresh.games){ if (S.data && S.data.games){ fresh.games = S.data.games; fresh.topics = S.data.topics; } else { fresh = await api('getStudentData', S.student.name, S.student.cls, ''); catChanged = true; } }
   } catch (e){
     if (had) return;
     app.innerHTML = `<div class="wrap narrow"><div class="panel">Не удалось загрузить задания: ${esc(e.message)}<br><br><button class="btn" id="retry">Попробовать снова</button></div></div>`; document.getElementById('retry').onclick = studentHome; return;
   }
   if (seq !== homeSeq || !S.student) return;
-  const same = had && JSON.stringify(fresh) === JSON.stringify(S.data);
-  S.data = fresh; saveDataCache(fresh);
+  const same = had && !catChanged && JSON.stringify(smallData(fresh)) === JSON.stringify(smallData(S.data));
+  if (same) { saveDataCache(fresh, false); return; }
+  S.data = fresh; saveDataCache(fresh, catChanged);
   if (!same && (!had || viewIsIdle())) renderStudentView();
 }
 
@@ -1591,11 +1610,24 @@ const BIO_SET = new Set(BIO_BRANCHES.map(b => b.name.toLowerCase()));
 const curBranches = () => S.subject === 'bio' ? BIO_BRANCHES : CHEM_BRANCHES;
 const branchOf = name => curBranches().find(b => lc(b.name) === lc(name));
 /* задания предмета: биология — темы из разделов BIO_BRANCHES, химия — всё остальное */
+let _sg = {d: null, m: {}};
 function subjGames(subj){
-  const of = {}; (S.data.topics || []).forEach(t => { of[lc(t.title)] = subjOfSection(t.section); });
-  return (S.data.games || []).filter(g => (of[lc(g.topic)] || 'chem') === subj);
+  if (_sg.d !== S.data || _sg.g !== S.data.games){
+    _sg = {d: S.data, g: S.data.games, m: {}};
+    const of = {}; (S.data.topics || []).forEach(t => { of[lc(t.title)] = subjOfSection(t.section); });
+    (S.data.games || []).forEach(g => { const k = of[lc(g.topic)] || 'chem'; (_sg.m[k] = _sg.m[k] || []).push(g); });
+  }
+  return _sg.m[subj] || [];
 }
+let _cat = {};
 function catalog(){
+  const ck = S.subject + '|' + S.student.cls;
+  if (_cat.d === S.data && _cat.g === S.data.games && _cat.k === ck) return _cat.v;
+  const v = catalog_();
+  _cat = {d: S.data, g: S.data.games, k: ck, v};
+  return v;
+}
+function catalog_(){
   const subj = S.subject === 'bio' || isAL(S.subject) ? S.subject : 'chem', isBio = subj !== 'chem';
   const topics = S.data.topics.filter(t => subjOfSection(t.section) === subj), games = subjGames(subj), cls = S.student.cls;
   const mine = games.filter(g => !g.className || g.className.toUpperCase().split(/[,\s]+/).includes(cls))
@@ -1603,9 +1635,11 @@ function catalog(){
   const key = s => String(s || '').trim().toLowerCase();
   const out = [], used = new Set();
   let n = 0;
+  const byTopic = {};
+  mine.forEach(g => { const k = key(g.topic); (byTopic[k] = byTopic[k] || []).push(g); });
   topics.forEach(t => {
     n++;
-    const gs = mine.filter(g => key(g.topic) === key(t.title));
+    const gs = byTopic[key(t.title)] || [];
     if (!gs.length) return;
     gs.forEach(g => used.add(g.id));
     let sec = out.find(s => s.section === t.section);
