@@ -170,6 +170,9 @@ body:has(.fab) .wrap{padding-bottom:90px}
 .alsoon .ic{width:64px; height:64px; margin:0 auto 12px; border-radius:20px; display:grid; place-items:center; background:color-mix(in srgb, var(--accent) 12%, var(--surface)); color:var(--accent)}
 .alsoon .ic svg{width:34px; height:34px}
 .alchips{display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:14px}
+.alpaper .aph{display:flex; align-items:center; gap:12px; margin-bottom:10px}
+.alpaper .aph h2{margin:0}
+.alpaper .apn{width:46px; height:46px; flex:none; border-radius:14px; display:grid; place-items:center; font:800 17px/1 var(--f-display); color:#FFD27A; background:linear-gradient(150deg,#16204F,#3B2A8A)}
 .alchips span{padding:6px 12px; border-radius:999px; background:var(--sunk); font-size:13px; font-weight:700; color:var(--muted)}
 .subj-page{position:relative}
 .subj-page::before{content:""; position:fixed; inset:0; z-index:-1; background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22240%22%20height%3D%22240%22%20viewBox%3D%220%200%20240%20240%22%20fill%3D%22none%22%20stroke%3D%22%236D5BF5%22%20stroke-opacity%3D%22.13%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M30%2020l18%2010v20L30%2060%2012%2050V30z%22/%3E%3Cpath%20d%3D%22M48%2030l18-10%2018%2010v20L66%2060%22/%3E%3Ccircle%20cx%3D%2240%22%20cy%3D%22150%22%20r%3D%227%22/%3E%3Ccircle%20cx%3D%2266%22%20cy%3D%22136%22%20r%3D%225%22/%3E%3Cpath%20d%3D%22M46%20146l15-7%22/%3E%3Cpath%20d%3D%22M150%2020h18M154%2020v26l-18%2034a8%208%200%200%200%207%2012h30a8%208%200%200%200%207-12l-18-34V20%22/%3E%3Cg%20stroke%3D%22%2316A34A%22%20stroke-opacity%3D%22.15%22%3E%3Cpath%20d%3D%22M180%20120c18%2014%2018%2028%200%2042s-18%2028%200%2042%22/%3E%3Cpath%20d%3D%22M204%20120c-18%2014-18%2028%200%2042s18%2028%200%2042%22/%3E%3Cpath%20d%3D%22M185%20133h14M185%20175h14%22/%3E%3Cpath%20d%3D%22M90%20200c0-22%2016-36%2036-38%202%2020-14%2038-36%2038z%22/%3E%3Cellipse%20cx%3D%22110%22%20cy%3D%2290%22%20rx%3D%2218%22%20ry%3D%2213%22/%3E%3Ccircle%20cx%3D%22113%22%20cy%3D%2289%22%20r%3D%224%22/%3E%3C/g%3E%3C/svg%3E") repeat, var(--bg)}
@@ -1444,7 +1447,12 @@ function alTopicsHtml(cat, my){
   if (!secs.length) return `<div class="panel alsoon"><div class="ic">${ART_AL.replace('stroke="#fff"', 'stroke="currentColor"')}</div>
       <h2 style="margin:0">${a.full}</h2><p class="muted" style="margin:8px auto 0; max-width:40ch">Здесь скоро появятся тесты и задания на английском языке. Загляни позже!</p>
       <div class="alchips">${a.areas.map(x => `<span>${x}</span>`).join('')}</div></div>`;
-  return secs.map(sec => `<div class="sec"><h2>${esc(secs.length > 1 ? sec.section.replace(/^a[ -]?level\s+(biology|chemistry)\s*[:—–-]?\s*/i, '') || sec.section : 'Topics')}</h2><div class="grid2">${topicCards(sec.topics, my)}</div></div>`).join('');
+  const PAPER = {1: 'Multiple choice · 40 questions · 1 h 15 min · AS Level', 2: 'AS Level structured questions · 1 h 15 min', 3: 'Advanced practical skills · 2 h', 4: 'A Level structured questions · 2 h', 5: 'Planning, analysis and evaluation · 1 h 15 min'};
+  return secs.map(sec => {
+    const head = sec.section.replace(/^a[ -]?level\s+(biology|chemistry)\s*[:—–-]?\s*/i, '') || sec.section, m = /paper\s*(\d)/i.exec(head);
+    const gs = sec.topics.flatMap(t => t.games), d = gs.filter(g => my[g.id]).length;
+    return `<div class="sec alpaper"><div class="aph"><span class="apn">${m ? 'P' + m[1] : '•'}</span><div class="grow"><h2>${esc(head)}</h2><div class="small muted">${m && PAPER[m[1]] ? PAPER[m[1]] + ' · ' : ''}выполнено ${d} из ${gs.length}</div></div></div><div class="grid2">${topicCards(sec.topics, my)}</div></div>`;
+  }).join('');
 }
 function renderSubjects(){
   S.subject = null; sstore('chem_subj', null);
@@ -1528,15 +1536,40 @@ function studentLogin(mode){
   };
 }
 
-async function studentHome(){
-  if (!S.student) return studentLogin();
-  if (!S.data) app.innerHTML = '<div class="loading">Загружаем задания…</div>';
-  try { S.data = await api('getStudentData', S.student.name, S.student.cls); }
-  catch (e){ app.innerHTML = `<div class="wrap narrow"><div class="panel">Не удалось загрузить задания: ${esc(e.message)}<br><br><button class="btn" id="retry">Попробовать снова</button></div></div>`; document.getElementById('retry').onclick = studentHome; return; }
+/* Быстрый старт: показываем сохранённые данные сразу, свежие подгружаем в фоне.
+   Задания (самая тяжёлая часть) сервер присылает, только если они изменились. */
+function dataCacheKey(){ return 'chem_data_' + lc((S.student && (S.student.email || S.student.name)) || '') + '|' + lc(S.student && S.student.cls); }
+function loadDataCache(){ try { const d = JSON.parse(localStorage.getItem(dataCacheKey()) || 'null'); return d && Array.isArray(d.games) ? d : null; } catch(e){ return null; } }
+function saveDataCache(d){ try { localStorage.setItem(dataCacheKey(), JSON.stringify(d)); } catch(e){ try { localStorage.removeItem(dataCacheKey()); } catch(_){} } }
+function renderStudentView(){
   if (!S.subject) S.subject = sstore('chem_subj');
   if (S.subject === 'alevel') return renderALevel();
   if (S.subject !== 'chem' && S.subject !== 'bio' && !isAL(S.subject)) return renderSubjects();
   if (S.topic != null) renderTopic(S.topic); else if (S.section != null) renderSection(S.section); else renderHome();
+}
+function viewIsIdle(){
+  const a = document.activeElement;
+  return !NAV.game && !document.getElementById('chat') && !document.getElementById('ptsheet') && !(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && app.contains(a));
+}
+let homeSeq = 0;
+async function studentHome(){
+  if (!S.student) return studentLogin();
+  const seq = ++homeSeq;
+  if (!S.data) S.data = loadDataCache();
+  const had = !!S.data;
+  if (had) renderStudentView(); else app.innerHTML = '<div class="loading">Загружаем задания…</div>';
+  let fresh;
+  try {
+    fresh = await api('getStudentData', S.student.name, S.student.cls, had ? S.data.ver || '' : '');
+    if (!fresh.games){ if (S.data && S.data.games){ fresh.games = S.data.games; fresh.topics = S.data.topics; } else fresh = await api('getStudentData', S.student.name, S.student.cls, ''); }
+  } catch (e){
+    if (had) return;
+    app.innerHTML = `<div class="wrap narrow"><div class="panel">Не удалось загрузить задания: ${esc(e.message)}<br><br><button class="btn" id="retry">Попробовать снова</button></div></div>`; document.getElementById('retry').onclick = studentHome; return;
+  }
+  if (seq !== homeSeq || !S.student) return;
+  const same = had && JSON.stringify(fresh) === JSON.stringify(S.data);
+  S.data = fresh; saveDataCache(fresh);
+  if (!same && (!had || viewIsIdle())) renderStudentView();
 }
 
 const TYPE_ORDER = ['test', 'quiz', 'match', 'build', 'cross'];
