@@ -523,6 +523,37 @@ tr.sub td{background:var(--bg); font-size:.85rem; white-space:normal}
 .calc .ck button.eq{background:var(--accent); color:#fff}
 .calc .ck button.cl{color:var(--bad)}
 .calc .ck button:active{transform:scale(.94)}
+/* Библиотека (книги) */
+.subj.books{--sc:#9A5B13; background:linear-gradient(140deg,#5B2E0E 0%,#A0521C 55%,#E0A43A 100%); animation-delay:.24s; min-height:180px}
+.lib-hero{background:linear-gradient(140deg,#4A260C 0%,#8E4A18 60%,#D9973A 100%)}
+.libsubj{display:grid; gap:14px; margin-top:16px; grid-template-columns:1fr 1fr}
+@media (max-width:560px){ .libsubj{grid-template-columns:1fr} }
+.libsubj .subj{min-height:170px}
+.shelf{display:flex; align-items:center; gap:14px; width:100%; text-align:left; margin-top:12px; padding:14px; border-radius:18px; border:1px solid var(--line); background:var(--surface); cursor:pointer; font:inherit; color:var(--ink); position:relative; overflow:hidden}
+.shelf::after{content:""; position:absolute; left:0; right:0; bottom:0; height:6px; background:linear-gradient(90deg,#8E4A18,#D9973A)}
+.shelf .spines{display:flex; gap:3px; align-items:flex-end; flex:none; height:58px}
+.shelf .spines i{display:block; width:11px; border-radius:3px 3px 1px 1px; background:var(--sc,#4338F0)}
+.shelf b{display:block; font-size:17px} .shelf small{color:var(--muted)}
+.btopics{margin-top:14px; display:grid; gap:8px}
+.btopic{display:flex; align-items:center; gap:12px; width:100%; text-align:left; padding:12px 14px; border-radius:14px; border:1px solid var(--line); background:var(--surface); cursor:pointer; font:inherit; color:var(--ink)}
+.btopic .no{flex:none; width:36px; height:36px; border-radius:10px; display:grid; place-items:center; font-weight:800; color:#fff; background:var(--sc,#8E4A18)}
+.btopic.read .no{background:var(--good)}
+.reader{background:var(--surface); border:1px solid var(--line); border-radius:22px; padding:18px 18px 26px; margin-top:14px; font-size:var(--rfs,17px); line-height:1.6}
+.reader h2{font-size:1.2em; margin:1.3em 0 .5em; line-height:1.3} .reader h3{font-size:1.07em; margin:1.1em 0 .4em} .reader h4{font-size:1em; margin:1em 0 .3em}
+.reader p{margin:.55em 0} .reader ul{padding-left:1.2em; margin:.5em 0} .reader li{margin:.3em 0}
+.reader img{display:block; max-width:100%; height:auto; margin:10px auto; border-radius:12px}
+.reader .tw{overflow-x:auto; margin:12px 0; -webkit-overflow-scrolling:touch}
+.reader table{border-collapse:collapse; font-size:.86em; min-width:100%}
+.reader td, .reader th{border:1px solid var(--line); padding:6px 8px; vertical-align:top; text-align:left}
+.reader th{background:#3B4A8A; color:#fff}
+.reader th span{color:#fff !important}
+.reader .box{border-radius:12px; padding:10px 14px; margin:12px 0; background:#FFF7DD}
+.reader .cap{text-align:center; font-size:.85em; color:var(--muted); margin-top:-4px}
+.reader mark{background:#FFF0A8; padding:0 2px; border-radius:3px}
+.rtoc{display:flex; flex-wrap:wrap; gap:6px; margin-top:12px}
+.rtoc button{border:1px solid var(--line); background:var(--sunk); color:var(--ink); border-radius:999px; padding:6px 12px; font:inherit; font-size:13px; font-weight:600; cursor:pointer; text-align:left}
+.rnav{display:flex; gap:10px; margin-top:16px} .rnav .btn{flex:1; justify-content:center}
+.rfs{display:inline-flex; gap:4px} .rfs button{width:38px; height:38px; border-radius:10px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-weight:800; cursor:pointer}
 /* Сообщения разработчику */
 .mailbtn{position:relative}
 .mailbtn .navbadge{position:absolute; top:-6px; right:-6px; margin:0}
@@ -587,7 +618,20 @@ const IN_GAS = !!(window.google && google.script && google.script.run);
   const v = parseFloat(getComputedStyle(d).paddingTop) || 0; d.remove();
   if (v < 20 && /iPhone|iPad|iPod/.test(navigator.userAgent)) document.documentElement.style.setProperty('--sat', '50px');
 } catch(e){} })();
-function api(fn, ...args){
+/* Устойчивость при большой нагрузке: если Google-сервер занят, запрос сам повторяется (до 3 раз, с паузой). */
+const API_NO_RETRY = {askHelper: 1, duelCreate: 1, sendFeedback: 1, registerStudent: 1, teacherCoinsChange: 1, importPackJson: 1, saveGame: 1, deleteGame: 1, savePrizes: 1};
+const BUSY_RE = /too many|simultaneous|invoked too many|try again|timed out|timeout|lock|занят|перегруж|Service|internal|Сервер ответил с ошибкой|Нет связи/i;
+async function api(fn, ...args){
+  const tries = API_NO_RETRY[fn] ? 1 : 4;
+  for (let i = 1; ; i++){
+    try { return await api1(fn, ...args); }
+    catch (e){
+      if (i >= tries || !BUSY_RE.test(String(e && e.message || e))) throw e;
+      await new Promise(r => setTimeout(r, (700 * Math.pow(2, i - 1)) + Math.random() * 900));
+    }
+  }
+}
+function api1(fn, ...args){
   if (IN_GAS) return new Promise((res, rej) => {
     google.script.run.withSuccessHandler(res).withFailureHandler(e => rej(e && e.message ? e : new Error(String(e))))[fn](...args);
   });
@@ -1152,13 +1196,31 @@ function showResult(game, res, opts){
   document.getElementById('back').onclick = () => { if (NAV.game && NAV.on && NAV.depth > 0) history.back(); else { NAV.game = null; opts.onExit && opts.onExit(); } };
   const st = document.getElementById('sendState');
   if (opts.preview){ st.innerHTML = '<span class="pill warn">Режим проверки — результат не записан</span>'; return; }
+  const payload = {gameId: game.id, student: S.student.name, className: S.student.cls, score: res.score, max: res.max, seconds: res.seconds, details: res.details, uid: Date.now().toString(36) + Math.random().toString(36).slice(2, 7)};
   const send = () => {
     st.innerHTML = '<span class="pill none">Отправляем результат учителю…</span>';
-    api('submitResult', {gameId: game.id, student: S.student.name, className: S.student.cls, score: res.score, max: res.max, seconds: res.seconds, details: res.details})
-      .then(() => { st.innerHTML = '<span class="pill good">✓ Результат отправлен учителю</span>'; })
-      .catch(e => { st.innerHTML = `<span class="pill bad">Не отправлено: ${esc(e.message)}</span> <button class="btn sm" id="resend">Отправить снова</button>`; document.getElementById('resend').onclick = send; });
+    api('submitResult', payload)
+      .then(() => { pendingDrop(payload.uid); if (st.isConnected) st.innerHTML = '<span class="pill good">✓ Результат отправлен учителю</span>'; })
+      .catch(e => {
+        pendingAdd(payload);
+        if (!st.isConnected) return;
+        st.innerHTML = `<span class="pill warn">Сервер сейчас занят — результат сохранён в телефоне и отправится сам</span> <button class="btn sm" id="resend">Отправить сейчас</button>`;
+        document.getElementById('resend').onclick = send;
+      });
   };
   send();
+}
+
+/* Неотправленные результаты хранятся в телефоне и досылаются при следующем открытии */
+function pendingList(){ try { return JSON.parse(localStorage.getItem('chem_pending') || '[]'); } catch(e){ return []; } }
+function pendingSave(a){ try { localStorage.setItem('chem_pending', JSON.stringify(a.slice(-50))); } catch(e){} }
+function pendingAdd(p){ const a = pendingList(); if (!a.some(x => x.uid === p.uid)) { a.push(p); pendingSave(a); } }
+function pendingDrop(uid){ pendingSave(pendingList().filter(x => x.uid !== uid)); }
+let pendingBusy = false;
+async function flushPending(){
+  if (pendingBusy) return; pendingBusy = true;
+  try { for (const p of pendingList()){ try { await api('submitResult', p); pendingDrop(p.uid); } catch(e){ break; } } }
+  finally { pendingBusy = false; }
 }
 
 /* ================= Помощник (ИИ) ================= */
@@ -1456,6 +1518,89 @@ function alTopicsHtml(cat, my){
     return `<div class="sec alpaper"><div class="aph"><span class="apn">${m ? 'P' + m[1] : '•'}</span><div class="grow"><h2>${esc(head)}</h2><div class="small muted">${m && PAPER[m[1]] ? PAPER[m[1]] + ' · ' : ''}выполнено ${d} из ${gs.length}</div></div></div><div class="grid2">${topicCards(sec.topics, my)}</div></div>`;
   }).join('');
 }
+/* ================= Библиотека: книги и конспекты по темам ================= */
+const ART_BOOKS = `<svg viewBox="0 0 220 200" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g opacity=".92"><rect x="40" y="40" width="26" height="120" rx="4"/><rect x="72" y="28" width="30" height="132" rx="4"/><path d="M80 52h14M80 64h14"/><rect x="108" y="48" width="24" height="112" rx="4"/><path d="M142 58l24-7 30 104-24 7z"/><path d="M28 162h170"/></g><g stroke="#FFE3A3" stroke-width="4"><path d="M46 60h14M46 72h14"/><path d="M114 70h12"/></g></svg>`;
+const BOOKS_BASE = 'https://daminovotabek785-byte.github.io/books/';
+const LIB = {index: null, shelf: {}};
+async function libFetch(name){
+  const r = await fetch(BOOKS_BASE + name, {cache: 'no-cache'});
+  if (!r.ok) throw new Error('Книга пока не загружена');
+  return r.json();
+}
+async function libIndex(){ if (!LIB.index) LIB.index = await libFetch('index.json'); return LIB.index; }
+async function libShelf(id){ if (!LIB.shelf[id]) LIB.shelf[id] = await libFetch(id + '.json'); return LIB.shelf[id]; }
+function libRead(){ try { return JSON.parse(localStorage.getItem('chem_libread') || '{}'); } catch(e){ return {}; } }
+function libMarkRead(k){ const r = libRead(); r[k] = 1; try { localStorage.setItem('chem_libread', JSON.stringify(r)); } catch(e){} }
+function libPage(back, inner){
+  app.innerHTML = `<div class="wrap subj-page">${topBar(back)}${inner}</div>`;
+  bindTop(); document.querySelectorAll('.inst-slot').forEach(fillInstall);
+  const b = document.getElementById('backCat'); if (b) b.onclick = () => goBack();
+}
+async function renderLibrary(){
+  S.subject = 'books'; S.topic = null; S.section = null;
+  NAV.game = () => renderSubjects();
+  libPage('Предметы', `<section class="subj-hero lib-hero"><h2>Библиотека</h2><p>Теория по каждой теме из конспектов. Выбери предмет и открывай темы по порядку.</p></section>
+    <div class="libsubj" id="libS"><div class="loading" style="min-height:120px">Открываем библиотеку…</div></div>`);
+  let idx; try { idx = await libIndex(); } catch (e){ document.getElementById('libS').innerHTML = `<div class="panel">Не удалось открыть библиотеку: ${esc(e.message)}. Проверьте интернет.</div>`; return; }
+  const box = document.getElementById('libS'); if (!box) return;
+  const cnt = k => (idx[k] || []).reduce((n, sh) => n + sh.topics.length, 0);
+  box.innerHTML = [['bio', 'Биология', 'albio', ART_BIO], ['chem', 'Химия', 'alchem', ART_CHEM]].map(([k, name, cls, art]) => {
+    const sh = (idx[k] || []).length;
+    return `<button class="subj ${cls}" data-lib="${k}"><span class="art">${art}</span><span class="tag">Книги</span><h3>${name}</h3><span class="sub">${sh ? plural(sh, 'полка', 'полки', 'полок') + ' · ' + plural(cnt(k), 'тема', 'темы', 'тем') : 'Скоро здесь появятся книги'}</span><span class="go">Открыть →</span></button>`;
+  }).join('');
+  box.querySelectorAll('[data-lib]').forEach(b => b.onclick = () => { sfx('tap'); navPush(); renderShelves(b.dataset.lib); window.scrollTo(0, 0); });
+}
+async function renderShelves(k){
+  S.subject = 'books_' + k;
+  NAV.game = () => renderLibrary();
+  const name = k === 'bio' ? 'Биология' : 'Химия';
+  const idx = await libIndex().catch(() => ({}));
+  const shelves = idx[k] || [], read = libRead();
+  libPage('Книги', `<section class="subj-hero lib-hero"><h2>${name}: книжные полки</h2><p>Каждая полка — отдельная книга. Внутри темы идут по порядку.</p></section>
+    ${shelves.length ? shelves.map((sh, i) => { const done = sh.topics.filter((t, j) => read[sh.id + '/' + j]).length;
+      return `<button class="shelf" data-sh="${esc(sh.id)}" style="--sc:${sh.color || '#8E4A18'}"><span class="spines">${[38, 52, 44, 58, 40].map((h, j) => `<i style="height:${h}px; opacity:${0.55 + j * 0.1}"></i>`).join('')}</span>
+        <span class="grow"><b>${esc(sh.title)}</b><small>${esc(sh.desc || '')}${sh.desc ? ' · ' : ''}${plural(sh.topics.length, 'тема', 'темы', 'тем')}${done ? ' · прочитано ' + done : ''}</small></span><span class="pill none">открыть</span></button>`; }).join('')
+      : '<div class="empty panel" style="margin-top:14px">Здесь скоро появятся книги. Загляни позже!</div>'}`);
+  app.querySelectorAll('[data-sh]').forEach(b => b.onclick = () => { sfx('tap'); navPush(); renderShelf(k, b.dataset.sh); window.scrollTo(0, 0); });
+}
+async function renderShelf(k, id){
+  NAV.game = () => renderShelves(k);
+  const idx = await libIndex().catch(() => ({}));
+  const sh = (idx[k] || []).find(x => x.id === id); if (!sh) return renderShelves(k);
+  const read = libRead();
+  libPage('Полки', `<section class="subj-hero lib-hero"><h2>${esc(sh.title)}</h2><p>${esc(sh.desc || '')}</p></section>
+    <div class="btopics" style="--sc:${sh.color || '#8E4A18'}">${sh.topics.map((t, j) => `<button class="btopic ${read[id + '/' + j] ? 'read' : ''}" data-t="${j}"><span class="no">${read[id + '/' + j] ? '✓' : j + 1}</span><span class="grow"><b>${esc(t)}</b></span></button>`).join('')}</div>`);
+  app.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { sfx('tap'); navPush(); renderBookTopic(k, id, +b.dataset.t); window.scrollTo(0, 0); });
+}
+async function renderBookTopic(k, id, j){
+  NAV.game = () => renderShelf(k, id);
+  const idx = await libIndex().catch(() => ({}));
+  const sh = (idx[k] || []).find(x => x.id === id); if (!sh) return renderShelves(k);
+  libPage(sh.title, `<div class="reader" id="rd"><div class="loading" style="min-height:160px">Открываем тему…</div></div>`);
+  let data; try { data = await libShelf(id); } catch (e){ document.getElementById('rd').innerHTML = `Не удалось открыть тему: ${esc(e.message)}`; return; }
+  const t = data[j]; if (!t) return renderShelf(k, id);
+  let fs = 17; try { fs = +localStorage.getItem('chem_rfs') || 17; } catch(e){}
+  const body = t.html.replace(/src="IMG\//g, 'loading="lazy" src="' + BOOKS_BASE);
+  const rd = document.getElementById('rd'); if (!rd) return;
+  rd.style.setProperty('--rfs', fs + 'px');
+  rd.innerHTML = `<div class="row" style="justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:nowrap">
+      <div class="grow"><div class="small muted">${esc(sh.title)} · тема ${j + 1} из ${data.length}</div><h1 style="margin:4px 0 0; font-size:1.45rem; line-height:1.25">${esc(t.title)}</h1></div>
+      <span class="rfs"><button id="fsm" aria-label="Мельче">A−</button><button id="fsp" aria-label="Крупнее">A+</button></span></div>
+    <div class="rtoc" id="rtoc"></div>
+    <div class="rbody">${body}</div>
+    <div class="rnav">${j > 0 ? '<button class="btn" id="rprev">← Предыдущая</button>' : ''}${j < data.length - 1 ? '<button class="btn primary" id="rnext">Следующая →</button>' : '<button class="btn primary" id="rdone">К списку тем</button>'}</div>`;
+  const hs = [...rd.querySelectorAll('.rbody h2')];
+  if (hs.length > 1) document.getElementById('rtoc').innerHTML = hs.map((h, i) => `<button data-h="${i}">${esc(h.textContent.trim().slice(0, 60))}</button>`).join('');
+  rd.querySelectorAll('[data-h]').forEach(b => b.onclick = () => hs[+b.dataset.h].scrollIntoView({behavior: 'smooth', block: 'start'}));
+  const setFs = v => { fs = Math.max(14, Math.min(24, v)); rd.style.setProperty('--rfs', fs + 'px'); try { localStorage.setItem('chem_rfs', fs); } catch(e){} };
+  document.getElementById('fsm').onclick = () => setFs(fs - 1);
+  document.getElementById('fsp').onclick = () => setFs(fs + 1);
+  const go = n => { sfx('tap'); NAV.game = () => renderShelf(k, id); renderBookTopic(k, id, n); window.scrollTo(0, 0); };
+  const pv = document.getElementById('rprev'); if (pv) pv.onclick = () => go(j - 1);
+  const nx = document.getElementById('rnext'); if (nx) nx.onclick = () => go(j + 1);
+  const dn = document.getElementById('rdone'); if (dn) dn.onclick = () => goBack();
+  libMarkRead(id + '/' + j);
+}
 function renderSubjects(){
   S.subject = null; sstore('chem_subj', null);
   const firstName = S.student.name.split(' ')[1] || S.student.name;
@@ -1476,12 +1621,15 @@ function renderSubjects(){
         <h3>Биология</h3><span class="sub">Ботаника, зоология, анатомия человека, общая биология${nBio ? ' · ' + nBio + ' заданий' : ''}</span><span class="go">Открыть →</span></button>
       <button class="subj alevel" id="sAL" aria-label="A Level"><span class="art">${ART_AL}</span>
         <span class="tag">International</span><h3><em>A</em> Level</h3><span class="sub">Biology и Chemistry на английском языке</span><span class="go">Открыть →</span></button>
+      <button class="subj books" id="sBooks" aria-label="Книги"><span class="art">${ART_BOOKS}</span>
+        <span class="tag">Библиотека</span><h3>Книги</h3><span class="sub">Теория по темам: конспекты для изучения</span><span class="go">Открыть →</span></button>
     </div></div>`;
   bindTop();
   document.querySelectorAll('.inst-slot').forEach(fillInstall);
   document.getElementById('sChem').onclick = () => { sfx('tap'); S.subject = 'chem'; sstore('chem_subj', 'chem'); navPush(); renderHome(); window.scrollTo(0, 0); };
   document.getElementById('sBio').onclick = () => { sfx('tap'); S.subject = 'bio'; sstore('chem_subj', 'bio'); navPush(); renderHome(); window.scrollTo(0, 0); };
   document.getElementById('sAL').onclick = () => { sfx('tap'); navPush(); renderALevel(); window.scrollTo(0, 0); };
+  document.getElementById('sBooks').onclick = () => { sfx('tap'); navPush(); renderLibrary(); window.scrollTo(0, 0); };
 }
 
 /* ================= Ученик ================= */
@@ -1572,6 +1720,7 @@ let homeSeq = 0;
 async function studentHome(){
   if (!S.student) return studentLogin();
   const seq = ++homeSeq;
+  if (pendingList().length) setTimeout(flushPending, 1500);
   if (!S.data) S.data = loadDataCache();
   const had = !!S.data;
   if (had) renderStudentView(); else app.innerHTML = '<div class="loading">Загружаем задания…</div>';
