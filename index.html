@@ -524,6 +524,8 @@ tr.sub td{background:var(--bg); font-size:.85rem; white-space:normal}
 .calc .ck button.cl{color:var(--bad)}
 .calc .ck button:active{transform:scale(.94)}
 /* Библиотека (книги) */
+.subj.books.locked{filter:saturate(.35); opacity:.85}
+.subj.books.locked .go{background:rgba(0,0,0,.25)}
 .subj.books{--sc:#9A5B13; background:linear-gradient(140deg,#5B2E0E 0%,#A0521C 55%,#E0A43A 100%); animation-delay:.24s; min-height:180px}
 .lib-hero{background:linear-gradient(140deg,#4A260C 0%,#8E4A18 60%,#D9973A 100%)}
 .libsubj{display:grid; gap:14px; margin-top:16px; grid-template-columns:1fr 1fr}
@@ -1521,6 +1523,14 @@ function alTopicsHtml(cat, my){
 /* ================= Библиотека: книги и конспекты по темам ================= */
 const ART_BOOKS = `<svg viewBox="0 0 220 200" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g opacity=".92"><rect x="40" y="40" width="26" height="120" rx="4"/><rect x="72" y="28" width="30" height="132" rx="4"/><path d="M80 52h14M80 64h14"/><rect x="108" y="48" width="24" height="112" rx="4"/><path d="M142 58l24-7 30 104-24 7z"/><path d="M28 162h170"/></g><g stroke="#FFE3A3" stroke-width="4"><path d="M46 60h14M46 72h14"/><path d="M114 70h12"/></g></svg>`;
 const BOOKS_BASE = 'https://daminovotabek785-byte.github.io/books/';
+/* Раздел «Книги» пока закрыт для учеников. Открыть: BOOKS_OPEN = true.
+   Предпросмотр для учителя: открыть приложение по ссылке с ?books=1 (запоминается до закрытия вкладки). */
+const BOOKS_OPEN = false;
+function booksOpen(){
+  if (BOOKS_OPEN) return true;
+  try { if (/[?&]books=1\b/.test(location.search)) sessionStorage.setItem('chem_books_preview', '1'); return sessionStorage.getItem('chem_books_preview') === '1'; } catch(e){ return false; }
+}
+booksOpen();
 const LIB = {index: null, shelf: {}};
 async function libFetch(name){
   const r = await fetch(BOOKS_BASE + name, {cache: 'no-cache'});
@@ -1537,6 +1547,7 @@ function libPage(back, inner){
   const b = document.getElementById('backCat'); if (b) b.onclick = () => goBack();
 }
 async function renderLibrary(){
+  if (!booksOpen()) return renderSubjects();
   S.subject = 'books'; S.topic = null; S.section = null;
   NAV.game = () => renderSubjects();
   libPage('Предметы', `<section class="subj-hero lib-hero"><h2>Библиотека</h2><p>Теория по каждой теме из конспектов. Выбери предмет и открывай темы по порядку.</p></section>
@@ -1621,15 +1632,15 @@ function renderSubjects(){
         <h3>Биология</h3><span class="sub">Ботаника, зоология, анатомия человека, общая биология${nBio ? ' · ' + nBio + ' заданий' : ''}</span><span class="go">Открыть →</span></button>
       <button class="subj alevel" id="sAL" aria-label="A Level"><span class="art">${ART_AL}</span>
         <span class="tag">International</span><h3><em>A</em> Level</h3><span class="sub">Biology и Chemistry на английском языке</span><span class="go">Открыть →</span></button>
-      <button class="subj books" id="sBooks" aria-label="Книги"><span class="art">${ART_BOOKS}</span>
-        <span class="tag">Библиотека</span><h3>Книги</h3><span class="sub">Теория по темам: конспекты для изучения</span><span class="go">Открыть →</span></button>
+      <button class="subj books ${booksOpen() ? '' : 'locked'}" id="sBooks" aria-label="Книги"><span class="art">${ART_BOOKS}</span>${booksOpen() ? '' : '<span class="soon">🔒 Скоро</span>'}
+        <span class="tag">Библиотека</span><h3>Книги</h3><span class="sub">${booksOpen() ? 'Теория по темам: конспекты для изучения' : 'Раздел готовится и скоро откроется'}</span><span class="go">${booksOpen() ? 'Открыть →' : 'Закрыто'}</span></button>
     </div></div>`;
   bindTop();
   document.querySelectorAll('.inst-slot').forEach(fillInstall);
   document.getElementById('sChem').onclick = () => { sfx('tap'); S.subject = 'chem'; sstore('chem_subj', 'chem'); navPush(); renderHome(); window.scrollTo(0, 0); };
   document.getElementById('sBio').onclick = () => { sfx('tap'); S.subject = 'bio'; sstore('chem_subj', 'bio'); navPush(); renderHome(); window.scrollTo(0, 0); };
   document.getElementById('sAL').onclick = () => { sfx('tap'); navPush(); renderALevel(); window.scrollTo(0, 0); };
-  document.getElementById('sBooks').onclick = () => { sfx('tap'); navPush(); renderLibrary(); window.scrollTo(0, 0); };
+  document.getElementById('sBooks').onclick = () => { if (!booksOpen()){ sfx('tap'); toast('Раздел «Книги» скоро откроется'); return; } sfx('tap'); navPush(); renderLibrary(); window.scrollTo(0, 0); };
 }
 
 /* ================= Ученик ================= */
