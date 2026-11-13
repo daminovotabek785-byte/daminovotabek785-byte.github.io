@@ -1717,6 +1717,16 @@ function saveDataCache(d, catChanged){
     localStorage.setItem(dataCacheKey(), JSON.stringify(smallData(d)));
   } catch(e){ try { localStorage.removeItem(CAT_KEY); localStorage.removeItem(dataCacheKey()); } catch(_){} }
 }
+/* Каталог заданий (самая тяжёлая часть, ~1 МБ) берём со статичного сайта GitHub Pages — он выдерживает любое число учеников.
+   Если файл устарел (учитель изменил задания в панели), берём свежий каталог с Google-сервера. */
+const CATALOG_URL = 'https://daminovotabek785-byte.github.io/catalog.json';
+async function loadCatalog(h){
+  try {
+    const r = await fetch(CATALOG_URL + '?h=' + encodeURIComponent(h || ''), {cache: 'no-cache'});
+    if (r.ok){ const c = await r.json(); if (c && c.h && c.h === h && Array.isArray(c.games)) return c; }
+  } catch(e){}
+  return await api('getCatalog');
+}
 function renderStudentView(){
   if (!S.subject) S.subject = sstore('chem_subj');
   if (S.subject === 'alevel') return renderALevel();
@@ -1737,9 +1747,13 @@ async function studentHome(){
   if (had) renderStudentView(); else app.innerHTML = '<div class="loading">Загружаем задания…</div>';
   let fresh, catChanged = false;
   try {
-    fresh = await api('getStudentData', S.student.name, S.student.cls, had ? S.data.ver || '' : '');
-    catChanged = !!fresh.games;
-    if (!fresh.games){ if (S.data && S.data.games){ fresh.games = S.data.games; fresh.topics = S.data.topics; } else { fresh = await api('getStudentData', S.student.name, S.student.cls, ''); catChanged = true; } }
+    fresh = await api('getStudentData', S.student.name, S.student.cls, had ? S.data.ver || '' : '', {lite: true});
+    if (fresh.needCat){
+      const cat = await loadCatalog(fresh.ver);
+      fresh.games = cat.games; fresh.topics = cat.topics; fresh.ver = cat.h; catChanged = true;
+    } else if (fresh.games) catChanged = true;
+    else if (S.data && S.data.games){ fresh.games = S.data.games; fresh.topics = S.data.topics; }
+    else { const cat = await loadCatalog(fresh.ver); fresh.games = cat.games; fresh.topics = cat.topics; fresh.ver = cat.h; catChanged = true; }
   } catch (e){
     if (had) return;
     app.innerHTML = `<div class="wrap narrow"><div class="panel">Не удалось загрузить задания: ${esc(e.message)}<br><br><button class="btn" id="retry">Попробовать снова</button></div></div>`; document.getElementById('retry').onclick = studentHome; return;
@@ -2762,16 +2776,56 @@ function renderResults(){
       <div class="stat"><span class="label">Ниже 50%</span><b style="color:var(--${weak ? 'bad' : 'muted'})">${weak}</b></div>
       <div class="stat"><span class="label">Всего попыток</span><b>${rs.length}</b></div>
     </div>
+    <details class="panel delbox" style="margin-bottom:14px; padding:12px 16px" ${T.delOpen ? 'open' : ''}>
+      <summary><b>🗑 Удаление результатов и очистка</b></summary>
+      <div class="small muted" style="margin:8px 0 10px">Удаление нельзя отменить. Задания, темы и аккаунты учеников не удаляются. Каждая кнопка просит нажать её второй раз для подтверждения.</div>
+      ${f.cls ? `<div class="row" style="margin-bottom:10px"><button class="btn sm danger" id="delcls">Удалить все результаты класса ${esc(f.cls)}</button></div>` : '<div class="small muted" style="margin-bottom:10px">Чтобы удалить класс — выберите его в фильтре «Все классы» выше. Чтобы удалить одного ученика — нажмите на его строку в таблице.</div>'}
+      <div class="row" style="flex-wrap:wrap; gap:6px 16px; margin-bottom:8px">
+        <label><input type="checkbox" id="cl-res" checked> Все результаты</label>
+        <label><input type="checkbox" id="cl-duel"> Дуэли</label>
+        <label><input type="checkbox" id="cl-coin"> Монеты (начисления и покупки)</label>
+        <label><input type="checkbox" id="cl-mail"> Сообщения</label>
+      </div>
+      <div class="linkbox"><input class="field" id="cl-word" placeholder="Для полной очистки напишите: УДАЛИТЬ" autocomplete="off"><button class="btn danger" id="cl-go">Очистить</button></div>
+    </details>
     ${rows.length ? `<div class="tscroll"><table>
       <thead><tr><th>Ученик</th><th>Класс</th><th>Игра</th><th>Лучший</th><th>Попыток</th><th>Последняя</th></tr></thead>
       <tbody>${rows.map(r => `<tr class="click" data-k="${esc(r.k)}"><td><b>${esc(r.student)}</b></td><td>${esc(r.cls)}</td><td>${esc(gameTitle(r.gameId))}</td><td><span class="pill ${pctClass(r.best)}">${r.best}%</span></td><td class="num">${r.attempts.length}</td><td class="num">${esc(r.last)}</td></tr>` +
-        (T.open === r.k ? `<tr class="sub"><td colspan="6">${r.attempts.slice().reverse().map(a => `<div style="padding:4px 0"><span class="num">${esc(a.time)}</span> — <b>${a.percent}%</b> (${a.score}/${a.max}), ${fmtSec(a.seconds)} · ${esc(a.details)}</div>`).join('')}</td></tr>` : '')).join('')}</tbody>
+        (T.open === r.k ? `<tr class="sub"><td colspan="6">${r.attempts.slice().reverse().map(a => `<div style="padding:4px 0"><span class="num">${esc(a.time)}</span> — <b>${a.percent}%</b> (${a.score}/${a.max}), ${fmtSec(a.seconds)} · ${esc(a.details)}</div>`).join('')}<div class="row" style="gap:8px; margin-top:8px; flex-wrap:wrap"><button class="btn sm danger" data-del="game" data-k="${esc(r.k)}">🗑 Удалить попытки по этой игре</button><button class="btn sm danger" data-del="student" data-k="${esc(r.k)}">🗑 Удалить все результаты ученика</button></div></td></tr>` : '')).join('')}</tbody>
     </table></div><p class="small muted" style="margin-top:10px">Нажмите на строку, чтобы увидеть все попытки. Все данные также лежат в Google Таблице на листе «Результаты».</p>`
     : '<div class="empty panel">Результатов пока нет. Отправьте ученикам ссылку — их попытки появятся здесь.</div>'}`;
   document.getElementById('fg').onchange = e => { f.game = e.target.value; renderResults(); };
   document.getElementById('fc').onchange = e => { f.cls = e.target.value; renderResults(); };
   const fq = document.getElementById('fq'); fq.oninput = e => { f.q = e.target.value; clearTimeout(T.qt); T.qt = setTimeout(() => { renderResults(); const n = document.getElementById('fq'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); }, 250); };
   box.querySelectorAll('tr.click').forEach(tr => tr.onclick = () => { T.open = T.open === tr.dataset.k ? null : tr.dataset.k; renderResults(); });
+  const db = box.querySelector('.delbox'); db.ontoggle = () => { T.delOpen = db.open; };
+  const after = (msg) => { toast(msg); T.open = null; teacherReloadResults(); };
+  box.querySelectorAll('[data-del]').forEach(b => b.onclick = ev => { ev.stopPropagation(); const g = groups[b.dataset.k]; if (!g) return;
+    confirm2(b, async () => {
+      const f2 = b.dataset.del === 'game' ? {student: g.student, className: g.cls, gameId: g.gameId} : {student: g.student, className: g.cls};
+      const r = await api('deleteResults', T.pw, f2); after('Удалено попыток: ' + r.removed);
+    }); });
+  const dc = document.getElementById('delcls');
+  if (dc) dc.onclick = () => confirm2(dc, async () => { const r = await api('deleteResults', T.pw, {className: f.cls}); f.cls = ''; after('Удалено попыток: ' + r.removed); });
+  const go = document.getElementById('cl-go');
+  go.onclick = () => {
+    const parts = {results: document.getElementById('cl-res').checked, duels: document.getElementById('cl-duel').checked, coins: document.getElementById('cl-coin').checked, mail: document.getElementById('cl-mail').checked};
+    if (!parts.results && !parts.duels && !parts.coins && !parts.mail) return toast('Отметьте, что очистить');
+    if (document.getElementById('cl-word').value.trim().toUpperCase() !== 'УДАЛИТЬ') return toast('Напишите в поле слово УДАЛИТЬ');
+    confirm2(go, async () => { const r = await api('clearData', T.pw, parts);
+      after('Очищено: ' + [['results','результатов'],['duels','дуэлей'],['coins','записей монет'],['mail','сообщений']].filter(x => r[x[0]] != null).map(x => r[x[0]] + ' ' + x[1]).join(', ')); });
+  };
+}
+/* Двойное нажатие для опасных действий: первое — «Точно?», второе (в течение 5 с) — выполнить. */
+function confirm2(btn, fn){
+  if (btn.dataset.armed){ delete btn.dataset.armed; clearTimeout(btn._t); btn.disabled = true; btn.textContent = 'Удаляем…';
+    Promise.resolve().then(fn).catch(e => { toast('Ошибка: ' + e.message); btn.disabled = false; btn.textContent = btn._orig; }); return; }
+  btn._orig = btn.textContent; btn.dataset.armed = '1'; btn.textContent = 'Точно удалить? Нажмите ещё раз';
+  btn._t = setTimeout(() => { delete btn.dataset.armed; btn.textContent = btn._orig; }, 5000);
+}
+async function teacherReloadResults(){
+  try { T.data = await api('teacherData', T.pw); } catch(e){ toast(e.message); }
+  teacherHome();
 }
 
 /* ================= Старт ================= */
