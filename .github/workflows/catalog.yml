@@ -1,0 +1,42 @@
+# Каждые 15 минут скачивает каталог заданий с Google-сервера и сохраняет его в catalog.json.
+# Ученики берут задания из этого файла (GitHub Pages выдерживает любую нагрузку), а не с Google-сервера.
+name: Обновить каталог заданий
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: catalog
+jobs:
+  catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Скачать каталог с Google-сервера
+        run: |
+          URL=$(grep -o "https://script.google.com/macros/s/[A-Za-z0-9_-]*/exec" config.js | head -1)
+          curl -sSL --retry 3 -m 120 -H 'Content-Type: text/plain;charset=utf-8' -d '{"fn":"getCatalog","args":[]}' "$URL" -o raw.json
+          python3 - <<'EOF'
+          import json
+          d = json.load(open('raw.json', encoding='utf-8'))
+          assert d.get('ok'), d
+          c = d['result']
+          assert c.get('h') and len(c.get('games') or []) > 0
+          try:
+              old = json.load(open('catalog.json', encoding='utf-8')).get('h')
+          except Exception:
+              old = None
+          if old != c['h']:
+              json.dump(c, open('catalog.json', 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+              print('updated', c['h'])
+          else:
+              print('same', old)
+          EOF
+          rm -f raw.json
+      - name: Сохранить изменения
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898299+github-actions[bot]@users.noreply.github.com"
+          git add catalog.json
+          git diff --cached --quiet || (git commit -m "Каталог заданий обновлён" && git push)
