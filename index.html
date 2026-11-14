@@ -144,7 +144,7 @@ body.hasfab .wrap{padding-bottom:90px}
 .subj-hero p{margin:8px 0 0; opacity:.8; position:relative; max-width:34ch}
 .subj-hero .deco{position:absolute; inset:0; pointer-events:none; opacity:.22}
 .subjects{display:grid; gap:16px; margin-top:16px; grid-template-columns:1fr}
-@media (min-width:760px){ .subjects{grid-template-columns:1fr 1fr} }
+@media (min-width:760px){ .subjects{grid-template-columns:1fr 1fr} .subjects .subj.videos{grid-column:1/-1} }
 .subj{position:relative; overflow:hidden; border:0; border-radius:24px; min-height:210px; padding:22px; text-align:left; color:#fff; cursor:pointer; display:flex; flex-direction:column; justify-content:flex-end; gap:6px; box-shadow:0 18px 40px -22px var(--sc); transition:transform .15s, box-shadow .15s; animation:rise .45s both}
 .subj:hover{transform:translateY(-4px)}
 .subj:focus-visible{outline:3px solid var(--sc); outline-offset:3px}
@@ -524,8 +524,15 @@ tr.sub td{background:var(--bg); font-size:.85rem; white-space:normal}
 .calc .ck button.cl{color:var(--bad)}
 .calc .ck button:active{transform:scale(.94)}
 /* Библиотека (книги) */
-.subj.books.locked{filter:saturate(.35); opacity:.85}
-.subj.books.locked .go{background:rgba(0,0,0,.25)}
+.subj.locked{filter:saturate(.35); opacity:.85}
+.subj.locked .go{background:rgba(0,0,0,.25)}
+.subj.videos{--sc:#B4234A; background:linear-gradient(140deg,#3A0B2E 0%,#8E1B4A 55%,#E2546A 100%); animation-delay:.32s; min-height:180px}
+.vid-hero{background:linear-gradient(140deg,#3A0B2E 0%,#8E1B4A 60%,#E2546A 100%)}
+.vlist{display:grid; gap:12px; margin-top:16px}
+.vitem{display:flex; gap:12px; align-items:center; text-align:left; padding:12px 14px; border:1px solid var(--line); border-radius:16px; background:var(--surface); color:var(--ink); font:inherit; cursor:pointer}
+.vitem .vp{flex:none; width:44px; height:44px; border-radius:12px; background:#E2546A; color:#fff; display:grid; place-items:center; font-size:18px}
+.vframe{position:relative; width:100%; aspect-ratio:16/9; border-radius:16px; overflow:hidden; background:#000; margin-top:14px}
+.vframe iframe, .vframe video{position:absolute; inset:0; width:100%; height:100%; border:0}
 .subj.books{--sc:#9A5B13; background:linear-gradient(140deg,#5B2E0E 0%,#A0521C 55%,#E0A43A 100%); animation-delay:.24s; min-height:180px}
 .lib-hero{background:linear-gradient(140deg,#4A260C 0%,#8E4A18 60%,#D9973A 100%)}
 .libsubj{display:grid; gap:14px; margin-top:16px; grid-template-columns:1fr 1fr}
@@ -1523,7 +1530,7 @@ function alTopicsHtml(cat, my){
 /* ================= Библиотека: книги и конспекты по темам ================= */
 const ART_BOOKS = `<svg viewBox="0 0 220 200" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g opacity=".92"><rect x="40" y="40" width="26" height="120" rx="4"/><rect x="72" y="28" width="30" height="132" rx="4"/><path d="M80 52h14M80 64h14"/><rect x="108" y="48" width="24" height="112" rx="4"/><path d="M142 58l24-7 30 104-24 7z"/><path d="M28 162h170"/></g><g stroke="#FFE3A3" stroke-width="4"><path d="M46 60h14M46 72h14"/><path d="M114 70h12"/></g></svg>`;
 const BOOKS_BASE = 'https://daminovotabek785-byte.github.io/books/';
-/* Раздел «Книги» пока закрыт для учеников. Открыть: BOOKS_OPEN = true.
+/* Разделы «Библиотека» и «Видеоролики» пока закрыты для учеников. Открыть оба: BOOKS_OPEN = true.
    Предпросмотр для учителя: открыть приложение по ссылке с ?books=1 (запоминается до закрытия вкладки). */
 const BOOKS_OPEN = false;
 function booksOpen(){
@@ -1534,7 +1541,7 @@ booksOpen();
 const LIB = {index: null, shelf: {}};
 async function libFetch(name){
   const r = await fetch(BOOKS_BASE + name, {cache: 'no-cache'});
-  if (!r.ok) throw new Error('Книга пока не загружена');
+  if (!r.ok) throw new Error('Материал пока не загружен');
   return r.json();
 }
 async function libIndex(){ if (!LIB.index) LIB.index = await libFetch('index.json'); return LIB.index; }
@@ -1557,7 +1564,7 @@ async function renderLibrary(){
   const cnt = k => (idx[k] || []).reduce((n, sh) => n + sh.topics.length, 0);
   box.innerHTML = [['bio', 'Биология', 'albio', ART_BIO], ['chem', 'Химия', 'alchem', ART_CHEM]].map(([k, name, cls, art]) => {
     const sh = (idx[k] || []).length;
-    return `<button class="subj ${cls}" data-lib="${k}"><span class="art">${art}</span><span class="tag">Книги</span><h3>${name}</h3><span class="sub">${sh ? plural(sh, 'полка', 'полки', 'полок') + ' · ' + plural(cnt(k), 'тема', 'темы', 'тем') : 'Скоро здесь появятся книги'}</span><span class="go">Открыть →</span></button>`;
+    return `<button class="subj ${cls}" data-lib="${k}"><span class="art">${art}</span><span class="tag">Библиотека</span><h3>${name}</h3><span class="sub">${sh ? plural(sh, 'полка', 'полки', 'полок') + ' · ' + plural(cnt(k), 'тема', 'темы', 'тем') : 'Скоро здесь появятся книги'}</span><span class="go">Открыть →</span></button>`;
   }).join('');
   box.querySelectorAll('[data-lib]').forEach(b => b.onclick = () => { sfx('tap'); navPush(); renderShelves(b.dataset.lib); window.scrollTo(0, 0); });
 }
@@ -1567,7 +1574,7 @@ async function renderShelves(k){
   const name = k === 'bio' ? 'Биология' : 'Химия';
   const idx = await libIndex().catch(() => ({}));
   const shelves = idx[k] || [], read = libRead();
-  libPage('Книги', `<section class="subj-hero lib-hero"><h2>${name}: книжные полки</h2><p>Каждая полка — отдельная книга. Внутри темы идут по порядку.</p></section>
+  libPage('Библиотека', `<section class="subj-hero lib-hero"><h2>${name}: книжные полки</h2><p>Каждая полка — отдельная книга. Внутри темы идут по порядку.</p></section>
     ${shelves.length ? shelves.map((sh, i) => { const done = sh.topics.filter((t, j) => read[sh.id + '/' + j]).length;
       return `<button class="shelf" data-sh="${esc(sh.id)}" style="--sc:${sh.color || '#8E4A18'}"><span class="spines">${[38, 52, 44, 58, 40].map((h, j) => `<i style="height:${h}px; opacity:${0.55 + j * 0.1}"></i>`).join('')}</span>
         <span class="grow"><b>${esc(sh.title)}</b><small>${esc(sh.desc || '')}${sh.desc ? ' · ' : ''}${plural(sh.topics.length, 'тема', 'темы', 'тем')}${done ? ' · прочитано ' + done : ''}</small></span><span class="pill none">открыть</span></button>`; }).join('')
@@ -1612,6 +1619,50 @@ async function renderBookTopic(k, id, j){
   const dn = document.getElementById('rdone'); if (dn) dn.onclick = () => goBack();
   libMarkRead(id + '/' + j);
 }
+/* ================= Видеоролики =================
+   Список видео лежит в файле books/videos.json на GitHub Pages:
+   {"chem": [{"title": "...", "url": "ссылка на YouTube или .mp4", "desc": "..."}], "bio": [...]} */
+const ART_VIDEO = `<svg viewBox="0 0 220 200" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g opacity=".92"><rect x="34" y="46" width="152" height="104" rx="16"/><path d="M96 76l38 22-38 22z" fill="#FFD0D8" stroke="#FFD0D8"/><path d="M60 170h100"/></g><g stroke="#FFD0D8" stroke-width="4"><path d="M52 34l14 12M168 34l-14 12"/></g></svg>`;
+const VID = {list: null};
+async function vidList(){ if (!VID.list) { try { VID.list = await libFetch('videos.json'); } catch(e){ VID.list = {chem: [], bio: []}; } } return VID.list; }
+function vidEmbed(url){
+  const u = String(url || ''), y = u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{11})/);
+  if (y) return `<iframe src="https://www.youtube-nocookie.com/embed/${y[1]}?rel=0" title="Видео" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe>`;
+  if (/\.(mp4|webm)(\?|$)/i.test(u)) return `<video src="${esc(u)}" controls playsinline preload="metadata"></video>`;
+  return `<div class="panel" style="position:absolute; inset:0; display:grid; place-items:center">Ссылка на видео не поддерживается</div>`;
+}
+async function renderVideos(){
+  if (!booksOpen()) return renderSubjects();
+  S.subject = 'videos'; S.topic = null; S.section = null;
+  NAV.game = () => renderSubjects();
+  libPage('Предметы', `<section class="subj-hero vid-hero"><h2>Видеоролики</h2><p>Видеоуроки, опыты и разборы задач. Выбери предмет.</p></section>
+    <div class="libsubj" id="vidS"><div class="loading" style="min-height:120px">Загружаем видео…</div></div>`);
+  const v = await vidList(), box = document.getElementById('vidS'); if (!box) return;
+  box.innerHTML = [['chem', 'Химия', 'alchem', ART_CHEM], ['bio', 'Биология', 'albio', ART_BIO]].map(([k, name, cls, art]) => {
+    const n = (v[k] || []).length;
+    return `<button class="subj ${cls}" data-vid="${k}"><span class="art">${art}</span><span class="tag">Видеоролики</span><h3>${name}</h3><span class="sub">${n ? plural(n, 'видео', 'видео', 'видео') : 'Скоро здесь появятся видео'}</span><span class="go">Открыть →</span></button>`;
+  }).join('');
+  box.querySelectorAll('[data-vid]').forEach(b => b.onclick = () => { sfx('tap'); navPush(); renderVideoList(b.dataset.vid); window.scrollTo(0, 0); });
+}
+async function renderVideoList(k){
+  NAV.game = () => renderVideos();
+  const name = k === 'bio' ? 'Биология' : 'Химия', list = (await vidList())[k] || [];
+  libPage('Видеоролики', `<section class="subj-hero vid-hero"><h2>${name}: видеоролики</h2><p>Смотри по порядку — после видео закрепи тему в играх.</p></section>
+    ${list.length ? `<div class="vlist">${list.map((x, i) => `<button class="vitem" data-v="${i}"><span class="vp">▶</span><span class="grow"><b>${esc(x.title)}</b>${x.desc ? `<br><small class="muted">${esc(x.desc)}</small>` : ''}</span></button>`).join('')}</div>`
+      : '<div class="empty panel" style="margin-top:14px">Здесь скоро появятся видеоролики. Загляни позже!</div>'}`);
+  app.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { sfx('tap'); navPush(); renderVideo(k, +b.dataset.v); window.scrollTo(0, 0); });
+}
+async function renderVideo(k, i){
+  NAV.game = () => renderVideoList(k);
+  const list = (await vidList())[k] || [], x = list[i]; if (!x) return renderVideoList(k);
+  libPage(k === 'bio' ? 'Биология' : 'Химия', `<div class="reader"><div class="small muted">Видео ${i + 1} из ${list.length}</div><h1 style="margin:4px 0 0; font-size:1.4rem; line-height:1.25">${esc(x.title)}</h1>
+    <div class="vframe">${vidEmbed(x.url)}</div>${x.desc ? `<p style="margin-top:12px">${esc(x.desc)}</p>` : ''}
+    <div class="rnav">${i > 0 ? '<button class="btn" id="vprev">← Предыдущее</button>' : ''}${i < list.length - 1 ? '<button class="btn primary" id="vnext">Следующее →</button>' : '<button class="btn primary" id="vdone">К списку видео</button>'}</div></div>`);
+  const go = n => { sfx('tap'); renderVideo(k, n); window.scrollTo(0, 0); };
+  const pv = document.getElementById('vprev'); if (pv) pv.onclick = () => go(i - 1);
+  const nx = document.getElementById('vnext'); if (nx) nx.onclick = () => go(i + 1);
+  const dn = document.getElementById('vdone'); if (dn) dn.onclick = () => goBack();
+}
 function renderSubjects(){
   S.subject = null; sstore('chem_subj', null);
   const firstName = S.student.name.split(' ')[1] || S.student.name;
@@ -1632,15 +1683,18 @@ function renderSubjects(){
         <h3>Биология</h3><span class="sub">Ботаника, зоология, анатомия человека, общая биология${nBio ? ' · ' + nBio + ' заданий' : ''}</span><span class="go">Открыть →</span></button>
       <button class="subj alevel" id="sAL" aria-label="A Level"><span class="art">${ART_AL}</span>
         <span class="tag">International</span><h3><em>A</em> Level</h3><span class="sub">Biology и Chemistry на английском языке</span><span class="go">Открыть →</span></button>
-      <button class="subj books ${booksOpen() ? '' : 'locked'}" id="sBooks" aria-label="Книги"><span class="art">${ART_BOOKS}</span>${booksOpen() ? '' : '<span class="soon">🔒 Скоро</span>'}
-        <span class="tag">Библиотека</span><h3>Книги</h3><span class="sub">${booksOpen() ? 'Теория по темам: конспекты для изучения' : 'Раздел готовится и скоро откроется'}</span><span class="go">${booksOpen() ? 'Открыть →' : 'Закрыто'}</span></button>
+      <button class="subj books ${booksOpen() ? '' : 'locked'}" id="sBooks" aria-label="Библиотека"><span class="art">${ART_BOOKS}</span>${booksOpen() ? '' : '<span class="soon">🔒 Скоро</span>'}
+        <span class="tag">Книги и конспекты</span><h3>Библиотека</h3><span class="sub">${booksOpen() ? 'Теория по темам: конспекты для изучения' : 'Раздел готовится и скоро откроется'}</span><span class="go">${booksOpen() ? 'Открыть →' : 'Закрыто'}</span></button>
+      <button class="subj videos ${booksOpen() ? '' : 'locked'}" id="sVideo" aria-label="Видеоролики"><span class="art">${ART_VIDEO}</span>${booksOpen() ? '' : '<span class="soon">🔒 Скоро</span>'}
+        <span class="tag">Видеоуроки</span><h3>Видеоролики</h3><span class="sub">${booksOpen() ? 'Видеоуроки и опыты по химии и биологии' : 'Раздел готовится и скоро откроется'}</span><span class="go">${booksOpen() ? 'Открыть →' : 'Закрыто'}</span></button>
     </div></div>`;
   bindTop();
   document.querySelectorAll('.inst-slot').forEach(fillInstall);
   document.getElementById('sChem').onclick = () => { sfx('tap'); S.subject = 'chem'; sstore('chem_subj', 'chem'); navPush(); renderHome(); window.scrollTo(0, 0); };
   document.getElementById('sBio').onclick = () => { sfx('tap'); S.subject = 'bio'; sstore('chem_subj', 'bio'); navPush(); renderHome(); window.scrollTo(0, 0); };
   document.getElementById('sAL').onclick = () => { sfx('tap'); navPush(); renderALevel(); window.scrollTo(0, 0); };
-  document.getElementById('sBooks').onclick = () => { if (!booksOpen()){ sfx('tap'); toast('Раздел «Книги» скоро откроется'); return; } sfx('tap'); navPush(); renderLibrary(); window.scrollTo(0, 0); };
+  document.getElementById('sBooks').onclick = () => { if (!booksOpen()){ sfx('tap'); toast('Раздел «Библиотека» скоро откроется'); return; } sfx('tap'); navPush(); renderLibrary(); window.scrollTo(0, 0); };
+  document.getElementById('sVideo').onclick = () => { if (!booksOpen()){ sfx('tap'); toast('Раздел «Видеоролики» скоро откроется'); return; } sfx('tap'); navPush(); renderVideos(); window.scrollTo(0, 0); };
 }
 
 /* ================= Ученик ================= */
