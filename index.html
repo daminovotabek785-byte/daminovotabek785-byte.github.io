@@ -525,6 +525,25 @@ tr.sub td{background:var(--bg); font-size:.85rem; white-space:normal}
 .calc .ck button:active{transform:scale(.94)}
 /* Библиотека (книги) */
 .subj.locked{filter:saturate(.35); opacity:.85}
+.prem-hero{background:linear-gradient(140deg,#3B2A00 0%,#A86B00 55%,#F2C230 100%)}
+.premban{display:flex; align-items:center; gap:12px; width:100%; margin-top:14px; padding:14px 16px; border:0; border-radius:18px; background:linear-gradient(120deg,#FFF3C4,#FFD86B); color:#4A3300; font:inherit; text-align:left; cursor:pointer; box-shadow:0 8px 22px -12px rgba(168,107,0,.6)}
+.premban .star{font-size:26px}
+.premban b{display:block; font-size:1.02rem}
+.premban small{display:block; opacity:.8; margin-top:2px}
+.premban .go{font-weight:800; white-space:nowrap}
+.premban.on{background:linear-gradient(120deg,#E3FBE9,#B9F0C8); color:#0E4A23}
+.plans{display:grid; gap:10px; grid-template-columns:1fr 1fr}
+@media (min-width:760px){ .plans{grid-template-columns:repeat(4,1fr)} }
+.plan{display:grid; gap:4px; text-align:left; padding:14px; border:2px solid var(--line); border-radius:16px; background:var(--surface); color:var(--ink); font:inherit; cursor:pointer}
+.plan .pr{font:800 1.15rem/1.2 var(--f-display)}
+.plan small{color:var(--muted)}
+.plan.on{border-color:#E0A400; box-shadow:0 0 0 3px rgba(242,194,48,.35)}
+.paycard .cardno{font:800 1.35rem/1.2 var(--f-display); letter-spacing:.06em; font-variant-numeric:tabular-nums}
+.prem-ok{border-color:#9BDDB0}
+.prem-wait{border-color:#F2C230}
+.pill.lockpill{background:#FFF1C2; color:#7A5300}
+.payreq{display:flex; gap:12px; align-items:center; flex-wrap:wrap; padding:12px 0; border-top:1px solid var(--line)}
+.payreq:first-of-type{border-top:0}
 .subj.locked .go{background:rgba(0,0,0,.25)}
 .subj.videos{--sc:#B4234A; background:linear-gradient(140deg,#3A0B2E 0%,#8E1B4A 55%,#E2546A 100%); animation-delay:.32s; min-height:180px}
 .vid-hero{background:linear-gradient(140deg,#3A0B2E 0%,#8E1B4A 60%,#E2546A 100%)}
@@ -825,6 +844,7 @@ window.addEventListener('popstate', () => { if (!NAV.on) return; NAV.depth = Mat
 
 /* ================= Игровой движок ================= */
 function play(game, opts){
+  if (isLocked(game)){ sfx('tap'); toast('Это задание входит в Premium'); renderPremium(); return; }
   helperFab(false); const _chat = document.getElementById('chat'); if (_chat) _chat.remove();
   opts = opts || {};
   const parsed = PARSE[game.type](game.source);
@@ -1377,6 +1397,7 @@ function mdLite(t){
   return esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/^\s*[\*\-]\s+/gm, '• ').replace(/\n/g, '<br>');
 }
 function openHelper(prefill){
+  if (!isPrem()){ toast('Помощники доступны в Premium'); if (!prefill){ navPush(); renderPremium(); } return; }
   helperLoad();
   helperFab(false);
   if (!document.getElementById('chat')) navPush();
@@ -1462,7 +1483,7 @@ async function helperSend(){
   const who = H.who, msgs = H.msgs;
   try {
     const res = await Promise.race([
-      api('askHelper', S.student.name, S.student.cls, msgs.filter(m => !m.err).map(m => ({role: m.role, text: m.text})), img ? img.split(',')[1] : '', who),
+      api('askHelper', S.student.name, S.student.cls, msgs.filter(m => !m.err).map(m => ({role: m.role, text: m.text})), img ? img.split(',')[1] : '', who, S.student.email || '', S.student.tok || ''),
       new Promise((_, rej) => setTimeout(() => rej(new Error('Ответ задерживается — нажми «Повторить» или спроси другого помощника')), 75000))
     ]);
     msgs.push({role: 'model', text: res.text});
@@ -1538,7 +1559,7 @@ function booksOpen(){
   try { if (/[?&]books=1\b/.test(location.search)) sessionStorage.setItem('chem_books_preview', '1'); return sessionStorage.getItem('chem_books_preview') === '1'; } catch(e){ return false; }
 }
 booksOpen();
-const LIB = {index: null, shelf: {}};
+const LIB = {index: null, shelf: {}, topic: {}};
 async function libFetch(name){
   const r = await fetch(BOOKS_BASE + name, {cache: 'no-cache'});
   if (!r.ok) throw new Error('Материал пока не загружен');
@@ -1595,8 +1616,9 @@ async function renderBookTopic(k, id, j){
   const idx = await libIndex().catch(() => ({}));
   const sh = (idx[k] || []).find(x => x.id === id); if (!sh) return renderShelves(k);
   libPage(sh.title, `<div class="reader" id="rd"><div class="loading" style="min-height:160px">Открываем тему…</div></div>`);
-  let data; try { data = await libShelf(id); } catch (e){ document.getElementById('rd').innerHTML = `Не удалось открыть тему: ${esc(e.message)}`; return; }
-  const t = data[j]; if (!t) return renderShelf(k, id);
+  if (!isPrem()){ toast('Библиотека доступна в Premium'); renderPremium(); return; }
+  let t; try { t = LIB.topic[id + '/' + j] || (LIB.topic[id + '/' + j] = await api('getBookTopic', S.student.email, S.student.tok, id, j)); } catch (e){ const rr = document.getElementById('rd'); if (rr) rr.innerHTML = `Не удалось открыть тему: ${esc(e.message)}`; return; }
+  const data = {length: t.total || sh.topics.length};
   let fs = 17; try { fs = +localStorage.getItem('chem_rfs') || 17; } catch(e){}
   const body = t.html.replace(/src="IMG\//g, 'loading="lazy" src="' + BOOKS_BASE);
   const rd = document.getElementById('rd'); if (!rd) return;
@@ -1645,6 +1667,7 @@ async function renderVideos(){
   box.querySelectorAll('[data-vid]').forEach(b => b.onclick = () => { sfx('tap'); navPush(); renderVideoList(b.dataset.vid); window.scrollTo(0, 0); });
 }
 async function renderVideoList(k){
+  if (!isPrem()){ toast('Видеоролики доступны в Premium'); renderPremium(); return; }
   NAV.game = () => renderVideos();
   const name = k === 'bio' ? 'Биология' : 'Химия', list = (await vidList())[k] || [];
   libPage('Видеоролики', `<section class="subj-hero vid-hero"><h2>${name}: видеоролики</h2><p>Смотри по порядку — после видео закрепи тему в играх.</p></section>
@@ -1676,6 +1699,7 @@ function renderSubjects(){
       <h2>Привет, ${esc(firstName)}! Что учим сегодня?</h2>
       <p>Выбери предмет — внутри тесты, задачи и игры.</p>
     </section>
+    <button class="premban ${isPrem() ? 'on' : ''}" id="premBan"><span class="star">⭐</span><span class="grow"><b>${isPrem() ? 'Premium активен до ' + esc(fmtDay(S.data.prem.until)) : 'Открой всё с Premium'}</b><small>${isPrem() ? 'Все темы, A Level, библиотека и помощники открыты' : 'Все темы химии и биологии, A Level, библиотека, видео и помощники'}</small></span><span class="go">${isPrem() ? 'Продлить' : 'Подробнее →'}</span></button>
     <div class="subjects">
       <button class="subj chem" id="sChem" aria-label="Химия"><span class="art">${ART_CHEM}</span>
         <h3>Химия</h3><span class="sub">Общая, неорганическая и органическая химия${nChem ? ' · ' + nChem + ' заданий' : ''}</span><span class="go">Открыть →</span></button>
@@ -1692,6 +1716,7 @@ function renderSubjects(){
   document.querySelectorAll('.inst-slot').forEach(fillInstall);
   document.getElementById('sChem').onclick = () => { sfx('tap'); S.subject = 'chem'; sstore('chem_subj', 'chem'); navPush(); renderHome(); window.scrollTo(0, 0); };
   document.getElementById('sBio').onclick = () => { sfx('tap'); S.subject = 'bio'; sstore('chem_subj', 'bio'); navPush(); renderHome(); window.scrollTo(0, 0); };
+  document.getElementById('premBan').onclick = () => { sfx('tap'); navPush(); renderPremium(); window.scrollTo(0, 0); };
   document.getElementById('sAL').onclick = () => { sfx('tap'); navPush(); renderALevel(); window.scrollTo(0, 0); };
   document.getElementById('sBooks').onclick = () => { if (!booksOpen()){ sfx('tap'); toast('Раздел «Библиотека» скоро откроется'); return; } sfx('tap'); navPush(); renderLibrary(); window.scrollTo(0, 0); };
   document.getElementById('sVideo').onclick = () => { if (!booksOpen()){ sfx('tap'); toast('Раздел «Видеоролики» скоро откроется'); return; } sfx('tap'); navPush(); renderVideos(); window.scrollTo(0, 0); };
@@ -1739,7 +1764,7 @@ function studentLogin(mode){
     go.disabled = true; go.textContent = 'Секунду…';
     try {
       const acc = reg ? await api('registerStudent', email, pin, name, cls) : await api('loginStudent', email, pin);
-      S.student = {name: acc.name, cls: acc.cls, email: acc.email}; store('chem_student', S.student); store('chem_mode', 'in');
+      S.student = {name: acc.name, cls: acc.cls, email: acc.email, tok: acc.tok}; store('chem_student', S.student); store('chem_mode', 'in');
       setUrlStudent(S.student); sfx('tap'); studentHome();
       setTimeout(() => toast(reg ? 'Готово! Вы зарегистрированы — больше вводить ничего не нужно' : 'С возвращением, ' + (acc.name.split(' ')[1] || acc.name) + '!'), 600);
     } catch (err){
@@ -1762,14 +1787,90 @@ function loadDataCache(){
     try { Object.keys(localStorage).filter(k => k.indexOf('chem_data_') === 0).forEach(k => localStorage.removeItem(k)); } catch(e){}
     const d = JSON.parse(localStorage.getItem(dataCacheKey()) || 'null'), c = JSON.parse(localStorage.getItem(CAT_KEY) || 'null');
     if (!d || !c || !Array.isArray(c.games)) return null;
-    d.games = c.games; d.topics = c.topics; d.ver = c.ver; return d;
+    d.games = c.games; d.topics = c.topics; d.ver = c.ver;
+    if (isPrem(d)) unlockFromCache(d);
+    return d;
   } catch(e){ return null; }
 }
 function saveDataCache(d, catChanged){
   try {
-    if (catChanged) localStorage.setItem(CAT_KEY, JSON.stringify({ver: d.ver, games: d.games, topics: d.topics}));
+    if (catChanged) localStorage.setItem(CAT_KEY, JSON.stringify({ver: d.ver, games: d.games.map(g => g.unl ? Object.assign({}, g, {source: '', unl: undefined}) : g), topics: d.topics}));
     localStorage.setItem(dataCacheKey(), JSON.stringify(smallData(d)));
   } catch(e){ try { localStorage.removeItem(CAT_KEY); localStorage.removeItem(dataCacheKey()); } catch(_){} }
+}
+/* ================= Подписка Premium =================
+   Бесплатно: первые 2 темы каждого раздела химии и биологии. Остальное открывается подпиской.
+   Тексты платных заданий приходят с сервера только при действующей подписке и хранятся отдельно (chem_psrc). */
+const PSRC_KEY = 'chem_psrc';
+const PLANS = [['m1', '1 месяц', 1], ['m3', '3 месяца', 3], ['m6', '6 месяцев', 6], ['m12', '12 месяцев', 12]];
+function isPrem(d){ d = d || S.data; const p = d && d.prem; return !!(p && p.active && p.until && p.until >= todayStr()); }
+function fmtDay(ymd){ const p = String(ymd || '').split('-'); return p.length === 3 ? p[2] + '.' + p[1] + '.' + p[0] : ymd; }
+function unlockFromCache(d){
+  try { const c = JSON.parse(localStorage.getItem(PSRC_KEY) || 'null');
+    if (!c || c.h !== d.ver || c.e !== (S.student && S.student.email)) return false;
+    d.games.forEach(g => { if (g.lock && c.src[g.id] != null){ g.source = c.src[g.id]; g.unl = 1; } }); return true;
+  } catch(e){ return false; }
+}
+async function unlockPaid(d){
+  if (!d || !d.games || unlockFromCache(d)) return;
+  try {
+    const r = await api('getPaidSources', S.student.email, S.student.tok);
+    try { localStorage.setItem(PSRC_KEY, JSON.stringify({h: r.h, e: S.student.email, src: r.src})); } catch(e){}
+    d.games.forEach(g => { if (g.lock && r.src[g.id] != null){ g.source = r.src[g.id]; g.unl = 1; } });
+  } catch(e){}
+}
+const isLocked = g => !!(g && g.lock && !g.unl);
+async function renderPremium(){
+  NAV.game = () => renderStudentView();
+  const prem = S.data && S.data.prem || {}, noTok = !S.student.email || !S.student.tok || prem.login;
+  libPage('Назад', `<section class="subj-hero prem-hero"><h2>⭐ Ramossitto Premium</h2><p>Все темы химии и биологии, A Level, пробные экзамены, библиотека, видеоролики и помощники mini-Ramossitto и Toirbek.</p></section>
+    <div id="premBox"><div class="loading" style="min-height:120px">Загружаем…</div></div>`);
+  const box = document.getElementById('premBox');
+  if (noTok){
+    box.innerHTML = `<div class="panel" style="margin-top:14px"><b>Чтобы оформить подписку, войдите по почте и PIN.</b><p class="small muted" style="margin:6px 0 12px">Так подписка будет привязана к вашему аккаунту и откроется на любом телефоне.</p><button class="btn primary" id="relog">Войти по почте и PIN</button></div>`;
+    document.getElementById('relog').onclick = () => { NAV.game = null; studentLogin('in'); };
+    return;
+  }
+  let info, my;
+  try { [info, my] = await Promise.all([api('payInfo'), api('myPremium', S.student.email, S.student.tok)]); }
+  catch (e){ if (document.getElementById('premBox')) box.innerHTML = `<div class="panel" style="margin-top:14px">Не удалось загрузить: ${esc(e.message)}</div>`; return; }
+  if (!document.getElementById('premBox')) return;
+  if (S.data){ const was = isPrem(); S.data.prem = {until: my.until, active: my.active}; if (my.active && !was){ toast('Premium активен! Открываем все задания…'); await unlockPaid(S.data); saveDataCache(S.data, true); } }
+  const status = my.active ? `<div class="panel prem-ok" style="margin-top:14px"><b>✅ Premium активен до ${esc(fmtDay(my.until))}</b><p class="small muted" style="margin:6px 0 0">Можно продлить заранее — дни добавятся к текущему сроку.</p></div>`
+    : my.until ? `<div class="panel" style="margin-top:14px">Подписка закончилась ${esc(fmtDay(my.until))}. Продлите, чтобы снова открыть все задания.</div>` : '';
+  const pend = my.pending ? `<div class="panel prem-wait" style="margin-top:14px"><b>⏳ Заявка на проверке</b><p class="small" style="margin:6px 0 0">Тариф: ${esc((PLANS.find(x => x[0] === my.pending.plan) || [])[1] || my.pending.plan)} · отправлена ${esc(my.pending.time)}. Как только учитель сверит перевод, Premium откроется сам — просто зайдите в приложение позже.</p></div>`
+    : my.last && my.last.status === 'no' ? `<div class="panel" style="margin-top:14px">Последняя заявка не подтверждена. Если вы оплатили — напишите учителю через ✉ или отправьте заявку ещё раз с точным временем перевода.</div>` : '';
+  if (!info.ready){ box.innerHTML = status + `<div class="panel" style="margin-top:14px">Оплата скоро будет доступна. Следите за новостями!</div>`; return; }
+  const plans = PLANS.filter(x => info.prices[x[0]] > 0);
+  const per = x => Math.round(info.prices[x[0]] / x[2]);
+  const base = plans.length ? per(plans[0]) : 0;
+  box.innerHTML = status + pend + `
+    <h3 style="margin:20px 0 10px">1. Выберите тариф</h3>
+    <div class="plans">${plans.map((x, i) => `<button class="plan ${i === 0 ? 'on' : ''}" data-plan="${x[0]}"><b>${x[1]}</b><span class="pr">${(info.prices[x[0]]).toLocaleString('ru-RU')} сум</span>${x[2] > 1 ? `<small>${per(x).toLocaleString('ru-RU')} сум/мес${base && per(x) < base ? ` · выгода ${Math.round((1 - per(x) / base) * 100)}%` : ''}</small>` : '<small>&nbsp;</small>'}</button>`).join('')}</div>
+    <h3 style="margin:20px 0 10px">2. Переведите сумму на карту</h3>
+    <div class="panel paycard"><div class="small muted">Номер карты${info.bank ? ' · ' + esc(info.bank) : ''}</div>
+      <div class="row" style="gap:10px; align-items:center; flex-wrap:wrap; margin-top:4px"><b class="cardno">${esc(info.card)}</b><button class="btn sm" id="cpCard">Копировать</button></div>
+      ${info.holder ? `<div class="small" style="margin-top:6px">Получатель: <b>${esc(info.holder)}</b></div>` : ''}
+      <div class="small" style="margin-top:6px">Сумма: <b id="sumTxt"></b></div>
+      ${info.note ? `<div class="small muted" style="margin-top:8px">${esc(info.note)}</div>` : ''}</div>
+    <h3 style="margin:20px 0 10px">3. Сообщите об оплате</h3>
+    <div class="panel"><label class="label" for="payCm">С чьей карты и во сколько был перевод</label>
+      <input class="field" id="payCm" maxlength="200" placeholder="Например: Каримов А., 14:35, карта *1234" style="margin-top:6px">
+      <button class="btn primary big" id="paySend" style="margin-top:12px; width:100%" ${my.pending ? 'disabled' : ''}>${my.pending ? 'Заявка уже отправлена' : 'Я оплатил(а)'}</button>
+      <p class="small muted" style="margin:10px 0 0">Учитель сверит перевод и подтвердит заявку — Premium откроется автоматически. Обычно это занимает до нескольких часов.${info.contact ? ' Вопросы: ' + esc(info.contact) : ''}</p></div>
+    <p class="small muted" style="margin-top:14px">Бесплатно навсегда: первые ${info.free} темы каждого раздела химии и биологии, рейтинг, таблица Менделеева и калькулятор.</p>`;
+  let plan = plans.length ? plans[0][0] : '';
+  const setSum = () => { const e = document.getElementById('sumTxt'); if (e) e.textContent = plan ? info.prices[plan].toLocaleString('ru-RU') + ' сум' : '—'; };
+  setSum();
+  box.querySelectorAll('[data-plan]').forEach(b => b.onclick = () => { sfx('tap'); plan = b.dataset.plan; box.querySelectorAll('[data-plan]').forEach(x => x.classList.toggle('on', x === b)); setSum(); });
+  document.getElementById('cpCard').onclick = () => { const t = info.card.replace(/\s/g, ''); (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast('Номер карты скопирован'), () => toast(info.card)); };
+  document.getElementById('paySend').onclick = async () => {
+    const cm = document.getElementById('payCm').value.trim(), btn = document.getElementById('paySend');
+    if (cm.length < 3){ toast('Напишите, с чьей карты был перевод и время'); return; }
+    btn.disabled = true; btn.textContent = 'Отправляем…';
+    try { await api('payRequest', S.student.email, S.student.tok, plan, cm); sfx('win'); toast('Заявка отправлена! Учитель проверит оплату'); renderPremium(); }
+    catch (e){ toast(e.message); btn.disabled = false; btn.textContent = 'Я оплатил(а)'; }
+  };
 }
 /* Каталог заданий (самая тяжёлая часть, ~1 МБ) берём со статичного сайта GitHub Pages — он выдерживает любое число учеников.
    Если файл устарел (учитель изменил задания в панели), берём свежий каталог с Google-сервера. */
@@ -1801,7 +1902,7 @@ async function studentHome(){
   if (had) renderStudentView(); else app.innerHTML = '<div class="loading">Загружаем задания…</div>';
   let fresh, catChanged = false;
   try {
-    fresh = await api('getStudentData', S.student.name, S.student.cls, had ? S.data.ver || '' : '', {lite: true});
+    fresh = await api('getStudentData', S.student.name, S.student.cls, had ? S.data.ver || '' : '', {lite: true, email: S.student.email || '', tok: S.student.tok || ''});
     if (fresh.needCat){
       const cat = await loadCatalog(fresh.ver);
       fresh.games = cat.games; fresh.topics = cat.topics; fresh.ver = cat.h; catChanged = true;
@@ -1812,6 +1913,9 @@ async function studentHome(){
     if (had) return;
     app.innerHTML = `<div class="wrap narrow"><div class="panel">Не удалось загрузить задания: ${esc(e.message)}<br><br><button class="btn" id="retry">Попробовать снова</button></div></div>`; document.getElementById('retry').onclick = studentHome; return;
   }
+  if (seq !== homeSeq || !S.student) return;
+  if (isPrem(fresh)){ const before = (S.data && S.data.games || []).filter(g => g.unl).length; await unlockPaid(fresh); if (!catChanged && before !== fresh.games.filter(g => g.unl).length) catChanged = true; }
+  else { try { localStorage.removeItem(PSRC_KEY); } catch(e){} fresh.games.forEach(g => { if (g.unl){ g.source = ''; delete g.unl; } }); }
   if (seq !== homeSeq || !S.student) return;
   const same = had && !catChanged && JSON.stringify(smallData(fresh)) === JSON.stringify(smallData(S.data));
   if (same) { saveDataCache(fresh, false); return; }
@@ -2469,6 +2573,62 @@ async function renderMailAdmin(){
   });
 }
 /* Учитель: монеты и призы */
+/* ================= Учитель: подписки Premium ================= */
+const PLAN_NAMES = {m1: '1 месяц', m3: '3 месяца', m6: '6 месяцев', m12: '12 месяцев'};
+async function renderPayAdmin(){
+  const box = document.getElementById('tbody');
+  box.innerHTML = '<div class="loading" style="min-height:120px">Загружаем подписки…</div>';
+  let d; try { d = await api('teacherPay', T.pw); } catch (e){ box.innerHTML = `<div class="panel">Ошибка: ${esc(e.message)}</div>`; return; }
+  const c = d.cfg, pend = d.pays.filter(r => r.status === 'new'), done = d.pays.filter(r => r.status !== 'new').slice(0, 40);
+  const subs = d.subs.slice().sort((a, b) => b.until.localeCompare(a.until)), active = subs.filter(x => x.until >= d.today);
+  box.innerHTML = `
+    <div class="panel" style="margin-bottom:14px"><h3 style="margin-top:0">Новые заявки на оплату ${pend.length ? `<span class="navbadge">${pend.length}</span>` : ''}</h3>
+      ${pend.length ? pend.map(r => `<div class="payreq"><div class="grow"><b>${esc(r.name)}</b> · ${esc(r.cls)} · <span class="muted">${esc(r.email)}</span><br>
+          <span class="pill warn">${esc(PLAN_NAMES[r.plan] || r.plan)} — ${Number(r.sum).toLocaleString('ru-RU')} сум</span> <span class="small muted">${esc(r.time)}</span>
+          <div class="small" style="margin-top:4px">«${esc(r.comment)}»</div></div>
+        <div class="row" style="gap:6px"><button class="btn sm primary" data-ok="${esc(r.id)}">✓ Подтвердить</button><button class="btn sm danger" data-no="${esc(r.id)}">Отклонить</button></div></div>`).join('')
+        : '<p class="small muted" style="margin:0">Новых заявок нет. Перед подтверждением сверьте сумму и время с SMS/уведомлением банка.</p>'}
+    </div>
+    <div class="angrid" style="margin-top:0">
+      <div class="panel"><h3 style="margin-top:0">Реквизиты и цены</h3>
+        <p class="small muted">Эти данные ученики видят на странице оплаты. Заполняете только вы.</p>
+        <div class="fgrid" style="grid-template-columns:1fr 1fr">
+          <div class="fgroup" style="grid-column:1/-1"><label class="label" for="pc-card">Номер карты (Uzcard / Humo / Visa)</label><input class="field" id="pc-card" inputmode="numeric" maxlength="23" autocomplete="off" placeholder="8600 0000 0000 0000" value="${esc(c.card)}"></div>
+          <div class="fgroup"><label class="label" for="pc-holder">Получатель</label><input class="field" id="pc-holder" maxlength="60" placeholder="Имя Фамилия" value="${esc(c.holder)}"></div>
+          <div class="fgroup"><label class="label" for="pc-bank">Банк / система</label><input class="field" id="pc-bank" maxlength="60" placeholder="Например: Uzcard, Kapitalbank" value="${esc(c.bank)}"></div>
+          <div class="fgroup" style="grid-column:1/-1"><label class="label" for="pc-contact">Контакт для вопросов</label><input class="field" id="pc-contact" maxlength="80" placeholder="Например: Telegram @username" value="${esc(c.contact)}"></div>
+          ${Object.keys(PLAN_NAMES).map(k => `<div class="fgroup"><label class="label" for="pc-${k}">${PLAN_NAMES[k]}, сум</label><input class="field" id="pc-${k}" type="number" min="0" step="1000" placeholder="0 — не продавать" value="${c.prices[k] || ''}"></div>`).join('')}
+          <div class="fgroup" style="grid-column:1/-1"><label class="label" for="pc-note">Примечание для учеников</label><input class="field" id="pc-note" maxlength="400" placeholder="Например: в комментарии к переводу ничего писать не нужно" value="${esc(c.note)}"></div>
+        </div>
+        <button class="btn primary" id="pcSave" style="margin-top:10px">Сохранить</button> ${c.ready ? '<span class="pill good">оплата включена</span>' : '<span class="pill warn">укажите карту и хотя бы одну цену</span>'}
+      </div>
+      <div class="panel"><h3 style="margin-top:0">Выдать или отключить Premium вручную</h3>
+        <p class="small muted">Например, для учеников школы-партнёра или в подарок. Ученик должен быть зарегистрирован по почте.</p>
+        <div class="fgroup"><label class="label" for="gr-email">Почта ученика</label><input class="field" id="gr-email" type="email" placeholder="aziz@gmail.com"></div>
+        <div class="row" style="gap:8px; margin-top:8px; flex-wrap:wrap"><select class="field" id="gr-m" style="max-width:180px"><option value="1">+1 месяц</option><option value="3">+3 месяца</option><option value="6">+6 месяцев</option><option value="12">+12 месяцев</option><option value="0">Отключить</option></select><button class="btn primary" id="grGo">Применить</button></div>
+        <h3>Активные подписки: ${active.length}</h3>
+        ${subs.length ? `<div class="tscroll"><table><thead><tr><th>Ученик</th><th>Класс</th><th>Почта</th><th>До</th></tr></thead><tbody>${subs.map(x => `<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.cls)}</td><td class="small">${esc(x.email)}</td><td><span class="pill ${x.until >= d.today ? 'good' : 'none'}">${esc(fmtDay(x.until))}</span></td></tr>`).join('')}</tbody></table></div>` : '<p class="small muted">Пока никого.</p>'}
+      </div>
+    </div>
+    ${done.length ? `<div class="panel" style="margin-top:14px"><h3 style="margin-top:0">История заявок</h3>${done.map(r => `<div class="chist"><span>${esc(r.time)} · ${esc(r.name)} (${esc(r.cls)}) · ${esc(PLAN_NAMES[r.plan] || r.plan)} · ${Number(r.sum).toLocaleString('ru-RU')} сум</span><b class="${r.status === 'ok' ? 'good' : 'bad'}">${r.status === 'ok' ? 'подтверждена' : 'отклонена'}</b></div>`).join('')}</div>` : ''}`;
+  document.getElementById('pcSave').onclick = async () => {
+    const v = id => document.getElementById(id).value;
+    const cfg = {card: v('pc-card'), holder: v('pc-holder'), bank: v('pc-bank'), contact: v('pc-contact'), note: v('pc-note'), prices: {}};
+    Object.keys(PLAN_NAMES).forEach(k => { cfg.prices[k] = Number(v('pc-' + k)) || 0; });
+    if (cfg.card && cfg.card.replace(/\D/g, '').length < 16){ toast('Проверьте номер карты — нужно 16 цифр'); return; }
+    try { await api('savePayCfg', T.pw, cfg); toast('Сохранено'); renderPayAdmin(); } catch (e){ toast(e.message); }
+  };
+  box.querySelectorAll('[data-ok],[data-no]').forEach(b => b.onclick = () => confirm2(b, async () => {
+    const ok = !!b.dataset.ok, r = await api('payDecide', T.pw, b.dataset.ok || b.dataset.no, ok);
+    toast(ok ? 'Подтверждено: Premium до ' + fmtDay(r.until) : 'Заявка отклонена'); renderPayAdmin();
+  }));
+  const gg = document.getElementById('grGo');
+  gg.onclick = () => confirm2(gg, async () => {
+    const em = document.getElementById('gr-email').value.trim(), m = +document.getElementById('gr-m').value;
+    if (!em){ toast('Укажите почту'); gg.disabled = false; gg.textContent = 'Применить'; return; }
+    const r = await api('grantPremium', T.pw, em, m); toast(m ? 'Premium до ' + fmtDay(r.until) : 'Premium отключён'); renderPayAdmin();
+  });
+}
 async function renderCoinsAdmin(){
   const box = document.getElementById('tbody');
   box.innerHTML = '<div class="loading" style="min-height:120px">Загружаем монеты…</div>';
@@ -2597,12 +2757,12 @@ function renderTopic(title){
       <div class="small muted" style="margin-top:6px">Выполнено ${t.games.filter(g => my[g.id]).length} из ${t.games.length}. Начните с теста или разомнитесь на играх.</div>
     </section>
     <div class="grid2" style="margin-top:18px">${topicCardsItems(t).length ? `<button class="card cardsbtn" id="cardsBtn">${tile('cards')}<div class="grow"><h3>Карточки: ${esc(t.title)}</h3><div class="meta"><span>${plural(topicCardsItems(t).length, 'термин', 'термина', 'терминов')}</span><span>выучено ${(cardsLearned()[t.title] || []).length}</span></div></div><span class="pill none">учить</span></button>` : ''}${t.games.map((g, i) => {
-      const p = PARSE[g.type](g.source), r = my[g.id];
-      const n = g.type === 'test' && g.count && g.count < p.items.length ? plural(g.count, 'вопрос', 'вопроса', 'вопросов') : p.label(p.items.length);
+      const p = PARSE[g.type](g.source), r = my[g.id], cntItems = isLocked(g) ? (g.n || 0) : p.items.length;
+      const n = g.type === 'test' && g.count && g.count < cntItems ? plural(g.count, 'вопрос', 'вопроса', 'вопросов') : p.label(cntItems);
       return `<button class="card" data-id="${esc(g.id)}" style="animation-delay:${i * 50}ms">${tile(g.type, i + 1)}
         <div class="grow"><h3>${esc(g.title)}</h3>
           <div class="meta"><span>${n}</span>${g.timeLimit ? `<span>⏱ ${g.timeLimit} мин</span>` : ''}${g.deadline ? `<span>${deadlineText(g.deadline)}</span>` : ''}${r ? `<span>попыток: ${r.attempts}</span>` : ''}</div></div>
-        ${r ? `<span class="pill ${pctClass(r.best)}">${r.best}%</span>` : '<span class="pill none">новое</span>'}
+        ${isLocked(g) ? '<span class="pill lockpill">🔒 Premium</span>' : r ? `<span class="pill ${pctClass(r.best)}">${r.best}%</span>` : '<span class="pill none">новое</span>'}
       </button>`; }).join('')}</div></div>`;
   bindTop();
   app.querySelectorAll('.card[data-id]').forEach(b => b.onclick = () => { sfx('tap'); navPush(); play(t.games.find(g => g.id === b.dataset.id), {onExit: studentHome}); });
@@ -2647,7 +2807,7 @@ function teacherHome(){
       <div class="small muted" style="margin-top:6px">Ключ хранится только на вашем Google-сервере. Ученики его не видят.</div>
     </div>
     <div class="row" style="justify-content:space-between; margin:22px 0 16px">
-      <div class="tabs"><button data-t="games" class="${T.tab === 'games' ? 'on' : ''}">Задания (${d.games.length})</button><button data-t="topics" class="${T.tab === 'topics' ? 'on' : ''}">Темы (${(d.topics || []).length})</button><button data-t="results" class="${T.tab === 'results' ? 'on' : ''}">Результаты (${d.results.length})</button><button data-t="analytics" class="${T.tab === 'analytics' ? 'on' : ''}">Аналитика</button><button data-t="coins" class="${T.tab === 'coins' ? 'on' : ''}">Монеты и призы</button><button data-t="mail" class="${T.tab === 'mail' ? 'on' : ''}">Сообщения${d.mailNew ? `<span class="navbadge">${d.mailNew}</span>` : ''}</button></div>
+      <div class="tabs"><button data-t="games" class="${T.tab === 'games' ? 'on' : ''}">Задания (${d.games.length})</button><button data-t="topics" class="${T.tab === 'topics' ? 'on' : ''}">Темы (${(d.topics || []).length})</button><button data-t="results" class="${T.tab === 'results' ? 'on' : ''}">Результаты (${d.results.length})</button><button data-t="analytics" class="${T.tab === 'analytics' ? 'on' : ''}">Аналитика</button><button data-t="coins" class="${T.tab === 'coins' ? 'on' : ''}">Монеты и призы</button><button data-t="mail" class="${T.tab === 'mail' ? 'on' : ''}">Сообщения${d.mailNew ? `<span class="navbadge">${d.mailNew}</span>` : ''}</button><button data-t="pay" class="${T.tab === 'pay' ? 'on' : ''}">⭐ Подписки</button></div>
       ${T.tab === 'games' ? '<button class="btn primary" id="new">+ Новое задание</button>' : ''}
     </div>
     <div id="tbody"></div></div>`;
@@ -2667,6 +2827,7 @@ function teacherHome(){
   else if (T.tab === 'analytics') renderAnalytics();
   else if (T.tab === 'coins') renderCoinsAdmin();
   else if (T.tab === 'mail') renderMailAdmin();
+  else if (T.tab === 'pay') renderPayAdmin();
   else renderResults();
 }
 
