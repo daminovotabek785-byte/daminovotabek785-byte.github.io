@@ -2622,6 +2622,73 @@ async function renderMailAdmin(){
   });
 }
 /* Учитель: монеты и призы */
+/* ================= Учитель: ученики и группы (отдельно химия и биология) ================= */
+const PEOPLE = {subj: 'chem', open: null, g: null, q: '', all: false};
+async function renderPeople(){
+  const box = document.getElementById('tbody');
+  box.innerHTML = '<div class="loading" style="min-height:120px">Загружаем учеников…</div>';
+  try { PEOPLE.g = await api('teacherGroups', T.pw); } catch (e){ box.innerHTML = `<div class="panel">Ошибка: ${esc(e.message)}</div>`; return; }
+  drawPeople();
+}
+const pkey = (n, c) => lc(n).replace(/\s+/g, ' ') + '|' + lc(c).replace(/\s+/g, ' ');
+function peopleStats(subj){
+  const secOf = {}, gsub = {}, gtitle = {};
+  (T.data.topics || []).forEach(t => { secOf[lc(t.title)] = t.section; });
+  T.data.games.forEach(g => { const s = subjOfSection(secOf[lc(g.topic)] || ''); gsub[g.id] = (s === 'bio' || s === 'al_bio') ? 'bio' : 'chem'; gtitle[g.id] = g.title; });
+  const users = {};
+  (PEOPLE.g.accounts || []).forEach(a => { users[pkey(a.name, a.cls)] = {name: a.name, cls: a.cls, email: a.email, games: {}}; });
+  T.data.results.forEach(r => {
+    const k = pkey(r.student, r.className), u = users[k] || (users[k] = {name: r.student, cls: r.className, email: '', games: {}});
+    const sj = gsub[r.gameId] || (/^(alb|bot|zoo|anat|gbio)-/.test(r.gameId) ? 'bio' : 'chem');
+    if (sj !== subj) return;
+    const g = u.games[r.gameId] || (u.games[r.gameId] = {best: 0, att: 0, last: '', title: gtitle[r.gameId] || r.gameTitle || r.gameId});
+    g.best = Math.max(g.best, r.percent); g.att++; if (r.time > g.last) g.last = r.time;
+  });
+  Object.values(users).forEach(u => { const gs = Object.values(u.games); u.done = gs.length; u.avg = gs.length ? Math.round(gs.reduce((a, g) => a + g.best, 0) / gs.length) : null; u.att = gs.reduce((a, g) => a + g.att, 0); u.last = gs.reduce((m, g) => g.last > m ? g.last : m, ''); });
+  return users;
+}
+function drawPeople(){
+  const box = document.getElementById('tbody'); if (!box) return;
+  const subj = PEOPLE.subj, users = peopleStats(subj), name = subj === 'bio' ? 'Биология' : 'Химия';
+  const groups = PEOPLE.g.groups.filter(g => g.subj === subj);
+  const inGroup = new Set(); groups.forEach(g => g.members.forEach(m => inGroup.add(pkey(m.name, m.cls))));
+  const uOf = m => users[pkey(m.name, m.cls)] || {name: m.name, cls: m.cls, email: m.email, games: {}, done: 0, avg: null, att: 0, last: ''};
+  const rowHtml = (u, gid, act) => { const k = gid + '#' + pkey(u.name, u.cls), open = PEOPLE.open === k;
+    return `<tr class="click" data-open="${esc(k)}"><td><b>${esc(u.name)}</b>${u.email ? `<div class="small muted">${esc(u.email)}</div>` : ''}</td><td>${esc(u.cls)}</td><td class="num">${u.done}</td><td>${u.avg == null ? '<span class="muted">—</span>' : `<span class="pill ${pctClass(u.avg)}">${u.avg}%</span>`}</td><td class="num">${u.att}</td><td class="num small">${esc(u.last || '—')}</td><td>${act}</td></tr>`
+      + (open ? `<tr class="sub"><td colspan="7">${Object.values(u.games).length ? Object.values(u.games).sort((a, b) => b.last.localeCompare(a.last)).map(g => `<div class="chist"><span>${esc(g.title)} <span class="small muted">· попыток ${g.att} · ${esc(g.last)}</span></span><b class="${g.best >= 80 ? 'p' : g.best < 50 ? 'm' : ''}">${g.best}%</b></div>`).join('') : `<span class="muted">По предмету «${name}» пока нет результатов.</span>`}</td></tr>` : ''); };
+  const head = '<thead><tr><th>Ученик</th><th>Класс</th><th>Заданий</th><th>Средний</th><th>Попыток</th><th>Последний раз</th><th></th></tr></thead>';
+  const sel = u => groups.length ? `<select class="field addg" data-name="${esc(u.name)}" data-cls="${esc(u.cls)}" data-email="${esc(u.email || '')}" style="min-width:150px; padding:6px 8px"><option value="">В группу…</option>${groups.map(g => `<option value="${esc(g.id)}">${esc(g.name)}</option>`).join('')}</select>` : '';
+  let others = Object.values(users).filter(u => !inGroup.has(pkey(u.name, u.cls)));
+  const activeOthers = others.filter(u => u.done > 0);
+  if (!PEOPLE.all) others = activeOthers;
+  if (PEOPLE.q) others = others.filter(u => (u.name + ' ' + u.cls + ' ' + (u.email || '')).toLowerCase().includes(PEOPLE.q.toLowerCase()));
+  others.sort((a, b) => (b.last || '').localeCompare(a.last || '') || a.name.localeCompare(b.name, 'ru'));
+  box.innerHTML = `
+    <div class="tabs subjtabs" style="margin-bottom:14px"><button data-ps="chem" class="${subj === 'chem' ? 'on' : ''}">🧪 Химия</button><button data-ps="bio" class="${subj === 'bio' ? 'on' : ''}">🧬 Биология</button></div>
+    <div class="panel" style="margin-bottom:14px"><h3 style="margin-top:0">Мои группы — ${name}</h3>
+      <p class="small muted" style="margin:4px 0 10px">Создайте группу, затем добавляйте в неё учеников из списка «Остальные пользователи» ниже. Группы по химии и по биологии — отдельные.</p>
+      <div class="linkbox"><input class="field" id="ngName" maxlength="60" placeholder="Название группы, например: Мои ученики 11А — ${name.toLowerCase()}"><button class="btn primary" id="ngGo">Создать группу</button></div></div>
+    ${groups.map(g => { const ms = g.members.map(uOf), withRes = ms.filter(u => u.avg != null), gavg = withRes.length ? Math.round(withRes.reduce((a, u) => a + u.avg, 0) / withRes.length) : null;
+      return `<div class="panel grp" style="margin-bottom:14px"><div class="row" style="justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:10px">
+        <div><h3 style="margin:0">👥 ${esc(g.name)}</h3><div class="small muted">${plural(ms.length, 'ученик', 'ученика', 'учеников')}${gavg != null ? ' · средний результат группы ' + gavg + '%' : ''}</div></div>
+        <button class="btn sm danger" data-delg="${esc(g.id)}">Удалить группу</button></div>
+        ${ms.length ? `<div class="tscroll"><table>${head}<tbody>${ms.sort((a, b) => a.name.localeCompare(b.name, 'ru')).map(u => rowHtml(u, g.id, `<button class="btn sm ghost" data-rm="${esc(g.id)}" data-name="${esc(u.name)}" data-cls="${esc(u.cls)}">Убрать</button>`)).join('')}</tbody></table></div>` : '<p class="small muted" style="margin:0">Пока пусто — добавьте учеников из списка ниже.</p>'}</div>`; }).join('')}
+    <div class="panel"><div class="row" style="justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:10px">
+      <div><h3 style="margin:0">Остальные пользователи — ${name}</h3><div class="small muted">${PEOPLE.all ? 'Все пользователи, кроме ваших групп' : 'Кто выполнял задания по предмету «' + name + '» и не входит в ваши группы'}: ${others.length}</div></div>
+      <label class="small"><input type="checkbox" id="pAll" ${PEOPLE.all ? 'checked' : ''}> показать всех, включая без результатов</label></div>
+      <input class="field" id="pQ" placeholder="Поиск по имени, классу или почте" value="${esc(PEOPLE.q)}" style="margin-bottom:10px">
+      ${others.length ? `<div class="tscroll"><table>${head}<tbody>${others.slice(0, 300).map(u => rowHtml(u, 'o', sel(u))).join('')}</tbody></table></div>${others.length > 300 ? '<p class="small muted">Показаны первые 300 — уточните поиск.</p>' : ''}` : '<p class="small muted" style="margin:0">Никого нет.</p>'}
+      <p class="small muted" style="margin:10px 0 0">Нажмите на строку, чтобы увидеть все задания ученика по этому предмету.</p></div>`;
+  box.querySelectorAll('[data-ps]').forEach(b => b.onclick = () => { PEOPLE.subj = b.dataset.ps; PEOPLE.open = null; drawPeople(); });
+  box.querySelectorAll('tr[data-open]').forEach(tr => tr.onclick = e => { if (e.target.closest('button, select')) return; PEOPLE.open = PEOPLE.open === tr.dataset.open ? null : tr.dataset.open; drawPeople(); });
+  const upd = async (fn, ...a) => { try { PEOPLE.g = await api(fn, T.pw, ...a); drawPeople(); } catch (e){ toast(e.message); } };
+  document.getElementById('ngGo').onclick = () => { const n = document.getElementById('ngName').value.trim(); if (!n) return toast('Напишите название группы'); upd('saveGroup', {name: n, subj}); };
+  box.querySelectorAll('[data-delg]').forEach(b => b.onclick = () => confirm2(b, () => upd('deleteGroup', b.dataset.delg)));
+  box.querySelectorAll('[data-rm]').forEach(b => b.onclick = e => { e.stopPropagation(); upd('setGroupMember', b.dataset.rm, {name: b.dataset.name, cls: b.dataset.cls}, false); });
+  box.querySelectorAll('select.addg').forEach(s => s.onchange = () => { if (!s.value) return; s.disabled = true; upd('setGroupMember', s.value, {name: s.dataset.name, cls: s.dataset.cls, email: s.dataset.email}, true).then(() => toast('Добавлен в группу')); });
+  document.getElementById('pAll').onchange = e => { PEOPLE.all = e.target.checked; drawPeople(); };
+  const q = document.getElementById('pQ'); q.oninput = () => { PEOPLE.q = q.value; clearTimeout(PEOPLE.t); PEOPLE.t = setTimeout(() => { drawPeople(); const n = document.getElementById('pQ'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); }, 250); };
+}
 /* ================= Учитель: подписки Premium ================= */
 const PLAN_NAMES = {m1: '1 месяц', m3: '3 месяца', m6: '6 месяцев', m12: '12 месяцев'};
 async function renderPayAdmin(){
@@ -2861,7 +2928,7 @@ function teacherHome(){
       <div class="small muted" style="margin-top:6px">Ключ хранится только на вашем Google-сервере. Ученики его не видят.</div>
     </div>
     <div class="row" style="justify-content:space-between; margin:22px 0 16px">
-      <div class="tabs"><button data-t="games" class="${T.tab === 'games' ? 'on' : ''}">Задания (${d.games.length})</button><button data-t="topics" class="${T.tab === 'topics' ? 'on' : ''}">Темы (${(d.topics || []).length})</button><button data-t="results" class="${T.tab === 'results' ? 'on' : ''}">Результаты (${d.results.length})</button><button data-t="analytics" class="${T.tab === 'analytics' ? 'on' : ''}">Аналитика</button><button data-t="coins" class="${T.tab === 'coins' ? 'on' : ''}">Монеты и призы</button><button data-t="mail" class="${T.tab === 'mail' ? 'on' : ''}">Сообщения${d.mailNew ? `<span class="navbadge">${d.mailNew}</span>` : ''}</button><button data-t="pay" class="${T.tab === 'pay' ? 'on' : ''}">⭐ Подписки</button></div>
+      <div class="tabs"><button data-t="games" class="${T.tab === 'games' ? 'on' : ''}">Задания (${d.games.length})</button><button data-t="topics" class="${T.tab === 'topics' ? 'on' : ''}">Темы (${(d.topics || []).length})</button><button data-t="results" class="${T.tab === 'results' ? 'on' : ''}">Результаты (${d.results.length})</button><button data-t="analytics" class="${T.tab === 'analytics' ? 'on' : ''}">Аналитика</button><button data-t="coins" class="${T.tab === 'coins' ? 'on' : ''}">Монеты и призы</button><button data-t="mail" class="${T.tab === 'mail' ? 'on' : ''}">Сообщения${d.mailNew ? `<span class="navbadge">${d.mailNew}</span>` : ''}</button><button data-t="people" class="${T.tab === 'people' ? 'on' : ''}">👥 Ученики</button><button data-t="pay" class="${T.tab === 'pay' ? 'on' : ''}">⭐ Подписки</button></div>
       ${T.tab === 'games' ? '<button class="btn primary" id="new">+ Новое задание</button>' : ''}
     </div>
     <div id="tbody"></div></div>`;
@@ -2882,6 +2949,7 @@ function teacherHome(){
   else if (T.tab === 'coins') renderCoinsAdmin();
   else if (T.tab === 'mail') renderMailAdmin();
   else if (T.tab === 'pay') renderPayAdmin();
+  else if (T.tab === 'people') renderPeople();
   else renderResults();
 }
 
