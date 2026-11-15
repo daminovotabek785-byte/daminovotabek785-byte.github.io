@@ -2655,7 +2655,7 @@ function drawPeople(){
   const uOf = m => users[pkey(m.name, m.cls)] || {name: m.name, cls: m.cls, email: m.email, games: {}, done: 0, avg: null, att: 0, last: ''};
   const rowHtml = (u, gid, act) => { const k = gid + '#' + pkey(u.name, u.cls), open = PEOPLE.open === k;
     return `<tr class="click" data-open="${esc(k)}"><td><b>${esc(u.name)}</b>${u.email ? `<div class="small muted">${esc(u.email)}</div>` : ''}</td><td>${esc(u.cls)}</td><td class="num">${u.done}</td><td>${u.avg == null ? '<span class="muted">—</span>' : `<span class="pill ${pctClass(u.avg)}">${u.avg}%</span>`}</td><td class="num">${u.att}</td><td class="num small">${esc(u.last || '—')}</td><td>${act}</td></tr>`
-      + (open ? `<tr class="sub"><td colspan="7">${Object.values(u.games).length ? Object.values(u.games).sort((a, b) => b.last.localeCompare(a.last)).map(g => `<div class="chist"><span>${esc(g.title)} <span class="small muted">· попыток ${g.att} · ${esc(g.last)}</span></span><b class="${g.best >= 80 ? 'p' : g.best < 50 ? 'm' : ''}">${g.best}%</b></div>`).join('') : `<span class="muted">По предмету «${name}» пока нет результатов.</span>`}</td></tr>` : ''); };
+      + (open ? `<tr class="sub"><td colspan="7">${Object.values(u.games).length ? Object.values(u.games).sort((a, b) => b.last.localeCompare(a.last)).map(g => `<div class="chist"><span>${esc(g.title)} <span class="small muted">· попыток ${g.att} · ${esc(g.last)}</span></span><b class="${g.best >= 80 ? 'p' : g.best < 50 ? 'm' : ''}">${g.best}%</b></div>`).join('') : `<span class="muted">По предмету «${name}» пока нет результатов.</span>`}${u.email ? `<div class="row pinrow" style="gap:8px; margin-top:10px; flex-wrap:wrap; align-items:center"><span class="small muted">🔑 Новый PIN для ${esc(u.email)}:</span><input class="field pinin" inputmode="numeric" maxlength="6" placeholder="4–6 цифр" style="max-width:120px; padding:6px 10px"><button class="btn sm" data-pin="${esc(u.email)}">Сбросить PIN</button></div>` : '<div class="small muted" style="margin-top:10px">У этого ученика нет аккаунта с почтой — PIN не используется.</div>'}</td></tr>` : ''); };
   const head = '<thead><tr><th>Ученик</th><th>Класс</th><th>Заданий</th><th>Средний</th><th>Попыток</th><th>Последний раз</th><th></th></tr></thead>';
   const sel = u => groups.length ? `<select class="field addg" data-name="${esc(u.name)}" data-cls="${esc(u.cls)}" data-email="${esc(u.email || '')}" style="min-width:150px; padding:6px 8px"><option value="">В группу…</option>${groups.map(g => `<option value="${esc(g.id)}">${esc(g.name)}</option>`).join('')}</select>` : '';
   let others = Object.values(users).filter(u => !inGroup.has(pkey(u.name, u.cls)));
@@ -2686,6 +2686,12 @@ function drawPeople(){
   box.querySelectorAll('[data-delg]').forEach(b => b.onclick = () => confirm2(b, () => upd('deleteGroup', b.dataset.delg)));
   box.querySelectorAll('[data-rm]').forEach(b => b.onclick = e => { e.stopPropagation(); upd('setGroupMember', b.dataset.rm, {name: b.dataset.name, cls: b.dataset.cls}, false); });
   box.querySelectorAll('select.addg').forEach(s => s.onchange = () => { if (!s.value) return; s.disabled = true; upd('setGroupMember', s.value, {name: s.dataset.name, cls: s.dataset.cls, email: s.dataset.email}, true).then(() => toast('Добавлен в группу')); });
+  box.querySelectorAll('[data-pin]').forEach(b => b.onclick = e => { e.stopPropagation();
+    const inp = b.parentNode.querySelector('.pinin'), pin = inp.value.trim();
+    if (!/^\d{4,6}$/.test(pin)){ toast('PIN — это 4–6 цифр'); inp.focus(); return; }
+    confirm2(b, async () => { await api('resetPin', T.pw, b.dataset.pin, pin); toast('Готово! Новый PIN: ' + pin + '. Сообщите его ученику'); b.disabled = false; b.textContent = 'Сбросить PIN'; inp.value = ''; });
+  });
+  box.querySelectorAll('.pinrow').forEach(r => r.onclick = e => e.stopPropagation());
   document.getElementById('pAll').onchange = e => { PEOPLE.all = e.target.checked; drawPeople(); };
   const q = document.getElementById('pQ'); q.oninput = () => { PEOPLE.q = q.value; clearTimeout(PEOPLE.t); PEOPLE.t = setTimeout(() => { drawPeople(); const n = document.getElementById('pQ'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); }, 250); };
 }
