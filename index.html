@@ -525,6 +525,16 @@ tr.sub td{background:var(--bg); font-size:.85rem; white-space:normal}
 .calc .ck button:active{transform:scale(.94)}
 /* Библиотека (книги) */
 .subj.locked{filter:saturate(.35); opacity:.85}
+.openmode.on{border-color:#9BDDB0; background:color-mix(in srgb, #2BB55A 7%, var(--surface))}
+/* Защита от копирования (только для учеников) */
+body.protect{-webkit-user-select:none; user-select:none; -webkit-touch-callout:none}
+body.protect input, body.protect textarea{-webkit-user-select:text; user-select:text}
+body.protect img, body.protect svg{-webkit-user-drag:none; user-drag:none}
+body.protect img{pointer-events:none}
+body.protect.shield #app, body.protect.shield .chat{filter:blur(18px)}
+#wmark{position:fixed; inset:0; z-index:60; pointer-events:none; opacity:.09; background-repeat:repeat; mix-blend-mode:multiply}
+@media (prefers-color-scheme: dark){ #wmark{mix-blend-mode:screen; opacity:.1} }
+@media print{ body.protect *{display:none !important} body.protect::before{content:'Печать запрещена'; display:block; font:700 24px sans-serif; padding:40px} }
 .prem-hero{background:linear-gradient(140deg,#3B2A00 0%,#A86B00 55%,#F2C230 100%)}
 .premban{display:flex; align-items:center; gap:12px; width:100%; margin-top:14px; padding:14px 16px; border:0; border-radius:18px; background:linear-gradient(120deg,#FFF3C4,#FFD86B); color:#4A3300; font:inherit; text-align:left; cursor:pointer; box-shadow:0 8px 22px -12px rgba(168,107,0,.6)}
 .premban .star{font-size:26px}
@@ -1556,6 +1566,7 @@ const BOOKS_BASE = 'https://daminovotabek785-byte.github.io/books/';
 const BOOKS_OPEN = false;
 function booksOpen(){
   if (BOOKS_OPEN) return true;
+  try { if (S.data && S.data.prem && S.data.prem.open) return true; } catch(e){}
   try { if (/[?&]books=1\b/.test(location.search)) sessionStorage.setItem('chem_books_preview', '1'); return sessionStorage.getItem('chem_books_preview') === '1'; } catch(e){ return false; }
 }
 booksOpen();
@@ -1617,7 +1628,7 @@ async function renderBookTopic(k, id, j){
   const sh = (idx[k] || []).find(x => x.id === id); if (!sh) return renderShelves(k);
   libPage(sh.title, `<div class="reader" id="rd"><div class="loading" style="min-height:160px">Открываем тему…</div></div>`);
   if (!isPrem()){ toast('Библиотека доступна в Premium'); renderPremium(); return; }
-  let t; try { t = LIB.topic[id + '/' + j] || (LIB.topic[id + '/' + j] = await api('getBookTopic', S.student.email, S.student.tok, id, j)); } catch (e){ const rr = document.getElementById('rd'); if (rr) rr.innerHTML = `Не удалось открыть тему: ${esc(e.message)}`; return; }
+  let t; try { t = LIB.topic[id + '/' + j] || (LIB.topic[id + '/' + j] = await api('getBookTopic', S.student.email || '', S.student.tok || '', id, j)); } catch (e){ const rr = document.getElementById('rd'); if (rr) rr.innerHTML = `Не удалось открыть тему: ${esc(e.message)}`; return; }
   const data = {length: t.total || sh.topics.length};
   let fs = 17; try { fs = +localStorage.getItem('chem_rfs') || 17; } catch(e){}
   const body = t.html.replace(/src="IMG\//g, 'loading="lazy" src="' + BOOKS_BASE);
@@ -1699,7 +1710,7 @@ function renderSubjects(){
       <h2>Привет, ${esc(firstName)}! Что учим сегодня?</h2>
       <p>Выбери предмет — внутри тесты, задачи и игры.</p>
     </section>
-    <button class="premban ${isPrem() ? 'on' : ''}" id="premBan"><span class="star">⭐</span><span class="grow"><b>${isPrem() ? 'Premium активен до ' + esc(fmtDay(S.data.prem.until)) : 'Открой всё с Premium'}</b><small>${isPrem() ? 'Все темы, A Level, библиотека и помощники открыты' : 'Все темы химии и биологии, A Level, библиотека, видео и помощники'}</small></span><span class="go">${isPrem() ? 'Продлить' : 'Подробнее →'}</span></button>
+    ${S.data && S.data.prem && S.data.prem.open ? '' : `<button class="premban ${isPrem() ? 'on' : ''}" id="premBan"><span class="star">⭐</span><span class="grow"><b>${isPrem() ? 'Premium активен до ' + esc(fmtDay(S.data.prem.until)) : 'Открой всё с Premium'}</b><small>${isPrem() ? 'Все темы, A Level, библиотека и помощники открыты' : 'Все темы химии и биологии, A Level, библиотека, видео и помощники'}</small></span><span class="go">${isPrem() ? 'Продлить' : 'Подробнее →'}</span></button>`}
     <div class="subjects">
       <button class="subj chem" id="sChem" aria-label="Химия"><span class="art">${ART_CHEM}</span>
         <h3>Химия</h3><span class="sub">Общая, неорганическая и органическая химия${nChem ? ' · ' + nChem + ' заданий' : ''}</span><span class="go">Открыть →</span></button>
@@ -1716,7 +1727,7 @@ function renderSubjects(){
   document.querySelectorAll('.inst-slot').forEach(fillInstall);
   document.getElementById('sChem').onclick = () => { sfx('tap'); S.subject = 'chem'; sstore('chem_subj', 'chem'); navPush(); renderHome(); window.scrollTo(0, 0); };
   document.getElementById('sBio').onclick = () => { sfx('tap'); S.subject = 'bio'; sstore('chem_subj', 'bio'); navPush(); renderHome(); window.scrollTo(0, 0); };
-  document.getElementById('premBan').onclick = () => { sfx('tap'); navPush(); renderPremium(); window.scrollTo(0, 0); };
+  const pb = document.getElementById('premBan'); if (pb) pb.onclick = () => { sfx('tap'); navPush(); renderPremium(); window.scrollTo(0, 0); };
   document.getElementById('sAL').onclick = () => { sfx('tap'); navPush(); renderALevel(); window.scrollTo(0, 0); };
   document.getElementById('sBooks').onclick = () => { if (!booksOpen()){ sfx('tap'); toast('Раздел «Библиотека» скоро откроется'); return; } sfx('tap'); navPush(); renderLibrary(); window.scrollTo(0, 0); };
   document.getElementById('sVideo').onclick = () => { if (!booksOpen()){ sfx('tap'); toast('Раздел «Видеоролики» скоро откроется'); return; } sfx('tap'); navPush(); renderVideos(); window.scrollTo(0, 0); };
@@ -1798,6 +1809,42 @@ function saveDataCache(d, catChanged){
     localStorage.setItem(dataCacheKey(), JSON.stringify(smallData(d)));
   } catch(e){ try { localStorage.removeItem(CAT_KEY); localStorage.removeItem(dataCacheKey()); } catch(_){} }
 }
+/* ================= Защита контента =================
+   Сайт не может полностью запретить снимок экрана — это решает телефон. Поэтому:
+   запрещаем выделение, копирование, меню, перетаскивание, печать и сохранение страницы;
+   прячем содержимое, когда приложение сворачивают или включают инструмент снимка экрана (ПК);
+   поверх всего — водяной знак с именем, классом и почтой ученика: любой снимок покажет, кто его сделал. */
+function protectInit(){
+  if (window.MODE === 'teacher' || protectInit.done) return; protectInit.done = true;
+  document.body.classList.add('protect');
+  const okField = t => t && t.closest && t.closest('input, textarea');
+  ['copy', 'cut', 'dragstart', 'selectstart', 'contextmenu'].forEach(ev => document.addEventListener(ev, e => { if (!okField(e.target)) e.preventDefault(); }, true));
+  document.addEventListener('keydown', e => {
+    const k = (e.key || '').toLowerCase(), mod = e.ctrlKey || e.metaKey;
+    if (k === 'printscreen' || k === 'f12' || (mod && ['s', 'p', 'u'].includes(k)) || (mod && e.shiftKey && ['i', 'j', 'c', 's'].includes(k)) || (mod && ['c', 'x', 'a'].includes(k) && !okField(e.target))){
+      e.preventDefault(); if (k === 'printscreen'){ shield(1500); try { navigator.clipboard.writeText(''); } catch(_){} toast('Снимки экрана запрещены'); }
+    }
+  }, true);
+  document.addEventListener('keyup', e => { if ((e.key || '').toLowerCase() === 'printscreen'){ try { navigator.clipboard.writeText(''); } catch(_){} } }, true);
+  const hide = () => { const a = document.activeElement; if (a && a.tagName === 'IFRAME') return; document.body.classList.add('shield'); };
+  window.addEventListener('blur', hide);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) document.body.classList.add('shield'); });
+  const show = () => document.body.classList.remove('shield');
+  window.addEventListener('focus', show); document.addEventListener('pointerdown', show, true);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) setTimeout(show, 150); });
+  window.addEventListener('beforeprint', () => document.body.classList.add('shield'));
+  window.addEventListener('afterprint', show);
+  watermark();
+}
+function shield(ms){ document.body.classList.add('shield'); setTimeout(() => document.body.classList.remove('shield'), ms); }
+function watermark(){
+  if (window.MODE === 'teacher' || !S.student) return;
+  const txt = [S.student.name, S.student.cls, S.student.email || ''].filter(Boolean).join(' · ');
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="340" height="170"><text x="10" y="95" transform="rotate(-24 170 85)" font-family="sans-serif" font-size="15" font-weight="700" fill="#555">${esc(txt)} · Ramossitto</text></svg>`;
+  let w = document.getElementById('wmark');
+  if (!w){ w = document.createElement('div'); w.id = 'wmark'; w.setAttribute('aria-hidden', 'true'); document.body.appendChild(w); }
+  w.style.backgroundImage = 'url("data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg) + '")';
+}
 /* ================= Подписка Premium =================
    Бесплатно: первые 2 темы каждого раздела химии и биологии. Остальное открывается подпиской.
    Тексты платных заданий приходят с сервера только при действующей подписке и хранятся отдельно (chem_psrc). */
@@ -1807,15 +1854,15 @@ function isPrem(d){ d = d || S.data; const p = d && d.prem; return !!(p && p.act
 function fmtDay(ymd){ const p = String(ymd || '').split('-'); return p.length === 3 ? p[2] + '.' + p[1] + '.' + p[0] : ymd; }
 function unlockFromCache(d){
   try { const c = JSON.parse(localStorage.getItem(PSRC_KEY) || 'null');
-    if (!c || c.h !== d.ver || c.e !== (S.student && S.student.email)) return false;
+    if (!c || c.h !== d.ver || c.e !== ((S.student && S.student.email) || '')) return false;
     d.games.forEach(g => { if (g.lock && c.src[g.id] != null){ g.source = c.src[g.id]; g.unl = 1; } }); return true;
   } catch(e){ return false; }
 }
 async function unlockPaid(d){
   if (!d || !d.games || unlockFromCache(d)) return;
   try {
-    const r = await api('getPaidSources', S.student.email, S.student.tok);
-    try { localStorage.setItem(PSRC_KEY, JSON.stringify({h: r.h, e: S.student.email, src: r.src})); } catch(e){}
+    const r = await api('getPaidSources', S.student.email || '', S.student.tok || '');
+    try { localStorage.setItem(PSRC_KEY, JSON.stringify({h: r.h, e: S.student.email || '', src: r.src})); } catch(e){}
     d.games.forEach(g => { if (g.lock && r.src[g.id] != null){ g.source = r.src[g.id]; g.unl = 1; } });
   } catch(e){}
 }
@@ -1840,6 +1887,7 @@ async function renderPremium(){
     : my.until ? `<div class="panel" style="margin-top:14px">Подписка закончилась ${esc(fmtDay(my.until))}. Продлите, чтобы снова открыть все задания.</div>` : '';
   const pend = my.pending ? `<div class="panel prem-wait" style="margin-top:14px"><b>⏳ Заявка на проверке</b><p class="small" style="margin:6px 0 0">Тариф: ${esc((PLANS.find(x => x[0] === my.pending.plan) || [])[1] || my.pending.plan)} · отправлена ${esc(my.pending.time)}. Как только учитель сверит перевод, Premium откроется сам — просто зайдите в приложение позже.</p></div>`
     : my.last && my.last.status === 'no' ? `<div class="panel" style="margin-top:14px">Последняя заявка не подтверждена. Если вы оплатили — напишите учителю через ✉ или отправьте заявку ещё раз с точным временем перевода.</div>` : '';
+  if (info.open){ box.innerHTML = `<div class="panel prem-ok" style="margin-top:14px"><b>🎁 Сейчас всё открыто бесплатно!</b><p class="small" style="margin:6px 0 0">Пользуйся всеми темами, A Level, библиотекой, видео и помощниками.</p></div>`; return; }
   if (!info.ready){ box.innerHTML = status + `<div class="panel" style="margin-top:14px">Оплата скоро будет доступна. Следите за новостями!</div>`; return; }
   const plans = PLANS.filter(x => info.prices[x[0]] > 0);
   const per = x => Math.round(info.prices[x[0]] / x[2]);
@@ -1895,6 +1943,7 @@ function viewIsIdle(){
 let homeSeq = 0;
 async function studentHome(){
   if (!S.student) return studentLogin();
+  protectInit(); watermark();
   const seq = ++homeSeq;
   if (pendingList().length) setTimeout(flushPending, 1500);
   if (!S.data) S.data = loadDataCache();
@@ -2582,6 +2631,9 @@ async function renderPayAdmin(){
   const c = d.cfg, pend = d.pays.filter(r => r.status === 'new'), done = d.pays.filter(r => r.status !== 'new').slice(0, 40);
   const subs = d.subs.slice().sort((a, b) => b.until.localeCompare(a.until)), active = subs.filter(x => x.until >= d.today);
   box.innerHTML = `
+    <div class="panel openmode ${c.open ? 'on' : ''}" style="margin-bottom:14px"><div class="row" style="justify-content:space-between; gap:10px; flex-wrap:wrap">
+      <div class="grow"><b>${c.open ? '🎁 Сейчас всё открыто бесплатно' : '⭐ Платный режим включён'}</b><div class="small muted" style="margin-top:4px">${c.open ? 'Все ученики видят все задания, A Level, библиотеку, видео и помощников. Когда будете готовы брать оплату — включите платный режим.' : 'Бесплатно открыты только первые 2 темы каждого раздела. Остальное — по подписке.'}</div></div>
+      <button class="btn ${c.open ? 'primary' : ''}" id="openTg">${c.open ? 'Включить платный режим' : 'Снова открыть всё бесплатно'}</button></div></div>
     <div class="panel" style="margin-bottom:14px"><h3 style="margin-top:0">Новые заявки на оплату ${pend.length ? `<span class="navbadge">${pend.length}</span>` : ''}</h3>
       ${pend.length ? pend.map(r => `<div class="payreq"><div class="grow"><b>${esc(r.name)}</b> · ${esc(r.cls)} · <span class="muted">${esc(r.email)}</span><br>
           <span class="pill warn">${esc(PLAN_NAMES[r.plan] || r.plan)} — ${Number(r.sum).toLocaleString('ru-RU')} сум</span> <span class="small muted">${esc(r.time)}</span>
@@ -2622,6 +2674,8 @@ async function renderPayAdmin(){
     const ok = !!b.dataset.ok, r = await api('payDecide', T.pw, b.dataset.ok || b.dataset.no, ok);
     toast(ok ? 'Подтверждено: Premium до ' + fmtDay(r.until) : 'Заявка отклонена'); renderPayAdmin();
   }));
+  const og = document.getElementById('openTg');
+  og.onclick = () => confirm2(og, async () => { const r = await api('setOpenAll', T.pw, !c.open); toast(r.open ? 'Всё открыто бесплатно' : 'Платный режим включён'); renderPayAdmin(); });
   const gg = document.getElementById('grGo');
   gg.onclick = () => confirm2(gg, async () => {
     const em = document.getElementById('gr-email').value.trim(), m = +document.getElementById('gr-m').value;
