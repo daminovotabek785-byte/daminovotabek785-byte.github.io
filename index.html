@@ -525,6 +525,7 @@ tr.sub td{background:var(--bg); font-size:.85rem; white-space:normal}
 .calc .ck button:active{transform:scale(.94)}
 /* Библиотека (книги) */
 .subj.locked{filter:saturate(.35); opacity:.85}
+.practice-note{margin-top:12px; padding:10px 12px; border-radius:12px; background:color-mix(in srgb, var(--accent) 10%, var(--surface)); font-size:.92rem; line-height:1.4}
 .openmode.on{border-color:#9BDDB0; background:color-mix(in srgb, #2BB55A 7%, var(--surface))}
 /* Защита от копирования (только для учеников) */
 body.protect{-webkit-user-select:none; user-select:none; -webkit-touch-callout:none}
@@ -1193,7 +1194,11 @@ function showResult(game, res, opts){
   const pct = res.max ? Math.round(res.score * 100 / res.max) : 0;
   const mood = pct >= 90 ? 'Блестяще!' : pct >= 70 ? 'Хорошая работа!' : pct >= 50 ? 'Неплохо, но можно лучше' : 'Стоит повторить тему';
   let xpHtml = '';
-  if (!opts.preview && S.data){
+  const practice = !opts.preview && S.data && !!(S.data.my[game.id] || pendingList().some(p => p.gameId === game.id && lc(p.student) === lc(S.student.name)));
+  if (practice){
+    const first = (S.data.my[game.id] || {}).best;
+    xpHtml = `<div class="practice-note">🏋 Тренировка для себя — засчитывается только первая попытка${first != null ? ` (${first}%)` : ''}. Этот результат не записывается, монеты не начисляются.</div>`;
+  } else if (!opts.preview && S.data){
     const prev = (S.data.my[game.id] || {}).best || 0, before = xpOf(S.data.my), gain = Math.max(0, pct - prev);
     const m = S.data.my[game.id] || (S.data.my[game.id] = {best: 0, attempts: 0});
     m.best = Math.max(m.best, pct); m.attempts++; m.last = todayStr();
@@ -1202,7 +1207,7 @@ function showResult(game, res, opts){
     const lb = levelOf(before), la = levelOf(before + gain);
     const cg = Math.floor((before + gain) / 10) - Math.floor(before / 10);
     if (cg && S.data.coins) S.data.coins.balance += cg;
-    xpHtml = gain ? `<div><span class="xp-gain">+${gain} опыта</span>${cg ? ` <span class="stakepill p">${COIN}+${cg}</span>` : ''}</div>` : `<div class="small muted" style="margin-top:10px">Опыт растёт, когда вы улучшаете свой лучший результат (сейчас ${prev}%)</div>`;
+    xpHtml = gain ? `<div><span class="xp-gain">+${gain} опыта</span>${cg ? ` <span class="stakepill p">${COIN}+${cg}</span>` : ''}</div>` : `<div class="small muted" style="margin-top:10px">Опыт и монеты начисляются за первую попытку</div>`;
     if (la.n > lb.n) xpHtml += `<div class="lvlup">Новый уровень! Теперь вы — ${la.name} <b>${la.sym}</b> (№ ${la.n})</div>`;
   }
   const review = res.review ? `<div class="review">${res.review}</div>` : '';
@@ -1235,6 +1240,7 @@ function showResult(game, res, opts){
   document.getElementById('back').onclick = () => { if (NAV.game && NAV.on && NAV.depth > 0) history.back(); else { NAV.game = null; opts.onExit && opts.onExit(); } };
   const st = document.getElementById('sendState');
   if (opts.preview){ st.innerHTML = '<span class="pill warn">Режим проверки — результат не записан</span>'; return; }
+  if (practice){ st.innerHTML = '<span class="pill none">Тренировка — не отправляется учителю</span>'; return; }
   const payload = {gameId: game.id, student: S.student.name, className: S.student.cls, score: res.score, max: res.max, seconds: res.seconds, details: res.details, uid: Date.now().toString(36) + Math.random().toString(36).slice(2, 7)};
   const send = () => {
     st.innerHTML = '<span class="pill none">Отправляем результат учителю…</span>';
@@ -1257,9 +1263,19 @@ function pendingAdd(p){ const a = pendingList(); if (!a.some(x => x.uid === p.ui
 function pendingDrop(uid){ pendingSave(pendingList().filter(x => x.uid !== uid)); }
 let pendingBusy = false;
 async function flushPending(){
-  if (pendingBusy) return; pendingBusy = true;
-  try { for (const p of pendingList()){ try { await api('submitResult', p); pendingDrop(p.uid); } catch(e){ break; } } }
+  if (pendingBusy) return; pendingBusy = true; let sent = 0;
+  try { for (const p of pendingList()){ try { await api('submitResult', p); pendingDrop(p.uid); sent++; } catch(e){ break; } } }
   finally { pendingBusy = false; }
+  if (sent && S.student && window.MODE !== 'teacher' && viewIsIdle()) studentHome();
+}
+/* Результаты, которые ещё не дошли до сервера, показываем сразу (чтобы после обновления ничего не «пропадало») */
+function mergePending(d){
+  if (!d || !d.my || !S.student) return;
+  pendingList().forEach(p => {
+    if (lc(p.student) !== lc(S.student.name) || lc(p.className) !== lc(S.student.cls) || d.my[p.gameId]) return;
+    const pct = p.max ? Math.round(p.score * 100 / p.max) : 0;
+    d.my[p.gameId] = {best: pct, attempts: 1, last: todayStr(), pending: true};
+  });
 }
 
 /* ================= Помощник (ИИ) ================= */
@@ -1966,6 +1982,7 @@ async function studentHome(){
   if (isPrem(fresh)){ const before = (S.data && S.data.games || []).filter(g => g.unl).length; await unlockPaid(fresh); if (!catChanged && before !== fresh.games.filter(g => g.unl).length) catChanged = true; }
   else { try { localStorage.removeItem(PSRC_KEY); } catch(e){} fresh.games.forEach(g => { if (g.unl){ g.source = ''; delete g.unl; } }); }
   if (seq !== homeSeq || !S.student) return;
+  mergePending(fresh);
   const same = had && !catChanged && JSON.stringify(smallData(fresh)) === JSON.stringify(smallData(S.data));
   if (same) { saveDataCache(fresh, false); return; }
   S.data = fresh; saveDataCache(fresh, catChanged);
