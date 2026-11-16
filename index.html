@@ -563,6 +563,9 @@ body.protect.shield #app, body.protect.shield .chat{filter:blur(18px)}
 .vitem .vp{flex:none; width:44px; height:44px; border-radius:12px; background:#E2546A; color:#fff; display:grid; place-items:center; font-size:18px}
 .vframe{position:relative; width:100%; aspect-ratio:16/9; border-radius:16px; overflow:hidden; background:#000; margin-top:14px}
 .vframe iframe, .vframe video{position:absolute; inset:0; width:100%; height:100%; border:0}
+.vsoon{position:absolute; inset:0; display:grid; place-items:center; color:#fff; font-weight:700; background:linear-gradient(140deg,#3A0B2E,#8E1B4A)}
+.shelf.vshelf::after{background:linear-gradient(90deg,#8E1B4A,#E2546A)}
+.btopic.novid{opacity:.6}
 .subj.books{--sc:#9A5B13; background:linear-gradient(140deg,#5B2E0E 0%,#A0521C 55%,#E0A43A 100%); animation-delay:.24s; min-height:180px}
 .lib-hero{background:linear-gradient(140deg,#4A260C 0%,#8E4A18 60%,#D9973A 100%)}
 .libsubj{display:grid; gap:14px; margin-top:16px; grid-template-columns:1fr 1fr}
@@ -1673,45 +1676,63 @@ async function renderBookTopic(k, id, j){
    {"chem": [{"title": "...", "url": "ссылка на YouTube или .mp4", "desc": "..."}], "bio": [...]} */
 const ART_VIDEO = `<svg viewBox="0 0 220 200" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g opacity=".92"><rect x="34" y="46" width="152" height="104" rx="16"/><path d="M96 76l38 22-38 22z" fill="#FFD0D8" stroke="#FFD0D8"/><path d="M60 170h100"/></g><g stroke="#FFD0D8" stroke-width="4"><path d="M52 34l14 12M168 34l-14 12"/></g></svg>`;
 const VID = {list: null};
-async function vidList(){ if (!VID.list) { try { VID.list = await libFetch('videos.json'); } catch(e){ VID.list = {chem: [], bio: []}; } } return VID.list; }
+/* books/videos.json: {"Зоология": {"Простейшие": [{"title": "...", "url": "YouTube / Google Drive / .mp4"}]}, "Общая химия": {...}}
+   Книги = разделы предмета, главы = темы раздела (те же, что в заданиях). */
+async function vidList(){ if (!VID.list) { try { VID.list = await libFetch('videos.json'); } catch(e){ VID.list = {}; } } return VID.list || {}; }
 function vidEmbed(url){
-  const u = String(url || ''), y = u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{11})/);
-  if (y) return `<iframe src="https://www.youtube-nocookie.com/embed/${y[1]}?rel=0" title="Видео" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe>`;
-  if (/\.(mp4|webm)(\?|$)/i.test(u)) return `<video src="${esc(u)}" controls playsinline preload="metadata"></video>`;
-  return `<div class="panel" style="position:absolute; inset:0; display:grid; place-items:center">Ссылка на видео не поддерживается</div>`;
+  const u = String(url || ''), y = u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([\w-]{11})/);
+  if (y) return `<iframe src="https://www.youtube-nocookie.com/embed/${y[1]}?rel=0&modestbranding=1" title="Видео" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe>`;
+  const g = u.match(/drive\.google\.com\/(?:file\/d\/|open\?id=)([\w-]{20,})/);
+  if (g) return `<iframe src="https://drive.google.com/file/d/${g[1]}/preview" title="Видео" allow="autoplay; fullscreen" allowfullscreen loading="lazy"></iframe>`;
+  if (/\.(mp4|webm)(\?|$)/i.test(u)) return `<video src="${esc(u)}" controls controlsList="nodownload" disablepictureinpicture playsinline preload="metadata"></video>`;
+  return `<div class="vsoon">🎬 Видео скоро появится</div>`;
 }
+const vidBooks = k => (k === 'bio' ? BIO_BRANCHES : CHEM_BRANCHES);
+const vidChapters = sec => (S.data && S.data.topics || []).filter(t => lc(t.section) === lc(sec)).map(t => t.title);
+function vidOf(v, sec, ch){ const b = v[sec] || {}; return (Array.isArray(b[ch]) ? b[ch] : []).filter(x => x && x.url); }
+function vidExtra(v, sec){ const known = new Set(vidChapters(sec).map(lc)); return Object.keys(v[sec] || {}).filter(c => !known.has(lc(c))); }
 async function renderVideos(){
   if (!booksOpen()) return renderSubjects();
   S.subject = 'videos'; S.topic = null; S.section = null;
   NAV.game = () => renderSubjects();
-  libPage('Предметы', `<section class="subj-hero vid-hero"><h2>Видеоролики</h2><p>Видеоуроки, опыты и разборы задач. Выбери предмет.</p></section>
+  libPage('Предметы', `<section class="subj-hero vid-hero"><h2>Видеоролики</h2><p>Видеоуроки по главам книг. Выбери предмет.</p></section>
     <div class="libsubj" id="vidS"><div class="loading" style="min-height:120px">Загружаем видео…</div></div>`);
   const v = await vidList(), box = document.getElementById('vidS'); if (!box) return;
   box.innerHTML = [['chem', 'Химия', 'alchem', ART_CHEM], ['bio', 'Биология', 'albio', ART_BIO]].map(([k, name, cls, art]) => {
-    const n = (v[k] || []).length;
-    return `<button class="subj ${cls}" data-vid="${k}"><span class="art">${art}</span><span class="tag">Видеоролики</span><h3>${name}</h3><span class="sub">${n ? plural(n, 'видео', 'видео', 'видео') : 'Скоро здесь появятся видео'}</span><span class="go">Открыть →</span></button>`;
+    const n = vidBooks(k).reduce((a, b) => a + Object.keys(v[b.name] || {}).reduce((x, c) => x + vidOf(v, b.name, c).length, 0), 0);
+    return `<button class="subj ${cls}" data-vid="${k}"><span class="art">${art}</span><span class="tag">Видеоролики</span><h3>${name}</h3><span class="sub">${plural(vidBooks(k).length, 'книга', 'книги', 'книг')}${n ? ' · ' + n + ' видео' : ' · видео скоро появятся'}</span><span class="go">Открыть →</span></button>`;
   }).join('');
-  box.querySelectorAll('[data-vid]').forEach(b => b.onclick = () => { sfx('tap'); navPush(); renderVideoList(b.dataset.vid); window.scrollTo(0, 0); });
+  box.querySelectorAll('[data-vid]').forEach(b => b.onclick = () => { sfx('tap'); navPush(); renderVideoBooks(b.dataset.vid); window.scrollTo(0, 0); });
 }
-async function renderVideoList(k){
+async function renderVideoBooks(k){
   if (!isPrem()){ toast('Видеоролики доступны в Premium'); renderPremium(); return; }
   NAV.game = () => renderVideos();
-  const name = k === 'bio' ? 'Биология' : 'Химия', list = (await vidList())[k] || [];
-  libPage('Видеоролики', `<section class="subj-hero vid-hero"><h2>${name}: видеоролики</h2><p>Смотри по порядку — после видео закрепи тему в играх.</p></section>
-    ${list.length ? `<div class="vlist">${list.map((x, i) => `<button class="vitem" data-v="${i}"><span class="vp">▶</span><span class="grow"><b>${esc(x.title)}</b>${x.desc ? `<br><small class="muted">${esc(x.desc)}</small>` : ''}</span></button>`).join('')}</div>`
-      : '<div class="empty panel" style="margin-top:14px">Здесь скоро появятся видеоролики. Загляни позже!</div>'}`);
-  app.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { sfx('tap'); navPush(); renderVideo(k, +b.dataset.v); window.scrollTo(0, 0); });
+  const name = k === 'bio' ? 'Биология' : 'Химия', v = await vidList();
+  libPage('Видеоролики', `<section class="subj-hero vid-hero"><h2>${name}: видео по книгам</h2><p>Каждая книга разбита на главы. Внутри главы — видеоуроки.</p></section>
+    ${vidBooks(k).map(b => { const chs = vidChapters(b.name).concat(vidExtra(v, b.name)), n = chs.reduce((a, c) => a + vidOf(v, b.name, c).length, 0);
+      return `<button class="shelf vshelf" data-vb="${esc(b.name)}" style="--sc:${b.color}"><span class="spines">${[38, 52, 44, 58, 40].map((h, j) => `<i style="height:${h}px; opacity:${0.55 + j * 0.1}"></i>`).join('')}</span>
+        <span class="grow"><b>${esc(b.name)}</b><small>${plural(chs.length, 'глава', 'главы', 'глав')} · ${n ? n + ' видео' : 'видео скоро появятся'}</small></span><span class="pill none">открыть</span></button>`; }).join('')}`);
+  app.querySelectorAll('[data-vb]').forEach(b => b.onclick = () => { sfx('tap'); navPush(); renderVideoChapters(k, b.dataset.vb); window.scrollTo(0, 0); });
 }
-async function renderVideo(k, i){
-  NAV.game = () => renderVideoList(k);
-  const list = (await vidList())[k] || [], x = list[i]; if (!x) return renderVideoList(k);
-  libPage(k === 'bio' ? 'Биология' : 'Химия', `<div class="reader"><div class="small muted">Видео ${i + 1} из ${list.length}</div><h1 style="margin:4px 0 0; font-size:1.4rem; line-height:1.25">${esc(x.title)}</h1>
-    <div class="vframe">${vidEmbed(x.url)}</div>${x.desc ? `<p style="margin-top:12px">${esc(x.desc)}</p>` : ''}
-    <div class="rnav">${i > 0 ? '<button class="btn" id="vprev">← Предыдущее</button>' : ''}${i < list.length - 1 ? '<button class="btn primary" id="vnext">Следующее →</button>' : '<button class="btn primary" id="vdone">К списку видео</button>'}</div></div>`);
-  const go = n => { sfx('tap'); renderVideo(k, n); window.scrollTo(0, 0); };
-  const pv = document.getElementById('vprev'); if (pv) pv.onclick = () => go(i - 1);
-  const nx = document.getElementById('vnext'); if (nx) nx.onclick = () => go(i + 1);
-  const dn = document.getElementById('vdone'); if (dn) dn.onclick = () => goBack();
+async function renderVideoChapters(k, sec){
+  NAV.game = () => renderVideoBooks(k);
+  const v = await vidList(), b = vidBooks(k).find(x => x.name === sec) || {color: '#B4234A'};
+  const chs = vidChapters(sec).concat(vidExtra(v, sec));
+  libPage(k === 'bio' ? 'Биология' : 'Химия', `<section class="subj-hero vid-hero"><h2>${esc(sec)}</h2><p>Выбери главу — внутри видеоуроки по теме.</p></section>
+    <div class="btopics" style="--sc:${b.color}">${chs.map((c, j) => { const n = vidOf(v, sec, c).length;
+      return `<button class="btopic ${n ? '' : 'novid'}" data-ch="${j}"><span class="no">${j + 1}</span><span class="grow"><b>${esc(c)}</b></span><span class="pill ${n ? 'good' : 'none'}">${n ? '▶ ' + n + ' видео' : 'скоро'}</span></button>`; }).join('')}</div>`);
+  app.querySelectorAll('[data-ch]').forEach(x => x.onclick = () => { const c = chs[+x.dataset.ch]; sfx('tap');
+    if (!vidOf(v, sec, c).length){ toast('Видео по этой главе скоро появится'); return; }
+    navPush(); renderVideoChapter(k, sec, c); window.scrollTo(0, 0); });
+}
+async function renderVideoChapter(k, sec, ch){
+  NAV.game = () => renderVideoChapters(k, sec);
+  const list = vidOf(await vidList(), sec, ch);
+  libPage(sec, `<div class="reader"><div class="small muted">${esc(sec)} · ${plural(list.length, 'видео', 'видео', 'видео')}</div><h1 style="margin:4px 0 0; font-size:1.4rem; line-height:1.25">${esc(ch)}</h1>
+    ${list.map((x, i) => `<h3 style="margin:18px 0 0; font-size:1.02rem">${list.length > 1 ? (i + 1) + '. ' : ''}${esc(x.title || ch)}</h3>${x.desc ? `<p class="small muted" style="margin:4px 0 0">${esc(x.desc)}</p>` : ''}<div class="vframe">${vidEmbed(x.url)}</div>`).join('')}
+    <div class="rnav"><button class="btn primary" id="vdone">К списку глав</button></div></div>`);
+  app.querySelectorAll('.vframe video').forEach(el => el.addEventListener('contextmenu', e => e.preventDefault()));
+  document.getElementById('vdone').onclick = () => goBack();
 }
 function renderSubjects(){
   S.subject = null; sstore('chem_subj', null);
