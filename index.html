@@ -622,6 +622,72 @@ textarea.field.mtext{width:100%; min-height:110px; resize:vertical; font-family:
 .stakepill.m{background:color-mix(in srgb, var(--bad) 12%, var(--surface)); color:var(--bad)}
 .ctbl input.field, .ctbl select.field{padding:6px 8px; font-size:14px; min-width:0}
 .ctbl td{vertical-align:middle}
+/* ---- Лаборатория ---- */
+.labtabs{flex-wrap:wrap}
+.lbox{padding:14px}
+.lbench{display:grid; grid-template-columns:auto 1fr; gap:6px 16px; align-items:end; position:relative}
+.ltube{grid-row:1; position:relative; width:86px; height:250px; margin:0 6px; border:4px solid rgba(150,170,195,.75); border-top:none; border-radius:0 0 46px 46px; background:linear-gradient(90deg, rgba(255,255,255,.55), rgba(255,255,255,.08) 40%, rgba(255,255,255,.35)); overflow:hidden; box-shadow:inset 0 0 0 2px rgba(255,255,255,.4)}
+.ltube::before{content:''; position:absolute; top:0; left:-8px; right:-8px; height:8px; border-radius:6px; background:rgba(150,170,195,.85)}
+.ltube.warm{box-shadow:inset 0 0 0 2px rgba(255,255,255,.4), 0 0 26px rgba(255,120,60,.55)}
+.ltube.pour .lliq{animation:lpour .9s ease-out}
+@keyframes lpour{0%{filter:brightness(1.5) saturate(.3)} 100%{filter:none}}
+.lliq{position:absolute; left:0; right:0; bottom:0; transition:height .6s ease, background-color 1.2s ease; border-top:2px solid rgba(255,255,255,.55)}
+.lliq i{position:absolute; bottom:6px; border-radius:50%; border:2px solid rgba(255,255,255,.9); background:rgba(255,255,255,.25); animation:lbub 1.6s infinite ease-in}
+@keyframes lbub{0%{transform:translateY(0) scale(.6); opacity:0} 15%{opacity:1} 100%{transform:translateY(-150px) scale(1.1); opacity:0}}
+.lppt{position:absolute; left:0; right:0; bottom:0; height:100%}
+.lppt b{position:absolute; top:6%; width:9px; height:9px; border-radius:40%; box-shadow:0 0 0 1px rgba(0,0,0,.08); animation:lfall 1.8s forwards cubic-bezier(.4,.1,.6,1)}
+.lppt::after{content:''; position:absolute; left:0; right:0; bottom:0; height:0; background:var(--pc); border-radius:0 0 40px 40px; animation:lsettle 2.2s .6s forwards}
+@keyframes lfall{to{top:88%; opacity:.9}}
+@keyframes lsettle{to{height:24%}}
+.lsolid{position:absolute; bottom:8px; width:26px; height:18px; border-radius:7px 9px 6px 10px; background:var(--sc); box-shadow:inset -3px -3px 0 rgba(0,0,0,.18), 0 1px 2px rgba(0,0,0,.25); transition:transform 3s ease, opacity 3s}
+.lsolid.eaten{transform:scale(.55); opacity:.75}
+.lgas{position:absolute; top:10px; left:50%; transform:translateX(-50%); font-size:12px; font-weight:700; background:rgba(255,255,255,.85); color:#333; padding:2px 6px; border-radius:8px; white-space:nowrap}
+.lsmell{position:absolute; top:-6px; right:-2px; font-size:14px; line-height:.9; color:#7a8a40; animation:lsm 2s infinite}
+@keyframes lsm{0%{transform:translateY(8px); opacity:0} 50%{opacity:1} 100%{transform:translateY(-14px); opacity:0}}
+.lbrown{position:absolute; top:0; left:0; right:0; height:60px; background:linear-gradient(180deg, rgba(150,70,20,.75), transparent); animation:lbr 3s ease-out}
+@keyframes lbr{from{opacity:0} to{opacity:1}}
+.lburner{grid-row:2; grid-column:1; justify-self:center; width:40px; height:30px; position:relative}
+.lburner::after{content:''; position:absolute; bottom:0; left:8px; right:8px; height:16px; border-radius:4px; background:#69707a}
+.lburner span{position:absolute; bottom:14px; left:12px; width:16px; height:26px; border-radius:50% 50% 45% 45%; background:radial-gradient(circle at 50% 70%, #fff6, #5EA9FF 45%, #FF8A3D 70%, transparent 72%); animation:lfl .25s infinite alternate}
+.lburner.off span{display:none}
+.lslots{grid-row:1 / span 2; grid-column:2; align-self:center; display:flex; flex-direction:column; gap:6px}
+.lslot{border:2px dashed var(--line); border-radius:14px; padding:10px 12px; color:var(--muted); font-size:14px; text-align:left; background:none; font:inherit}
+.lslot.full{border-style:solid; border-color:color-mix(in srgb, var(--accent) 40%, var(--line)); color:var(--ink); display:grid; grid-template-columns:1fr auto; cursor:pointer; background:var(--surface)}
+.lslot.full b{font-size:18px} .lslot.full small{grid-column:1; color:var(--muted); font-size:12px} .lslot.full span{grid-row:1 / span 2; grid-column:2; align-self:center; color:var(--muted)}
+.lplus{text-align:center; font-weight:800; color:var(--muted)}
+.ltools{display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 6px; align-items:center}
+.lsel{width:auto; padding:7px 10px; font-size:14px}
+.lres{font-size:15px; line-height:1.45}
+.leq{font-weight:700; font-size:17px; padding:10px 12px; border-radius:12px; background:color-mix(in srgb, var(--accent) 9%, var(--surface)); margin:6px 0 10px; overflow-x:auto; white-space:nowrap}
+.lobs{margin:0 0 8px; padding-left:20px} .lobs li{margin:3px 0}
+.lchips{display:flex; flex-wrap:wrap; gap:6px; margin:6px 0}
+.lchip{display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; background:var(--surface); border:1px solid var(--line); font-size:13px}
+.lchip i{width:14px; height:14px; border-radius:50%; border:1px solid rgba(0,0,0,.2)}
+.lnote{margin:8px 0; padding:10px 12px; border-radius:12px; border:1px solid var(--line); background:var(--surface); font-size:14px}
+.ltests{display:flex; flex-wrap:wrap; gap:6px}
+.lshelf-h{font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin:12px 0 6px}
+.lshelf{display:grid; grid-template-columns:repeat(auto-fill, minmax(96px, 1fr)); gap:8px}
+.lbottle{position:relative; border:1px solid var(--line); border-radius:14px 14px 18px 18px; background:linear-gradient(180deg, var(--surface) 0 34%, color-mix(in srgb, var(--bc) 55%, var(--surface)) 34%); padding:16px 6px 8px; text-align:center; cursor:pointer; font:inherit; color:var(--ink); min-height:78px; display:flex; flex-direction:column; justify-content:flex-end; gap:2px}
+.lbottle .cap{position:absolute; top:-1px; left:50%; transform:translateX(-50%); width:30px; height:8px; border-radius:0 0 6px 6px; background:#8a6d5a}
+.lbottle b{font-size:15px} .lbottle small{font-size:10.5px; line-height:1.15; color:var(--ink); opacity:.75}
+.lbottle.on{outline:3px solid var(--accent); outline-offset:1px}
+.lbottle:active{transform:scale(.96)}
+.lmys{margin-bottom:12px; line-height:1.45}
+.lguess{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
+.lq{display:grid; gap:8px}
+.lqi{display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border-radius:12px; border:1px solid var(--line); background:var(--surface)}
+.lqi.ok{border-color:color-mix(in srgb, var(--good) 50%, var(--line)); background:color-mix(in srgb, var(--good) 8%, var(--surface))}
+.lfl{display:flex; gap:16px; align-items:center; flex-wrap:wrap}
+.lburn2{position:relative; width:130px; height:230px; flex:none}
+.lstand{position:absolute; bottom:0; left:45px; width:40px; height:70px; border-radius:6px 6px 4px 4px; background:linear-gradient(90deg, #5d636b, #9aa1aa, #5d636b)}
+.lflame{position:absolute; bottom:68px; left:30px; width:70px; height:140px}
+.lflame i{position:absolute; left:50%; bottom:0; transform:translateX(-50%); border-radius:50% 50% 40% 40% / 60% 60% 40% 40%; animation:lfl .18s infinite alternate}
+.lflame i:nth-child(1){width:70px; height:140px; background:radial-gradient(ellipse at 50% 80%, color-mix(in srgb, var(--fc) 80%, #fff) 0%, var(--fc) 45%, transparent 72%); filter:blur(2px)}
+.lflame i:nth-child(2){width:44px; height:96px; background:radial-gradient(ellipse at 50% 85%, #fff 0%, color-mix(in srgb, var(--fc) 60%, #fff) 50%, transparent 75%); animation-duration:.23s}
+.lflame i:nth-child(3){width:20px; height:40px; background:radial-gradient(ellipse at 50% 80%, #bfe0ff, #4f8cff 60%, transparent 75%)}
+@keyframes lfl{from{transform:translateX(-50%) scaleY(1)} to{transform:translateX(-50%) scaleY(1.07) skewX(2deg)}}
+.lloop{position:absolute; left:84px; bottom:120px; font-size:12px; font-weight:700; background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:2px 6px}
+.lab-card .pte{--pc:#3DDC84}
 </style>
 </head>
 <body>
@@ -731,7 +797,7 @@ function confetti(){
   })();
 }
 /* Уровни = элементы таблицы Менделеева. 100 опыта на уровень. */
-const ELEMENTS = 'H Водород|He Гелий|Li Литий|Be Бериллий|B Бор|C Углерод|N Азот|O Кислород|F Фтор|Ne Неон|Na Натрий|Mg Магний|Al Алюминий|Si Кремний|P Фосфор|S Сера|Cl Хлор|Ar Аргон|K Калий|Ca Кальций|Sc Скандий|Ti Титан|V Ванадий|Cr Хром|Mn Марганец|Fe Железо|Co Кобальт|Ni Никель|Cu Медь|Zn Цинк|Ga Галлий|Ge Германий|As Мышьяк|Se Селен|Br Бром|Kr Криптон|Rb Рубидий|Sr Стронций|Y Иттрий|Zr Цирконий|Nb Ниобий|Mo Молибден|Tc Технеций|Ru Рутений|Rh Родий|Pd Палладий|Ag Серебро|Cd Кадмий|In Индий|Sn Олово|Sb Сурьма|Te Теллур|I Иод|Xe Ксенон'.split('|').map(s => { const [sym, name] = s.split(' '); return {sym, name}; });
+const ELEMENTS = 'H Водород|He Гелий|Li Литий|Be Бериллий|B Бор|C Углерод|N Азот|O Кислород|F Фтор|Ne Неон|Na Натрий|Mg Магний|Al Алюминий|Si Кремний|P Фосфор|S Сера|Cl Хлор|Ar Аргон|K Калий|Ca Кальций|Sc Скандий|Ti Титан|V Ванадий|Cr Хром|Mn Марганец|Fe Железо|Co Кобальт|Ni Никель|Cu Медь|Zn Цинк|Ga Галлий|Ge Германий|As Мышьяк|Se Селен|Br Бром|Kr Криптон|Rb Рубидий|Sr Стронций|Y Иттрий|Zr Цирконий|Nb Ниобий|Mo Молибден|Tc Технеций|Ru Рутений|Rh Родий|Pd Палладий|Ag Серебро|Cd Кадмий|In Индий|Sn Олово|Sb Сурьма|Te Теллур|I Иод|Xe Ксенон|Cs Цезий|Ba Барий|La Лантан|Ce Церий|Pr Празеодим|Nd Неодим|Pm Прометий|Sm Самарий|Eu Европий|Gd Гадолиний|Tb Тербий|Dy Диспрозий|Ho Гольмий|Er Эрбий|Tm Тулий|Yb Иттербий|Lu Лютеций|Hf Гафний|Ta Тантал|W Вольфрам|Re Рений|Os Осмий|Ir Иридий|Pt Платина|Au Золото|Hg Ртуть|Tl Таллий|Pb Свинец|Bi Висмут|Po Полоний|At Астат|Rn Радон|Fr Франций|Ra Радий|Ac Актиний|Th Торий|Pa Протактиний|U Уран|Np Нептуний|Pu Плутоний|Am Америций|Cm Кюрий|Bk Берклий|Cf Калифорний|Es Эйнштейний|Fm Фермий|Md Менделевий|No Нобелий|Lr Лоуренсий|Rf Резерфордий|Db Дубний|Sg Сиборгий|Bh Борий|Hs Хассий|Mt Мейтнерий|Ds Дармштадтий|Rg Рентгений|Cn Коперниций|Nh Нихоний|Fl Флеровий|Mc Московий|Lv Ливерморий|Ts Теннессин|Og Оганесон'.split('|').map(s => { const [sym, name] = s.split(' '); return {sym, name}; });
 function levelOf(xp){ const n = Math.min(ELEMENTS.length, 1 + Math.floor(xp / 100)); return {n, ...ELEMENTS[n - 1], into: n >= ELEMENTS.length ? 100 : xp % 100, max: n >= ELEMENTS.length}; }
 function xpOf(my){ return Object.values(my || {}).reduce((s, r) => s + (r.best || 0), 0); }
 /* Память ученика: localStorage + запасная cookie на 2 года, чтобы имя вводилось один раз */
@@ -853,8 +919,16 @@ function navBack(){
   else if (S.subject) renderSubjects();
   window.scrollTo(0, 0);
 }
-function goBack(){ if (NAV.on && NAV.depth > 0) history.back(); else navBack(); }
-window.addEventListener('popstate', () => { if (!NAV.on) return; NAV.depth = Math.max(0, NAV.depth - 1); navBack(); });
+/* Кнопки «Назад/Выйти» внутри приложения: сразу показываем нужный экран, а историю браузера
+   синхронизируем отдельно (на некоторых телефонах history.back() не вызывает popstate — кнопка «не работала»). */
+function navLeave(){
+  NAV.depth = Math.max(0, NAV.depth - 1); NAV.skip = (NAV.skip || 0) + 1;
+  clearTimeout(NAV.st); NAV.st = setTimeout(() => { NAV.skip = 0; }, 1500);
+  try { history.back(); } catch(e){}
+  navBack();
+}
+function goBack(){ if (NAV.on && NAV.depth > 0) navLeave(); else navBack(); }
+window.addEventListener('popstate', () => { if (!NAV.on) return; if (NAV.skip > 0){ NAV.skip--; return; } NAV.depth = Math.max(0, NAV.depth - 1); navBack(); });
 
 /* ================= Игровой движок ================= */
 function play(game, opts){
@@ -898,7 +972,7 @@ function play(game, opts){
   const exitClick = e => {
     const btn = e.currentTarget;
     if (!armed && !ctx.finished && ctx.elapsed() > 20){ armed = true; const was = btn.textContent; btn.textContent = 'Точно выйти? Нажмите ещё раз'; setTimeout(() => { armed = false; if (btn.isConnected) btn.textContent = was; }, 3000); return; }
-    if (NAV.game && NAV.on && NAV.depth > 0) history.back(); else { NAV.game = null; ctx.finished = true; clearInterval(tick); opts.onExit && opts.onExit(); }
+    if (NAV.game && NAV.on && NAV.depth > 0) navLeave(); else { NAV.game = null; ctx.finished = true; clearInterval(tick); opts.onExit && opts.onExit(); }
   };
   document.getElementById('exitBtn').onclick = exitClick;
   const impl = GAMES[game.type](stage, parsed.items, ctx);
@@ -1240,7 +1314,7 @@ function showResult(game, res, opts){
   document.getElementById('again').onclick = () => play(game, opts);
   const ah = document.getElementById('askh');
   if (ah) ah.onclick = () => openHelper('Я решал «' + game.title + '» и получил ' + pct + '%.' + (res.review ? ' Помоги разобраться с ошибками:\n' + stripHtml(res.review).slice(0, 3000) : ' С какими вопросами мне стоит разобраться?'));
-  document.getElementById('back').onclick = () => { if (NAV.game && NAV.on && NAV.depth > 0) history.back(); else { NAV.game = null; opts.onExit && opts.onExit(); } };
+  document.getElementById('back').onclick = () => { if (NAV.game && NAV.on && NAV.depth > 0) navLeave(); else { NAV.game = null; opts.onExit && opts.onExit(); } };
   const st = document.getElementById('sendState');
   if (opts.preview){ st.innerHTML = '<span class="pill warn">Режим проверки — результат не записан</span>'; return; }
   if (practice){ st.innerHTML = '<span class="pill none">Тренировка — не отправляется учителю</span>'; return; }
@@ -1443,7 +1517,7 @@ function openHelper(prefill){
       <button class="ib send" aria-label="Отправить"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></form>
   </div>`;
   document.body.appendChild(box);
-  const close = () => { if (NAV.on && NAV.depth > 0) history.back(); else { box.remove(); helperFab(true); } };
+  const close = () => { if (NAV.on && NAV.depth > 0) navLeave(); else { box.remove(); helperFab(true); } };
   box.querySelectorAll('.who button').forEach(b => b.onclick = () => helperSwitch(b.dataset.who));
   document.getElementById('hx').onclick = close;
   box.onclick = e => { if (e.target === box) close(); };
@@ -1782,7 +1856,7 @@ function studentLogin(mode){
     <div class="hero" style="text-align:center">
       <div class="row" style="justify-content:center"><div class="lvl"><i>7</i><b>N</b><small>Азот</small></div></div>
       <h1 style="margin-top:18px">Ramossitto</h1>
-      <p class="muted" style="margin:8px 0 0">Химия: тесты, игры и уровни. Начните с Водорода и дойдите до Ксенона!</p>
+      <p class="muted" style="margin:8px 0 0">Химия: тесты, игры и уровни. Начните с Водорода и дойдите до Оганесона — все 118 элементов!</p>
     </div>
     <div class="authtabs" role="tablist" style="margin-top:16px">
       <button type="button" role="tab" class="${reg ? 'on' : ''}" data-m="reg">Регистрация</button>
@@ -2150,7 +2224,7 @@ function renderHome(){
     return;
   }
   const others = cat.filter(sec => !branchOf(sec.section));
-  v.innerHTML = dailyCardHtml() + (S.subject !== 'bio' ? `<button class="ptbtn" id="ptOpen"><span class="pte" style="--pc:#6FA8DC"><i>26</i><b>Fe</b><small>Железо</small></span><div class="grow"><b>Таблица Менделеева</b><span class="s">Все 118 элементов · игра «Угадай элемент»</span></div><span class="pill none">открыть</span></button>` : '') + `<div class="branches${S.subject === 'bio' ? ' b4' : ''}">${curBranches().map((br, i) => {
+  v.innerHTML = dailyCardHtml() + (S.subject !== 'bio' ? `<button class="ptbtn" id="ptOpen"><span class="pte" style="--pc:#6FA8DC"><i>26</i><b>Fe</b><small>Железо</small></span><div class="grow"><b>Таблица Менделеева</b><span class="s">Все 118 элементов · игра «Угадай элемент»</span></div><span class="pill none">открыть</span></button><button class="ptbtn lab-card" id="labOpen"><span class="pte" style="--pc:#3DDC84"><i>⚗️</i><b>Лб</b><small>опыты</small></span><div class="grow"><b>Виртуальная лаборатория</b><span class="s">Смешивай реактивы: осадки, газы, запахи, цвета · задания и загадки</span></div><span class="pill none">открыть</span></button>` : '') + `<div class="branches${S.subject === 'bio' ? ' b4' : ''}">${curBranches().map((br, i) => {
       const sec = cat.find(x => lc(x.section) === lc(br.name)), st = statOf(sec ? sec.topics : []);
       return `<button class="branch ${st.total ? '' : 'soon'}" data-b="${esc(br.name)}" style="--bc:${br.color}; animation-delay:${i * 70}ms">
         <div class="head"><span class="btile"><i>${br.n}</i><b>${br.sym}</b><small>${br.el}</small></span><h2>${br.name}</h2></div>
@@ -2161,6 +2235,7 @@ function renderHome(){
     ${others.map(sec => `<div class="sec"><h2>${esc(sec.section || 'Другие задания')}</h2><div class="grid2">${topicCards(sec.topics, my)}</div></div>`).join('')}`;
   bindDaily(); checkNewBadges();
   const pto = document.getElementById('ptOpen'); if (pto) pto.onclick = () => { sfx('tap'); navPush(); renderPT(); };
+  const lbo = document.getElementById('labOpen'); if (lbo) lbo.onclick = () => { sfx('tap'); navPush(); LAB.tab = LAB.tab === 'mys' ? 'mix' : LAB.tab; LAB.mys = null; labReset(); renderLab(); window.scrollTo(0, 0); };
   v.querySelectorAll('.branch').forEach(b => b.onclick = () => { sfx('tap'); navPush(); renderSection(b.dataset.b); window.scrollTo(0, 0); });
   v.querySelectorAll('.card').forEach(b => b.onclick = () => { sfx('tap'); S.section = null; navPush(); renderTopic(b.dataset.t); window.scrollTo(0, 0); });
 }
@@ -2336,7 +2411,7 @@ function openCards(t){
   queue = shuffle(queue.slice());
   let flipped = false;
   const save = () => { const st = cardsLearned(); st[t.title] = [...learned]; lsSet('cards', st); };
-  const exit = () => { if (NAV.on && NAV.depth > 0) history.back(); else { NAV.game = null; helperFab(true); renderTopic(t.title); } };
+  const exit = () => { if (NAV.on && NAV.depth > 0) navLeave(); else { NAV.game = null; helperFab(true); renderTopic(t.title); } };
   function draw(){
     const k = all.filter(c => learned.has(c.k)).length;
     if (!queue.length){
@@ -2402,7 +2477,7 @@ function renderPT(){
       <div class="ptlegend">${Object.keys(PT_CAT).map(k => `<span><i style="background:${PT_CAT[k][1]}"></i>${PT_CAT[k][0]}</span>`).join('')}</div>
       <div class="tfoot"><div class="row" style="justify-content:center"><button class="btn" id="ptX2">← Выйти</button><button class="btn primary" id="ptQ2">Угадай элемент</button></div></div>
     </div>`;
-  const exit = () => { if (NAV.on && NAV.depth > 0) history.back(); else { NAV.game = null; helperFab(true); renderHome(); } };
+  const exit = () => { if (NAV.on && NAV.depth > 0) navLeave(); else { NAV.game = null; helperFab(true); renderHome(); } };
   document.getElementById('ptX').onclick = document.getElementById('ptX2').onclick = exit;
   document.getElementById('ptQ').onclick = document.getElementById('ptQ2').onclick = () => ptQuiz();
   app.querySelectorAll('.pte').forEach(b => b.onclick = () => { sfx('tap'); ptInfo(PT[+b.dataset.z - 1]); });
@@ -2472,6 +2547,279 @@ function ptQuiz(){
 
 /* ================= Дуэли ================= */
 const DU = {list: null, roster: null};
+/* ================= Виртуальная лаборатория ================= */
+let LABD = null, LABR = {};
+async function labLoad(){ if (!LABD){ const d = await libFetch('lab.json'); LABR = Object.fromEntries(d.R.map(r => [r.id, r])); LABD = d; } }
+const LAB = {tab: 'mix', tube: [], res: null, heated: null, ind: null, tests: {}, excess: false, flame: null, mys: null, last: null};
+const LAB_KIND = [['acid', 'Кислоты'], ['base', 'Щёлочи'], ['salt', 'Соли'], ['metal', 'Металлы'], ['other', 'Твёрдые и прочее']];
+const LAB_IND = {
+  ph: ['Фенолфталеин', {acid: [null, 'бесцветный'], neutral: [null, 'бесцветный'], base: ['#D81B60', 'малиновый']}],
+  lit: ['Лакмус', {acid: ['#E53935', 'красный'], neutral: ['#7E57C2', 'фиолетовый'], base: ['#1E5BD8', 'синий']}],
+  mo: ['Метилоранж', {acid: ['#E8434F', 'розово-красный'], neutral: ['#F39C12', 'оранжевый'], base: ['#F4D03F', 'жёлтый']}]};
+const LAB_MED = {acid: 'кислая', neutral: 'нейтральная', base: 'щелочная'};
+const LAB_GTEST = {
+  smell: ['👃 Понюхать', {H2: 'Без запаха', O2: 'Без запаха', CO2: 'Без запаха', NH3: 'Резкий запах нашатыря! 🤢', H2S: 'Запах тухлых яиц! 🤢', SO2: 'Резкий удушливый запах горящей спички', NO: 'Резкий запах — у отверстия газ буреет (NO₂)'}],
+  burn: ['🔥 Горящая лучинка', {H2: 'Хлопок! («лающий» звук) — это водород', O2: 'Лучинка горит ещё ярче', CO2: 'Лучинка гаснет', NH3: 'Лучинка гаснет', H2S: 'Газ сгорает голубоватым пламенем', SO2: 'Лучинка гаснет', NO: 'Лучинка гаснет'}],
+  glow: ['✨ Тлеющая лучинка', {O2: 'Лучинка ВСПЫХИВАЕТ — это кислород!', H2: 'Лучинка не вспыхивает', CO2: 'Лучинка гаснет', NH3: 'Лучинка гаснет', H2S: 'Без изменений', SO2: 'Лучинка гаснет', NO: 'Без изменений'}],
+  lime: ['🥛 Известковая вода', {CO2: 'Известковая вода мутнеет: Ca(OH)₂ + CO₂ → CaCO₃↓ + H₂O', SO2: 'Известковая вода мутнеет (CaSO₃↓) — отличают от CO₂ по запаху', H2: 'Без изменений', O2: 'Без изменений', NH3: 'Без изменений', H2S: 'Без изменений', NO: 'Без изменений'}],
+  litm: ['🟣 Влажный лакмус', {NH3: 'Бумажка СИНЕЕТ — аммиак даёт щелочную среду', CO2: 'Бумажка слегка краснеет', SO2: 'Бумажка краснеет', H2S: 'Бумажка слегка краснеет', H2: 'Без изменений', O2: 'Без изменений', NO: 'Без изменений'}],
+  pb: ['📄 Бумажка с Pb(NO₃)₂', {H2S: 'Бумажка ЧЕРНЕЕТ (PbS↓) — это сероводород', H2: 'Без изменений', O2: 'Без изменений', CO2: 'Без изменений', NH3: 'Без изменений', SO2: 'Без изменений', NO: 'Без изменений'}]};
+const LAB_EXCESS = {
+  'AlCl3+NaOH': ['Al(OH)3 + NaOH → Na[Al(OH)4]', 'Осадок растворяется — гидроксид алюминия амфотерный', null],
+  'NaOH+ZnSO4': ['Zn(OH)2 + 2NaOH → Na2[Zn(OH)4]', 'Осадок растворяется — гидроксид цинка амфотерный', null],
+  'CuSO4+NH4OH': ['Cu(OH)2 + 4NH3 → [Cu(NH3)4](OH)2', 'Осадок растворяется, раствор становится ярко-синим — качественная реакция на Cu²⁺', '#1F3FBF'],
+  'AgNO3+NH4OH': ['Ag2O + 4NH3 + H2O → 2[Ag(NH3)2]OH', 'Бурый осадок растворяется — образуется аммиачный комплекс серебра', null],
+  'AlCl3+NH4OH': [null, 'Осадок НЕ растворяется: Al(OH)₃ не растворим в избытке аммиака (в отличие от щёлочи)', null]};
+const LAB_HEAT_PPT = ['Cu(OH)2', 'Fe(OH)3', 'Al(OH)3', 'Zn(OH)2'];
+const LAB_Q = [
+  ['cuoh', 'Получи голубой осадок гидроксида меди(II)', r => labHasPpt(r, 'Cu(OH)2')],
+  ['h2s', 'Получи газ с запахом тухлых яиц и понюхай его (взмахом руки!)', (r, c) => r && r.gas === 'H2S' && c.tests.smell],
+  ['agcl', 'Докажи хлорид-ион: белый творожистый осадок', r => labHasPpt(r, 'AgCl')],
+  ['pbi', '«Золотой дождь»: ярко-жёлтый осадок PbI₂', r => labHasPpt(r, 'PbI2')],
+  ['prus', 'Получи берлинскую лазурь — синий осадок', r => labHasPpt(r, 'Fe4[Fe(CN)6]3')],
+  ['turn', 'Получи турнбулеву синь — качественная реакция на Fe²⁺', r => labHasPpt(r, 'Fe3[Fe(CN)6]2')],
+  ['scn', 'Кроваво-красный раствор — качественная реакция на Fe³⁺', (r, c) => c.key === 'FeCl3+KSCN'],
+  ['co2', 'Получи CO₂ и докажи его известковой водой', (r, c) => r && r.gas === 'CO2' && c.tests.lime],
+  ['cu', 'Вытесни медь из раствора её соли', r => labHasPpt(r, 'Cu')],
+  ['baso4', 'Докажи сульфат-ион: белый осадок, не растворимый в кислотах', r => labHasPpt(r, 'BaSO4')],
+  ['flk', 'Окрась пламя в фиолетовый цвет', (r, c) => c.flame === 'K'],
+  ['flli', 'Окрась пламя в карминово-красный цвет', (r, c) => c.flame === 'Li'],
+  ['nh3', 'Получи аммиак и докажи его влажным лакмусом', (r, c) => r && r.gas === 'NH3' && c.tests.litm],
+  ['h2', 'Получи водород и проверь его горящей лучинкой', (r, c) => r && r.gas === 'H2' && c.tests.burn],
+  ['o2', 'Получи кислород и проверь тлеющей лучинкой', (r, c) => r && r.gas === 'O2' && c.tests.glow],
+  ['php', 'Окрась фенолфталеин в малиновый цвет', (r, c) => c.ind === 'ph' && c.med === 'base'],
+  ['cuo', 'Превращение: голубой осадок → чёрный CuO (нагрей!)', (r, c) => c.heated === 'Cu(OH)2'],
+  ['mal', 'Получи «малахит» — зеленовато-голубой осадок', r => labHasPpt(r, '(CuOH)2CO3')],
+  ['cr', 'Жёлтое → оранжевое: хромат в дихромат', (r, c) => /^K2CrO4\+|\+K2CrO4$/.test(c.key || '') && /HCl|H2SO4|HNO3/.test(c.key || '')],
+  ['no', 'Медь + азотная кислота: газ, который буреет на воздухе', (r, c) => c.key === 'Cu+HNO3'],
+  ['gel', 'Получи студенистый осадок кремниевой кислоты', r => labHasPpt(r, 'H2SiO3')],
+  ['amph', 'Докажи амфотерность: растворь осадок в избытке щёлочи', (r, c) => c.excess && /NaOH/.test(c.key || '') && /AlCl3|ZnSO4/.test(c.key || '')],
+  ['blue', 'Ярко-синий аммиакат меди [Cu(NH₃)₄]²⁺', (r, c) => c.excess && c.key === 'CuSO4+NH4OH'],
+  ['mg', 'Сожги магний — ослепительная вспышка', (r, c) => c.flame === 'Mg']];
+const LAB_MYS = ['NaCl', 'Na2SO4', 'Na2CO3', 'Na2S', 'Na3PO4', 'KI', 'NH4Cl', 'BaCl2', 'FeCl3', 'FeSO4', 'AlCl3', 'ZnSO4', 'AgNO3', 'PbNO32', 'Na2SO3', 'Na2SiO3', 'MgCl2', 'CuSO4'];
+
+function labHasPpt(r, f){ return !!(r && r.ppt && r.ppt.some(p => p.f === f)); }
+function labStore(k, v){ try { if (v === undefined) return JSON.parse(localStorage.getItem('lab_' + k) || 'null'); localStorage.setItem('lab_' + k, JSON.stringify(v)); } catch(e){ return null; } }
+function chemF(s){
+  return esc(String(s || '')).replace(/([A-Za-z\)\]])(\d+)/g, '$1<sub>$2</sub>').replace(/·/g, '·');
+}
+function labKey(a, b){ return [a, b].sort().join('+'); }
+function labObs(i){ return typeof i === 'number' ? LABD.S[i] : i; }
+function labRes(ids){
+  if (ids.length < 2) return null;
+  const k = labKey(ids[0], ids[1]); const x = LABD.X[k];
+  if (!x) return {key: k, obs: ['Видимых изменений нет'], none: true};
+  return {...x, key: k, obs: (x.obs || []).map(labObs), ppt: (x.ppt || []).map(p => ({...p, d: labObs(p.d)})), none: !x.eq && !x.gas && !(x.ppt || []).length && !x.solColor};
+}
+function labMedium(){
+  if (LAB.res) return LAB.res.medium || 'neutral';
+  if (LAB.tube.length === 1){ const r = LABR[LAB.tube[0]]; return r.med || 'neutral'; }
+  return 'neutral';
+}
+function labName(id){ return LAB.mys && id === 'X' ? 'Пробирка X' : LABR[id].name; }
+function labFormula(id){ return LAB.mys && id === 'X' ? '?' : chemF(LABR[id].f); }
+function labFound(){ return labStore('found') || []; }
+function labQuests(){ return labStore('q') || []; }
+function labCheck(){
+  const done = labQuests(), ctx = {key: LAB.res && LAB.res.key, tests: LAB.tests, ind: LAB.ind, med: labMedium(), heated: LAB.heated, excess: LAB.excess, flame: LAB.flame};
+  const got = [];
+  LAB_Q.forEach(([id, t, fn]) => { if (!done.includes(id)){ try { if (fn(LAB.res, ctx)){ done.push(id); got.push(t); } } catch(e){} } });
+  if (got.length){ labStore('q', done); sfx('win'); toast('🏆 Задание выполнено: ' + got[0]); }
+}
+function labRecord(){
+  if (!LAB.res || !LAB.res.eq || LAB.mys) return;
+  const f = labFound(); if (!f.includes(LAB.res.key)){ f.push(LAB.res.key); labStore('found', f); }
+}
+
+function renderLab(){
+  helperFab(false);
+  NAV.game = () => { LAB.mys = null; helperFab(true); renderHome(); };
+  if (!LABD){
+    app.innerHTML = `<div class="wrap" style="padding-top:40px; text-align:center"><div class="panel">⚗️ Готовим лабораторию…</div><div style="margin-top:14px"><button class="btn" id="labX">← Выйти</button></div></div>`;
+    document.getElementById('labX').onclick = () => { if (NAV.on && NAV.depth > 0) navLeave(); else { NAV.game = null; helperFab(true); renderHome(); } };
+    labLoad().then(() => { if (document.getElementById('labX') && !document.getElementById('labBody')) renderLab(); }).catch(() => { const p = app.querySelector('.panel'); if (p) p.textContent = 'Не удалось загрузить лабораторию. Проверь интернет и попробуй ещё раз.'; });
+    return;
+  }
+  const nf = labFound().filter(k => LABD.X[k] && LABD.X[k].eq).length, total = Object.values(LABD.X).filter(x => x.eq).length, nq = labQuests().length;
+  app.innerHTML = `<div class="bar"><div class="wrap"><div class="row"><button class="btn sm ghost" id="labX">← Выйти</button>
+      <div class="grow" style="font-weight:700">🧪 Лаборатория</div><span class="pill none" title="Открыто реакций">${nf}/${total}</span></div></div></div>
+    <div class="wrap" style="padding-top:10px">
+      <div class="tabs labtabs">${[['mix', '⚗️ Опыты'], ['quest', `🏆 Задания ${nq}/${LAB_Q.length}`], ['mys', '❓ Загадка'], ['flame', '🔥 Пламя']].map(([k, t]) => `<button data-lt="${k}" class="${LAB.tab === k ? 'on' : ''}">${t}</button>`).join('')}</div>
+      <div id="labBody"></div>
+      <div class="tfoot"><div class="row" style="justify-content:center"><button class="btn" id="labX2">← Выйти</button></div></div>
+    </div>`;
+  const exit = () => { if (NAV.on && NAV.depth > 0) navLeave(); else { NAV.game = null; LAB.mys = null; helperFab(true); renderHome(); } };
+  document.getElementById('labX').onclick = exit; document.getElementById('labX2').onclick = exit;
+  app.querySelectorAll('[data-lt]').forEach(b => b.onclick = () => { sfx('tap'); LAB.tab = b.dataset.lt; if (LAB.tab === 'mys' && !LAB.mys) labNewMystery(); if (LAB.tab !== 'mys') { LAB.mys = null; } labReset(); renderLab(); });
+  if (LAB.tab === 'mys' && !LAB.mys){ labNewMystery(); labReset(); }
+  ({mix: labMix, quest: labQuest, mys: labMix, flame: labFlame})[LAB.tab]();
+}
+function labReset(){ LAB.tube = LAB.mys ? ['X'] : []; LAB.res = null; LAB.heated = null; LAB.ind = null; LAB.tests = {}; LAB.excess = false; LAB.excessInfo = null; LAB.excessDiss = false; LAB.excessColor = undefined; LAB.heatInfo = null; }
+
+function labTubeHtml(){
+  const ids = LAB.tube, r = LAB.res;
+  let liquid = null, solids = [], ppt = [], gas = null;
+  const mysR = LAB.mys ? LABR[LAB.mys.id] : null;
+  const R1 = id => id === 'X' ? mysR : LABR[id];
+  ids.forEach(id => { const x = R1(id); if (x.state === 'тв') solids.push(x); else if (!liquid && x.color) liquid = x.color; });
+  if (r){
+    if (r.solColor) liquid = r.solColor; else if (!r.none) liquid = null;
+    ppt = r.ppt || []; gas = r.gas || null;
+    if (r.eq && solids.length && !solids.some(s => s.id === 'MnO2')) solids = solids.map(s => ({...s, eaten: true}));
+  }
+  if (LAB.excessColor !== undefined && LAB.excess) liquid = LAB.excessColor || liquid;
+  if (LAB.excess && LAB.excessDiss) ppt = [];
+  if (LAB.heatInfo && LAB.heatInfo.ppt) ppt = LAB.heatInfo.ppt;
+  if (LAB.heatInfo && LAB.heatInfo.gas) gas = LAB.heatInfo.gas;
+  const indC = LAB.ind ? LAB_IND[LAB.ind][1][labMedium()][0] : null;
+  if (indC) liquid = indC;
+  const level = ids.length ? (ids.length === 1 && solids.length === 1 ? 0 : (ids.length > 1 || !solids.length ? 62 : 36)) : 0;
+  const lc = liquid || 'rgba(210,232,248,.55)';
+  const bubbles = gas ? Array.from({length: 14}, (_, i) => `<i style="left:${8 + (i * 37) % 76}%; animation-delay:${(i * 0.23) % 1.6}s; width:${6 + i % 4 * 3}px; height:${6 + i % 4 * 3}px"></i>`).join('') : '';
+  const pp = ppt.length ? `<div class="lppt" style="--pc:${ppt[0].color}">${Array.from({length: 26}, (_, i) => `<b style="left:${4 + (i * 41) % 90}%; animation-delay:${(i % 9) * 0.12}s; background:${ppt[i % ppt.length].color}"></b>`).join('')}</div>` : '';
+  const sol = solids.map((s, i) => `<div class="lsolid ${s.eaten ? 'eaten' : ''}" style="--sc:${s.color || '#999'}; left:${28 + i * 22}%"></div>`).join('');
+  const smell = gas && LABD.GAS[gas] && !/без запаха/.test(LABD.GAS[gas].smell) ? '<div class="lsmell">〰️<br>〰️</div>' : '';
+  const brown = gas === 'NO' ? '<div class="lbrown"></div>' : '';
+  const heat = LAB.heatInfo ? '<div class="lburner"><span></span></div>' : '<div class="lburner off"></div>';
+  return `<div class="lbench">
+    <div class="ltube ${r && r.heat ? 'warm' : ''}">${brown}${smell}
+      <div class="lliq" style="height:${level}%; background:${lc}">${bubbles}${pp}</div>${sol}
+      ${gas ? `<span class="lgas">газ ${chemF(gas)}</span>` : ''}
+    </div>${heat}
+    <div class="lslots">${[0, 1].map(i => ids[i] ? `<button class="lslot full" data-rm="${i}"><b>${labFormula(ids[i])}</b><small>${esc(labName(ids[i]))}</small><span>✕</span></button>` : `<div class="lslot">${i === 0 ? 'Выбери реактив на полке ↓' : '+ второй реактив'}</div>`).join('<span class="lplus">+</span>')}</div>
+  </div>`;
+}
+function labResultHtml(){
+  const r = LAB.res, out = [];
+  if (LAB.tube.length === 1 && !r){
+    const x = LAB.tube[0] === 'X' ? null : LABR[LAB.tube[0]];
+    out.push(`<p class="small muted" style="margin:0">${x ? `В пробирке: <b>${chemF(x.f)}</b> — ${esc(x.name)}. ` : 'В пробирке неизвестный раствор X. '}Добавь второй реактив, капни индикатор или нагрей.</p>`);
+  }
+  if (r){
+    if (r.eq) out.push(`<div class="leq">${chemF(r.eq)}</div>`);
+    if (r.ion) out.push(`<div class="small muted" style="margin:-4px 0 8px">Ионное: ${chemF(r.ion)}</div>`);
+    out.push(`<ul class="lobs">${r.obs.map(o => `<li>${chemF(o)}</li>`).join('')}</ul>`);
+    const chips = [];
+    (r.ppt || []).forEach(p => chips.push(`<span class="lchip"><i style="background:${p.color}"></i>осадок ${chemF(p.f)}</span>`));
+    if (r.gas){ const G = LABD.GAS[r.gas]; chips.push(`<span class="lchip">💨 ${chemF(r.gas)} — ${esc(G.name)}</span>`); }
+    if (r.heat) chips.push('<span class="lchip">🌡 тепло</span>');
+    if (r.type) chips.push(`<span class="lchip">${esc(r.type)}</span>`);
+    if (chips.length) out.push(`<div class="lchips">${chips.join('')}</div>`);
+  }
+  if (LAB.excessInfo) out.push(`<div class="lnote">${LAB.excessInfo[0] ? `<div class="leq">${chemF(LAB.excessInfo[0])}</div>` : ''}${chemF(LAB.excessInfo[1])}</div>`);
+  if (LAB.heatInfo) out.push(`<div class="lnote">🔥 ${LAB.heatInfo.eq ? `<div class="leq">${chemF(LAB.heatInfo.eq)}</div>` : ''}${LAB.heatInfo.obs.map(chemF).join('<br>')}</div>`);
+  if (LAB.ind){ const [n, m] = LAB_IND[LAB.ind], md = labMedium(); out.push(`<div class="lnote">💧 ${n}: <b>${m[md][1]}</b> — среда ${LAB_MED[md]}</div>`); }
+  const gas = (LAB.heatInfo && LAB.heatInfo.gas) || (r && r.gas);
+  if (gas){
+    out.push(`<div class="small" style="margin:10px 0 6px; font-weight:700">Исследуй газ ${chemF(gas)}:</div><div class="ltests">${Object.keys(LAB_GTEST).map(k => `<button class="btn sm ${LAB.tests[k] ? 'primary' : ''}" data-gt="${k}">${LAB_GTEST[k][0]}</button>`).join('')}</div>`);
+    Object.keys(LAB.tests).forEach(k => out.push(`<div class="lnote">${LAB_GTEST[k][0]}: <b>${chemF(LAB_GTEST[k][1][gas] || 'Без изменений')}</b>${k === 'smell' ? '<div class="small muted">Газы нюхают осторожно — взмахом руки к себе!</div>' : ''}</div>`));
+  }
+  return out.join('');
+}
+function labShelfHtml(){
+  const groups = LAB_KIND.map(([k, t]) => {
+    const list = LABD.R.filter(r => (k === 'other' ? ['solid', 'oxide', 'catal', 'h2o2', 'water'].includes(r.kind) : r.kind === k));
+    return `<div class="lshelf-h">${t}</div><div class="lshelf">${list.map(r => `<button class="lbottle ${LAB.tube.includes(r.id) ? 'on' : ''}" data-add="${r.id}" style="--bc:${r.color || (r.state === 'тв' ? '#B0B6BE' : '#CFE6F7')}"><span class="cap"></span><b>${chemF(r.f)}</b><small>${esc(r.name)}</small></button>`).join('')}</div>`;
+  });
+  return groups.join('');
+}
+function labMix(){
+  const body = document.getElementById('labBody');
+  const mys = LAB.mys;
+  if (mys && !LAB.tube.length) LAB.tube = ['X'];
+  body.innerHTML = `${mys ? `<div class="panel lmys"><b>❓ Загадка ${mys.n}.</b> В пробирке X — раствор одной соли. Добавляй к ней реактивы с полки, смотри на осадки, газы и окраску — и определи, что это. <span class="small muted">Отгадано подряд: ${mys.streak} · всего: ${labStore('mysok') || 0}</span>
+      <div class="lguess">${mys.opts.map(id => `<button class="btn sm" data-guess="${id}"><span>${chemF(LABR[id].f)}</span></button>`).join('')}</div></div>` : ''}
+    <div class="lbox panel">${labTubeHtml()}
+      <div class="ltools">
+        <button class="btn primary" id="lMix" ${LAB.tube.length === 2 && !LAB.res ? '' : 'disabled'}>⚗️ Смешать</button>
+        <button class="btn sm" id="lHeat" ${LAB.tube.length ? '' : 'disabled'}>🔥 Нагреть</button>
+        <select class="field lsel" id="lInd" ${LAB.tube.length ? '' : 'disabled'}><option value="">💧 Индикатор…</option>${Object.keys(LAB_IND).map(k => `<option value="${k}" ${LAB.ind === k ? 'selected' : ''}>${LAB_IND[k][0]}</option>`).join('')}</select>
+        ${LAB.res && LAB_EXCESS[LAB.res.key] && !LAB.excess ? '<button class="btn sm" id="lEx">➕ Добавить избыток</button>' : ''}
+        <button class="btn sm ghost" id="lClr" ${LAB.tube.length ? '' : 'disabled'}>🧽 Вымыть пробирку</button>
+      </div>
+      <div class="lres" id="lRes">${labResultHtml()}</div>
+    </div>
+    <h3 style="margin:16px 0 4px">Полка с реактивами</h3>
+    <p class="small muted" style="margin:0 0 6px">Нажми на склянку — реактив попадёт в пробирку. Две склянки → «Смешать».</p>
+    ${labShelfHtml()}`;
+  const redraw = () => { labMix(); };
+  body.querySelectorAll('[data-add]').forEach(b => b.onclick = () => {
+    const id = b.dataset.add;
+    if (LAB.res) labReset();
+    if (LAB.tube.includes(id)){ toast('Этот реактив уже в пробирке'); return; }
+    if (LAB.tube.length >= 2){ toast('В пробирке уже два вещества — вымой её'); return; }
+    sfx('tap'); LAB.tube.push(id); LAB.ind = null; LAB.heatInfo = null; LAB.heated = null; LAB.tests = {}; redraw();
+    if (LAB.tube.length === 2) document.getElementById('lMix').scrollIntoView({block: 'center', behavior: 'smooth'});
+    else document.querySelector('.lbench').scrollIntoView({block: 'center', behavior: 'smooth'});
+  });
+  body.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { const i = +b.dataset.rm; if (LAB.mys && LAB.tube[i] === 'X') return; LAB.tube.splice(i, 1); LAB.res = null; LAB.tests = {}; LAB.ind = null; LAB.heatInfo = null; LAB.excess = false; LAB.excessInfo = null; redraw(); });
+  const mx = document.getElementById('lMix');
+  mx.onclick = () => {
+    const ids = LAB.tube.map(id => id === 'X' ? LAB.mys.id : id);
+    LAB.res = labRes(ids); LAB.tests = {}; LAB.excess = false; LAB.excessInfo = null; LAB.excessDiss = false; LAB.excessColor = undefined; LAB.heatInfo = null; LAB.ind = null;
+    sfx(LAB.res.none ? 'tap' : 'good'); labRecord(); redraw(); labCheck();
+    const t = document.querySelector('.ltube'); if (t){ t.classList.add('pour'); }
+    document.getElementById('lRes').scrollIntoView({block: 'nearest', behavior: 'smooth'});
+  };
+  document.getElementById('lHeat').onclick = () => {
+    sfx('tap'); const ids = LAB.tube.map(id => id === 'X' ? LAB.mys.id : id);
+    let info = null;
+    const pp = LAB.res && (LAB.res.ppt || []).find(p => LAB_HEAT_PPT.includes(p.f));
+    if (pp && !LAB.excess){ const h = LABD.HEAT[pp.f]; info = {...h, ppt: (h.ppt || []).map(p => ({...p, d: p.d}))}; LAB.heated = pp.f; }
+    else if (LAB.res && LAB.res.key === 'NH4Cl+NaOH'){ info = {obs: LABD.HEAT['NH4Cl+NaOH'].obs, gas: 'NH3'}; }
+    else if (!LAB.res && ids.length === 1 && LABD.HEAT[ids[0]]){ info = {...LABD.HEAT[ids[0]]}; LAB.heated = ids[0]; LAB.tests = {}; }
+    else info = {obs: [LAB.tube.some(id => (id === 'X' ? 'р-р' : LABR[id].state) !== 'тв') ? 'Раствор нагревается и закипает, новых веществ не образуется' : 'Видимых изменений нет']};
+    LAB.heatInfo = info; redraw(); labCheck();
+  };
+  document.getElementById('lInd').onchange = e => { LAB.ind = e.target.value || null; sfx('tap'); redraw(); labCheck(); };
+  const ex = document.getElementById('lEx');
+  if (ex) ex.onclick = () => { const e = LAB_EXCESS[LAB.res.key]; LAB.excess = true; LAB.excessInfo = e; LAB.excessDiss = !!e[0]; LAB.excessColor = e[2]; sfx('good'); redraw(); labCheck(); };
+  document.getElementById('lClr').onclick = () => { sfx('tap'); labReset(); redraw(); };
+  body.querySelectorAll('[data-gt]').forEach(b => b.onclick = () => { LAB.tests[b.dataset.gt] = true; sfx('tap'); redraw(); labCheck(); });
+  body.querySelectorAll('[data-guess]').forEach(b => b.onclick = () => labGuess(b.dataset.guess));
+}
+function labNewMystery(){
+  const prev = LAB.mys ? LAB.mys.id : null;
+  let id; do { id = LAB_MYS[Math.floor(Math.random() * LAB_MYS.length)]; } while (id === prev);
+  const opts = shuffle([id, ...shuffle(LAB_MYS.filter(x => x !== id)).slice(0, 3)]);
+  LAB.mys = {id, opts, n: ((LAB.mys && LAB.mys.n) || 0) + 1, streak: (LAB.mys && LAB.mys.streak) || 0};
+}
+const LAB_HINT = {NaCl: 'с AgNO₃ — белый творожистый осадок AgCl', Na2SO4: 'с BaCl₂ — белый осадок BaSO₄, не растворимый в кислотах', Na2CO3: 'с кислотой — «вскипание» CO₂ без запаха',
+  Na2S: 'с кислотой — запах тухлых яиц (H₂S), с CuSO₄ — чёрный осадок', Na3PO4: 'с AgNO₃ — жёлтый осадок Ag₃PO₄', KI: 'с Pb(NO₃)₂ — «золотой дождь» PbI₂, с AgNO₃ — жёлтый AgI',
+  NH4Cl: 'со щёлочью — запах аммиака, влажный лакмус синеет', BaCl2: 'с H₂SO₄ или Na₂SO₄ — белый осадок BaSO₄; пламя жёлто-зелёное', FeCl3: 'со щёлочью — бурый осадок, с KSCN — кроваво-красный раствор',
+  FeSO4: 'со щёлочью — серо-зелёный осадок, с K₃[Fe(CN)₆] — турнбулева синь', AlCl3: 'со щёлочью — белый осадок, растворимый в избытке', ZnSO4: 'с Na₂S — белый сульфид ZnS; Zn(OH)₂ растворим в избытке щёлочи',
+  AgNO3: 'с NaCl — белый творожистый AgCl', PbNO32: 'с KI — ярко-жёлтый PbI₂, с Na₂S — чёрный PbS', Na2SO3: 'с кислотой — резкий запах SO₂', Na2SiO3: 'с кислотой — студенистый гель H₂SiO₃',
+  MgCl2: 'со щёлочью — белый осадок Mg(OH)₂, НЕ растворимый в избытке', CuSO4: 'голубой раствор; со щёлочью — голубой осадок Cu(OH)₂'};
+function labGuess(id){
+  const m = LAB.mys, ok = id === m.id, r = LABR[m.id];
+  if (ok){ m.streak++; labStore('mysok', (labStore('mysok') || 0) + 1); sfx('win'); toast(`✅ Верно! Это ${r.name} (${r.f})`); }
+  else { m.streak = 0; sfx('bad'); toast(`❌ Это был ${r.name} (${r.f})`); }
+  const body = document.getElementById('labBody');
+  const box = document.createElement('div'); box.className = 'panel lnote'; box.style.marginBottom = '10px';
+  box.innerHTML = `${ok ? '✅ Верно!' : '❌ Неверно.'} В пробирке X был <b>${chemF(r.f)}</b> — ${esc(r.name)}.<br><span class="small">Как определить: ${chemF(LAB_HINT[m.id] || '')}</span><div style="margin-top:10px"><button class="btn primary" id="lNext">Следующая загадка →</button></div>`;
+  body.prepend(box); window.scrollTo({top: 0, behavior: 'smooth'});
+  body.querySelectorAll('[data-guess]').forEach(b => b.disabled = true);
+  document.getElementById('lNext').onclick = () => { labNewMystery(); labReset(); renderLab(); };
+}
+function labQuest(){
+  const body = document.getElementById('labBody'), done = labQuests();
+  body.innerHTML = `<p class="small muted" style="margin:6px 0 10px">Выполняй опыты во вкладке «Опыты» — задание засчитается само. Выполнено ${done.length} из ${LAB_Q.length}.</p>
+    <div class="lq">${LAB_Q.map(([id, t]) => `<div class="lqi ${done.includes(id) ? 'ok' : ''}"><span>${done.includes(id) ? '✅' : '⬜'}</span><div>${chemF(t)}</div></div>`).join('')}</div>
+    <div style="margin-top:14px"><button class="btn primary" id="lGo">⚗️ К опытам</button> <button class="btn sm ghost" id="lQr">Сбросить прогресс</button></div>`;
+  document.getElementById('lGo').onclick = () => { LAB.tab = 'mix'; renderLab(); };
+  document.getElementById('lQr').onclick = e => confirm2(e.currentTarget, async () => { labStore('q', []); labStore('found', []); renderLab(); });
+}
+function labFlame(){
+  const body = document.getElementById('labBody');
+  const list = LABD.R.filter(r => r.flame);
+  const cur = LAB.flameId ? LABR[LAB.flameId] : null, fc = cur && cur.flame[0];
+  body.innerHTML = `<div class="panel lfl">
+      <div class="lburn2"><div class="lflame" style="--fc:${fc || '#5EA9FF'}; ${cur ? '' : 'opacity:.75'}"><i></i><i></i><i></i></div><div class="lstand"></div>${cur ? `<div class="lloop">${chemF(cur.f)}</div>` : ''}</div>
+      <div class="lres">${cur ? `<b>${chemF(cur.f)}</b> — ${esc(cur.name)}<br>${chemF(cur.flame[1] || '')}` : 'Внеси вещество в пламя горелки на нихромовой петле — по цвету пламени можно узнать металл.'}</div></div>
+    <div class="lshelf" style="margin-top:12px">${list.map(r => `<button class="lbottle ${LAB.flameId === r.id ? 'on' : ''}" data-fl="${r.id}" style="--bc:${r.color || (r.state === 'тв' ? '#B0B6BE' : '#CFE6F7')}"><span class="cap"></span><b>${chemF(r.f)}</b><small>${esc(r.name)}</small></button>`).join('')}</div>`;
+  body.querySelectorAll('[data-fl]').forEach(b => b.onclick = () => { LAB.flameId = b.dataset.fl; const r = LABR[LAB.flameId]; LAB.flame = r.cat || r.id; sfx('tap'); labFlame(); labCheck(); window.scrollTo({top: 0, behavior: 'smooth'}); });
+}
+
 async function renderDuels(v){
   v.innerHTML = '<div class="loading" style="min-height:120px">Загружаем дуэли…</div>';
   try { DU.list = await api('duelList', S.student.name, S.student.cls); } catch (e){ v.innerHTML = `<div class="panel">Не удалось загрузить дуэли: ${esc(e.message)}</div>`; return; }
@@ -2565,7 +2913,7 @@ function duelResultScreen(msg, res, won){
     ${res.review ? `<details style="text-align:left; margin-top:10px"><summary>Разбор ошибок</summary><div class="review">${res.review}</div></details>` : ''}
     <button class="btn primary big" id="duBack" style="margin-top:14px">К дуэлям</button></div></div>`;
   if (won){ confetti(); sfx('win'); }
-  document.getElementById('duBack').onclick = () => { if (NAV.game && NAV.on && NAV.depth > 0) history.back(); else { NAV.game = null; helperFab(true); S.view = 'duels'; renderHome(); } };
+  document.getElementById('duBack').onclick = () => { if (NAV.game && NAV.on && NAV.depth > 0) navLeave(); else { NAV.game = null; helperFab(true); S.view = 'duels'; renderHome(); } };
 }
 
 /* ================= Аналитика для учителя ================= */
@@ -2710,7 +3058,7 @@ function drawPeople(){
       return `<div class="panel grp" style="margin-bottom:14px"><div class="row" style="justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:10px">
         <div><h3 style="margin:0">👥 ${esc(g.name)}</h3><div class="small muted">${plural(ms.length, 'ученик', 'ученика', 'учеников')}${gavg != null ? ' · средний результат группы ' + gavg + '%' : ''}</div></div>
         <button class="btn sm danger" data-delg="${esc(g.id)}">Удалить группу</button></div>
-        ${ms.length ? `<div class="tscroll"><table>${head}<tbody>${ms.sort((a, b) => a.name.localeCompare(b.name, 'ru')).map(u => rowHtml(u, g.id, `<button class="btn sm ghost" data-rm="${esc(g.id)}" data-name="${esc(u.name)}" data-cls="${esc(u.cls)}">Убрать</button>`)).join('')}</tbody></table></div>` : '<p class="small muted" style="margin:0">Пока пусто — добавьте учеников из списка ниже.</p>'}</div>`; }).join('')}
+        ${ms.length ? `<div class="tscroll"><table>${head}<tbody>${ms.sort((a, b) => (b.last || '').localeCompare(a.last || '') || a.name.localeCompare(b.name, 'ru')).map(u => rowHtml(u, g.id, `<button class="btn sm ghost" data-rm="${esc(g.id)}" data-name="${esc(u.name)}" data-cls="${esc(u.cls)}">Убрать</button>`)).join('')}</tbody></table></div>` : '<p class="small muted" style="margin:0">Пока пусто — добавьте учеников из списка ниже.</p>'}</div>`; }).join('')}
     <div class="panel"><div class="row" style="justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:10px">
       <div><h3 style="margin:0">Остальные пользователи — ${name}</h3><div class="small muted">${PEOPLE.all ? 'Все пользователи, кроме ваших групп' : 'Кто выполнял задания по предмету «' + name + '» и не входит в ваши группы'}: ${others.length}</div></div>
       <label class="small"><input type="checkbox" id="pAll" ${PEOPLE.all ? 'checked' : ''}> показать всех, включая без результатов</label></div>
@@ -2859,7 +3207,7 @@ function renderHelp(v){
   ];
   v.innerHTML = `<div class="sec"><button class="panel mailcta" id="helpMail"><span class="ic">${MAIL_IC}</span><div class="grow"><h3 style="margin:0">Написать разработчику</h3><div class="small muted">Нашёл ошибку, есть идея или вопрос? Напиши — ответ придёт сюда же.</div></div><span class="pill none">написать</span></button></div>
     <div class="sec"><h2>Виды заданий</h2><div class="grid2">${types.map(t => `<div class="panel helpc">${tile(t[0])}<div><h3>${t[1]}</h3><p>${t[2]}</p></div></div>`).join('')}</div></div>
-    <div class="sec"><h2>Опыт и уровни</h2><div class="panel helpc"><div class="mini" style="width:46px;height:52px;font-size:1.2rem">Li</div><div><p>Каждое задание даёт до 100 опыта — столько, сколько процентов вы набрали. Пройдёте ещё раз лучше — получите разницу. Каждые 100 опыта — новый уровень, следующий элемент таблицы Менделеева: от Водорода H до Ксенона Xe.</p></div></div></div>
+    <div class="sec"><h2>Опыт и уровни</h2><div class="panel helpc"><div class="mini" style="width:46px;height:52px;font-size:1.2rem">Li</div><div><p>Каждое задание даёт до 100 опыта — столько, сколько процентов вы набрали. Опыт и монеты даются за первую попытку, повторные — тренировка для себя. Каждые 100 опыта — новый уровень, следующий элемент таблицы Менделеева: от Водорода H до Оганесона Og — все 118 элементов.</p></div></div></div>
     <div class="sec"><h2>Установить как приложение</h2><div class="grid2">
       <div class="panel"><h3 style="font-size:1rem">Android</h3><ol class="steps"><li>Если учитель прислал файл .apk — откройте его и нажмите «Установить» (разрешите установку из этого источника)</li><li>Или откройте ссылку в Chrome и нажмите «Установить» вверху экрана либо ⋮ → «Установить приложение»</li></ol></div>
       <div class="panel"><h3 style="font-size:1rem">iPhone (Safari)</h3><ol class="steps"><li>Откройте ссылку в Safari</li><li>Нажмите «Поделиться» (квадрат со стрелкой)</li><li>«На экран „Домой“» → «Добавить»</li></ol></div>
@@ -3142,7 +3490,7 @@ function renderResults(){
     const g = groups[k] || (groups[k] = {k, gameId: r.gameId, student: r.student, cls: r.className, best: 0, attempts: [], last: ''});
     g.attempts.push(r); g.best = Math.max(g.best, r.percent); if (r.time > g.last) g.last = r.time;
   });
-  const rows = Object.values(groups).sort((a, b) => gameTitle(a.gameId).localeCompare(gameTitle(b.gameId)) || a.cls.localeCompare(b.cls) || a.student.localeCompare(b.student, 'ru'));
+  const rows = Object.values(groups).sort((a, b) => b.last.localeCompare(a.last) || a.student.localeCompare(b.student, 'ru'));   // самые свежие сверху
   const avg = rows.length ? Math.round(rows.reduce((s, r) => s + r.best, 0) / rows.length) : 0;
   const weak = rows.filter(r => r.best < 50).length;
   box.innerHTML = `
