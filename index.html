@@ -688,6 +688,10 @@ textarea.field.mtext{width:100%; min-height:110px; resize:vertical; font-family:
 @keyframes lfl{from{transform:translateX(-50%) scaleY(1)} to{transform:translateX(-50%) scaleY(1.07) skewX(2deg)}}
 .lloop{position:absolute; left:84px; bottom:120px; font-size:12px; font-weight:700; background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:2px 6px}
 .lab-card .pte{--pc:#3DDC84}
+.izoom{position:fixed;inset:0;z-index:9999;background:rgba(10,12,20,.94);display:flex;flex-direction:column}
+.izoom .izs{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:54px 6px 10px;touch-action:pan-x pan-y pinch-zoom}
+.izoom img{width:100%;max-width:none;display:block;margin:0 auto;border-radius:8px;cursor:zoom-in}
+.izoom .izx{position:absolute;top:10px;right:12px;width:40px;height:40px;border-radius:50%;border:0;background:#fff;color:#111;font-size:20px;z-index:2}
 </style>
 </head>
 <body>
@@ -1715,6 +1719,16 @@ async function renderShelf(k, id){
     <div class="btopics" style="--sc:${sh.color || '#8E4A18'}">${sh.topics.map((t, j) => `<button class="btopic ${read[id + '/' + j] ? 'read' : ''}" data-t="${j}"><span class="no">${read[id + '/' + j] ? '✓' : j + 1}</span><span class="grow"><b>${esc(t)}</b></span></button>`).join('')}</div>`);
   app.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { sfx('tap'); navPush(); renderBookTopic(k, id, +b.dataset.t); window.scrollTo(0, 0); });
 }
+function imgZoom(src){
+  const o = document.createElement('div'); o.className = 'izoom';
+  o.innerHTML = `<button class="izx" aria-label="Закрыть">✕</button><div class="izs"><img alt="" src="${esc(src)}"></div>`;
+  let big = false; const im = o.querySelector('img');
+  im.onclick = e => { e.stopPropagation(); big = !big; im.style.width = big ? '220%' : '100%'; };
+  const close = () => { o.remove(); document.removeEventListener('keydown', kd); };
+  const kd = e => { if (e.key === 'Escape') close(); };
+  o.querySelector('.izx').onclick = close; document.addEventListener('keydown', kd);
+  document.body.appendChild(o);
+}
 async function renderBookTopic(k, id, j){
   NAV.game = () => renderShelf(k, id);
   const idx = await libIndex().catch(() => ({}));
@@ -1736,6 +1750,7 @@ async function renderBookTopic(k, id, j){
   const hs = [...rd.querySelectorAll('.rbody h2')];
   if (hs.length > 1) document.getElementById('rtoc').innerHTML = hs.map((h, i) => `<button data-h="${i}">${esc(h.textContent.trim().slice(0, 60))}</button>`).join('');
   rd.querySelectorAll('[data-h]').forEach(b => b.onclick = () => hs[+b.dataset.h].scrollIntoView({behavior: 'smooth', block: 'start'}));
+  rd.querySelectorAll('.rbody img').forEach(im => { im.style.cursor = 'zoom-in'; im.onclick = () => imgZoom(im.src); });
   const setFs = v => { fs = Math.max(14, Math.min(24, v)); rd.style.setProperty('--rfs', fs + 'px'); try { localStorage.setItem('chem_rfs', fs); } catch(e){} };
   document.getElementById('fsm').onclick = () => setFs(fs - 1);
   document.getElementById('fsp').onclick = () => setFs(fs + 1);
@@ -1752,7 +1767,9 @@ const ART_VIDEO = `<svg viewBox="0 0 220 200" fill="none" stroke="#fff" stroke-w
 const VID = {list: null};
 /* books/videos.json: {"Зоология": {"Простейшие": [{"title": "...", "url": "YouTube / Google Drive / .mp4"}]}, "Общая химия": {...}}
    Книги = разделы предмета, главы = темы раздела (те же, что в заданиях). */
-async function vidList(){ if (!VID.list) { try { VID.list = await libFetch('videos.json'); } catch(e){ VID.list = {}; } } return VID.list || {}; }
+async function vidList(){ if (!VID.list) { try { VID.list = await libFetch('videos.json'); } catch(e){ VID.list = {}; } }
+  if (!VID.shelves) { try { const idx = await libIndex(), m = {}; ['bio', 'chem'].forEach(k => (idx[k] || []).forEach(x => { if (x && x.title && Array.isArray(x.topics)) m[lc(x.title)] = x.topics; })); VID.shelves = m; } catch(e){} }
+  return VID.list || {}; }
 function vidEmbed(url){
   const u = String(url || ''), y = u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([\w-]{11})/);
   if (y) return `<iframe src="https://www.youtube-nocookie.com/embed/${y[1]}?rel=0&modestbranding=1" title="Видео" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe>`;
@@ -1761,8 +1778,9 @@ function vidEmbed(url){
   if (/\.(mp4|webm)(\?|$)/i.test(u)) return `<video src="${esc(u)}" controls controlsList="nodownload" disablepictureinpicture playsinline preload="metadata"></video>`;
   return `<div class="vsoon">🎬 Видео скоро появится</div>`;
 }
-const vidBooks = k => (k === 'bio' ? BIO_BRANCHES : CHEM_BRANCHES);
-const vidChapters = sec => (S.data && S.data.topics || []).filter(t => lc(t.section) === lc(sec)).map(t => t.title);
+const VID_BIO_EXTRA = [{name: 'Экология', color: '#2E9E5B'}];
+const vidBooks = k => (k === 'bio' ? BIO_BRANCHES.concat(VID_BIO_EXTRA) : CHEM_BRANCHES);
+const vidChapters = sec => { const c = (S.data && S.data.topics || []).filter(t => lc(t.section) === lc(sec)).map(t => t.title); return c.length ? c : ((VID.shelves || {})[lc(sec)] || []).slice(); };
 function vidOf(v, sec, ch){ const b = v[sec] || {}; return (Array.isArray(b[ch]) ? b[ch] : []).filter(x => x && x.url); }
 function vidExtra(v, sec){ const known = new Set(vidChapters(sec).map(lc)); return Object.keys(v[sec] || {}).filter(c => !known.has(lc(c))); }
 async function renderVideos(){
