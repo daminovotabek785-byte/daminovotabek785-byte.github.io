@@ -128,6 +128,34 @@
     "Эволюция",
     "История эволюционного учения и развитие жизни на Земле"
    ]
+  },
+  {
+   "id": "bio-al",
+   "title": "Biology AS & A Level",
+   "desc": "Биология по программе A Level на русском с английскими терминами: клетка, генетика, физиология, экология",
+   "color": "#6A3FB5",
+   "topics": [
+    "Строение клетки (Cell structure)",
+    "Биологические молекулы (Biological molecules)",
+    "Ферменты (Enzymes)",
+    "Мембраны и транспорт (Cell membranes and transport)",
+    "Митотический клеточный цикл (The mitotic cell cycle)",
+    "Нуклеиновые кислоты и синтез белка (Nucleic acids and protein synthesis)",
+    "Транспорт у растений (Transport in plants)",
+    "Транспорт у млекопитающих (Transport in mammals)",
+    "Газообмен (Gas exchange)",
+    "Инфекционные болезни (Infectious diseases)",
+    "Иммунитет (Immunity)",
+    "Энергия и дыхание (Energy and respiration)",
+    "Фотосинтез (Photosynthesis)",
+    "Гомеостаз (Homeostasis)",
+    "Контроль и координация (Control and coordination)",
+    "Наследственность (Inheritance)",
+    "Отбор и эволюция (Selection and evolution)",
+    "Классификация, биоразнообразие, охрана (Classification, biodiversity and conservation)",
+    "Генные технологии (Genetic technology)",
+    "Практические навыки и статистика (Practical skills)"
+   ]
   }
  ],
  "chem": [
@@ -375,6 +403,44 @@
     "8.5. Законы Фарадея",
     "9.1. Учёные общей химии — сводная таблица",
     "9.2. Главные формулы — шпаргалка"
+   ]
+  },
+  {
+   "id": "chem-al",
+   "title": "Chemistry AS & A Level",
+   "desc": "Химия по программе A Level на русском с английскими терминами: физическая, неорганическая и органическая",
+   "color": "#1F4E9A",
+   "topics": [
+    "Моли и уравнения (Moles and equations)",
+    "Строение атома (Atomic structure)",
+    "Электроны в атомах (Electrons in atoms)",
+    "Химическая связь (Chemical bonding)",
+    "Агрегатные состояния (States of matter)",
+    "Изменения энтальпии (Enthalpy changes)",
+    "Окислительно-восстановительные реакции (Redox)",
+    "Равновесие (Equilibrium)",
+    "Скорость реакций (Rates of reaction)",
+    "Периодичность (Periodicity)",
+    "Группа 2 (Group 2)",
+    "Группа 17 — галогены (Group 17)",
+    "Азот и сера (Nitrogen and sulfur)",
+    "Введение в органическую химию (Introduction to organic chemistry)",
+    "Углеводороды (Hydrocarbons)",
+    "Галогеналканы (Halogenoalkanes)",
+    "Спирты, сложные эфиры, карбоновые кислоты (Alcohols, esters and carboxylic acids)",
+    "Карбонильные соединения (Carbonyl compounds)",
+    "Энергия решётки (Lattice energy)",
+    "Электрохимия (Electrochemistry)",
+    "Дальнейшее равновесие (Further aspects of equilibria)",
+    "Кинетика (Reaction kinetics)",
+    "Энтропия и энергия Гиббса (Entropy and Gibbs free energy)",
+    "Переходные элементы (Transition elements)",
+    "Бензол и его производные (Benzene and its compounds)",
+    "Карбоновые кислоты и производные (Carboxylic acids and derivatives)",
+    "Азотсодержащие соединения (Organic nitrogen compounds)",
+    "Полимеризация (Polymerisation)",
+    "Аналитическая химия (Analytical chemistry)",
+    "Органический синтез (Organic synthesis)"
    ]
   }
  ]
