@@ -92,5 +92,67 @@
     "url": "https://daminovotabek785-byte.github.io/videos/zoo-v17-mlekopitayushchie-3.mp4"
    }
   ]
+ },
+ "Анатомия человека": {
+  "Опорно-двигательная система": [
+   {
+    "title": "Опорно-двигательная система",
+    "url": "https://daminovotabek785-byte.github.io/videos/anat-v03-ods.mp4"
+   }
+  ],
+  "Кровь и иммунитет": [
+   {
+    "title": "Кровь и внутренняя среда",
+    "url": "https://daminovotabek785-byte.github.io/videos/anat-v04-krov.mp4"
+   }
+  ],
+  "Кровеносная система": [
+   {
+    "title": "Кровеносная система",
+    "url": "https://daminovotabek785-byte.github.io/videos/anat-v05-krovenosnaya.mp4"
+   }
+  ],
+  "Дыхательная система": [
+   {
+    "title": "Дыхательная система",
+    "url": "https://daminovotabek785-byte.github.io/videos/anat-v06-dyhatelnaya.mp4"
+   }
+  ],
+  "Пищеварительная система": [
+   {
+    "title": "Пищеварительная система",
+    "url": "https://daminovotabek785-byte.github.io/videos/anat-v07-pishchevaritelnaya.mp4"
+   }
+  ],
+  "Обмен веществ и витамины": [
+   {
+    "title": "Обмен веществ и энергии",
+    "url": "https://daminovotabek785-byte.github.io/videos/anat-v08-obmen.mp4"
+   }
+  ],
+  "Кожа": [
+   {
+    "title": "Кожа и мочевыделительная система",
+    "url": "https://daminovotabek785-byte.github.io/videos/anat-v09-kozha-vydelenie.mp4"
+   }
+  ],
+  "Мочевыделительная система": [
+   {
+    "title": "Кожа и мочевыделительная система",
+    "url": "https://daminovotabek785-byte.github.io/videos/anat-v09-kozha-vydelenie.mp4"
+   }
+  ],
+  "Нервная система": [
+   {
+    "title": "Нервная система",
+    "url": "https://daminovotabek785-byte.github.io/videos/anat-v10-nervnaya.mp4"
+   }
+  ],
+  "Высшая нервная деятельность": [
+   {
+    "title": "Высшая нервная деятельность",
+    "url": "https://daminovotabek785-byte.github.io/videos/anat-v11-vnd.mp4"
+   }
+  ]
  }
 }
