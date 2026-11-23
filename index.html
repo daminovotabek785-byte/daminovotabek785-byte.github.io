@@ -1780,7 +1780,10 @@ function vidEmbed(url){
 }
 const VID_BIO_EXTRA = [{name: 'Экология', color: '#2E9E5B'}];
 const vidBooks = k => (k === 'bio' ? BIO_BRANCHES.concat(VID_BIO_EXTRA) : CHEM_BRANCHES);
-const vidChapters = sec => { const c = (S.data && S.data.topics || []).filter(t => lc(t.section) === lc(sec)).map(t => t.title); return c.length ? c : ((VID.shelves || {})[lc(sec)] || []).slice(); };
+/* объединённые главы в видео: несколько тем раздела показываются одной главой */
+const VID_MERGE = {'анатомия человека': {'кожа': 'Кожа и мочевыделительная система', 'мочевыделительная система': 'Кожа и мочевыделительная система'}};
+const vidChapters = sec => { let c = (S.data && S.data.topics || []).filter(t => lc(t.section) === lc(sec)).map(t => t.title); if (!c.length) c = ((VID.shelves || {})[lc(sec)] || []).slice();
+  const m = VID_MERGE[lc(sec)]; if (m) c = c.map(t => m[lc(t)] || t).filter((t, i, a) => a.indexOf(t) === i); return c; };
 function vidOf(v, sec, ch){ const b = v[sec] || {}; return (Array.isArray(b[ch]) ? b[ch] : []).filter(x => x && x.url); }
 function vidExtra(v, sec){ const known = new Set(vidChapters(sec).map(lc)); return Object.keys(v[sec] || {}).filter(c => !known.has(lc(c))); }
 async function renderVideos(){
